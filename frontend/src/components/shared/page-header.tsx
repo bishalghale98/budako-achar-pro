@@ -5,6 +5,7 @@ type Align = "left" | "center" | "right";
 interface PageHeaderProps {
   title: string;
   description?: string;
+  tagline?: string;
   align?: Align;
   children?: React.ReactNode;
   className?: string;
@@ -13,6 +14,7 @@ interface PageHeaderProps {
 export function PageHeader({
   title,
   description,
+  tagline,
   align = "left",
   children,
   className,
@@ -26,6 +28,11 @@ export function PageHeader({
         className
       )}
     >
+      {tagline && (
+        <span className="text-maroon font-semibold text-sm tracking-wider uppercase">
+          {tagline}
+        </span>
+      )}
       <h1 className="font-serif text-3xl lg:text-4xl font-bold text-darkText">
         {title}
       </h1>
