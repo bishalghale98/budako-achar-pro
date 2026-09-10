@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { useState } from "react";
 import { useUser } from "@/features/auth/auth-hooks";
 import { LogoutButton } from "@/features/auth/components/logout-button";
@@ -64,8 +65,15 @@ export function Header() {
   return (
     <header className="sticky top-0 z-50 border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="mx-auto flex h-12  max-w-7xl p-6 items-center justify-between px-4 sm:h-14">
-        <Link href="/" className="font-serif text-base font-bold text-maroon">
-          Buda Ko Achar
+        <Link href="/" className="flex items-center">
+          <Image
+            src="/logos/wordmark.png"
+            alt="Buda Ko Achar"
+            width={140}
+            height={40}
+            className="h-8 w-auto"
+            priority
+          />
         </Link>
 
         {/* Desktop nav */}

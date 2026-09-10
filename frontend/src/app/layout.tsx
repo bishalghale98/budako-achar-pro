@@ -17,6 +17,9 @@ export const metadata: Metadata = {
   title: "Buda Ko Achar — Authentic Nepali Pickles",
   description:
     "Handcrafted, traditional Nepali achar made with love. Explore our range of authentic pickles.",
+  icons: {
+    icon: "/logos/facivon logo.png",
+  },
 };
 
 export default function RootLayout({

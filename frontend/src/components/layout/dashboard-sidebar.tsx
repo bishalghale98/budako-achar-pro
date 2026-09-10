@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { cn } from "cn";
 import { Separator } from "@/components/ui/separator";
@@ -136,9 +137,15 @@ export function DashboardSidebar() {
         <div className="flex h-14 items-center px-4">
           <Link
             href="/"
-            className="font-serif text-base font-bold text-maroon"
+            className="flex items-center"
           >
-            Buda Ko Achar
+            <Image
+              src="/logos/wordmark.png"
+              alt="Buda Ko Achar"
+              width={120}
+              height={32}
+              className="h-7 w-auto"
+            />
           </Link>
         </div>
         <Separator className="bg-sidebar-border" />
