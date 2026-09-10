@@ -5,8 +5,8 @@ export default function ContactPage() {
   return (
     <>
 
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
-        <div className="text-center max-w-2xl mx-auto mb-16 space-y-2">
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        <div className="text-center max-w-2xl mx-auto mb-16 ">
           <span className="text-maroon font-semibold text-sm tracking-wider uppercase">
             Get in Touch
           </span>
@@ -102,7 +102,7 @@ export default function ContactPage() {
         </div>
       </main>
 
-    
+
     </>
   );
 }

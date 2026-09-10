@@ -1,0 +1,9 @@
+export { HeroSection } from "./hero-section";
+export { TrustSection } from "./trust-section";
+export { FeaturedProducts } from "./featured-products";
+export { ProductCard } from "./product-card";
+export { BrandStory } from "./brand-story";
+export { WhyChooseUs } from "./why-choose-us";
+export { Testimonials } from "./testimonials";
+export { TestimonialCard } from "./testimonial-card";
+export { CTASection } from "./cta-section";
