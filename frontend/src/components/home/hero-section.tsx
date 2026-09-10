@@ -36,8 +36,8 @@ export function HeroSection() {
         </div>
         <div className="relative flex justify-center">
           <div className="absolute -inset-1 bg-linear-to-r from-gold to-maroon rounded-2xl blur-lg opacity-25" />
-          <div className="relative bg-white p-4 rounded-2xl shadow-xl border border-gray-100 max-w-md w-full">
-            <div className="h-80 bg-gray-100 rounded-xl overflow-hidden flex items-center justify-center relative">
+          <div className="relative bg-white rounded-2xl shadow-xl border border-gray-100 max-w-md w-full overflow-hidden">
+            <div className="h-80 bg-gray-100 overflow-hidden relative">
               <Image
                 src={heroProduct.image}
                 alt={heroProduct.alt}
@@ -49,16 +49,16 @@ export function HeroSection() {
                 {heroProduct.weight}
               </span>
             </div>
-            <div className="mt-4 flex items-center justify-between">
-              <div>
-                <h3 className="font-serif font-bold text-lg">
-                  {heroProduct.name}
-                </h3>
+            <div className="p-4 space-y-2">
+              <h3 className="font-serif font-bold text-lg sm:text-xl">
+                {heroProduct.name}
+              </h3>
+              <div className="flex items-center justify-between">
                 <p className="text-xs text-gray-500">{heroProduct.tagline}</p>
+                <span className="text-maroon font-bold text-lg sm:text-xl">
+                  {heroProduct.price}
+                </span>
               </div>
-              <span className="text-maroon font-bold text-lg">
-                {heroProduct.price}
-              </span>
             </div>
           </div>
         </div>
