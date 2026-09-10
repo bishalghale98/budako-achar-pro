@@ -87,6 +87,17 @@ export function PublicFooter() {
               &copy; {new Date().getFullYear()} Buda Ko Achar. All rights
               reserved.
             </p>
+            <p className="mt-2 text-xs text-gray-500">
+              Crafted with care by{" "}
+              <a
+                href="https://github.com/bishalghale98"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-gold/70 underline-offset-2 transition hover:text-gold hover:underline"
+              >
+                Bishal Ghale
+              </a>
+            </p>
           </div>
         </div>
       </footer>
