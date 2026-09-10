@@ -64,8 +64,8 @@ export function Header() {
   return (
     <header className="sticky top-0 z-50 border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="mx-auto flex h-12  max-w-7xl p-6 items-center justify-between px-4 sm:h-14">
-        <Link href="/" className="font-heading text-base font-semibold">
-          Sanctum SPA
+        <Link href="/" className="font-serif text-base font-bold text-maroon">
+          Buda Ko Achar
         </Link>
 
         {/* Desktop nav */}

@@ -43,7 +43,7 @@ function SidebarNav({
             className={cn(
               "flex items-center gap-2 rounded-md px-3 py-2 text-sm font-medium transition-colors",
               isActive
-                ? "bg-sidebar-accent text-sidebar-accent-foreground"
+                ? "bg-maroon/10 text-maroon font-semibold"
                 : "text-sidebar-foreground/70 hover:bg-sidebar-accent/50 hover:text-sidebar-foreground"
             )}
           >
@@ -75,7 +75,7 @@ function SidebarUser() {
   return (
     <div className="border-t border-sidebar-border p-3">
       <div className="flex items-center gap-3">
-        <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-sidebar-accent text-xs font-semibold text-sidebar-accent-foreground">
+        <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-maroon/10 text-xs font-bold text-maroon">
           {user.name
             .split(" ")
             .map((n) => n[0])
@@ -94,7 +94,7 @@ function SidebarUser() {
       </div>
       <div className="mt-3 flex items-center gap-2">
         {user.role && (
-          <span className="inline-flex items-center rounded-md bg-sidebar-accent px-2 py-0.5 text-[11px] font-medium text-sidebar-accent-foreground capitalize">
+          <span className="inline-flex items-center rounded-md bg-gold/15 px-2 py-0.5 text-[11px] font-bold text-maroon capitalize">
             {user.role}
           </span>
         )}
@@ -136,9 +136,9 @@ export function DashboardSidebar() {
         <div className="flex h-14 items-center px-4">
           <Link
             href="/"
-            className="font-heading text-base font-semibold text-sidebar-foreground"
+            className="font-serif text-base font-bold text-maroon"
           >
-            Sanctum SPA
+            Buda Ko Achar
           </Link>
         </div>
         <Separator className="bg-sidebar-border" />

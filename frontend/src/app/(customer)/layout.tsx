@@ -3,7 +3,8 @@
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { useAuth } from "@/features/auth/auth-hooks";
-import { Header } from "@/components/layout";
+import { PublicHeader } from "@/components/layout/public-header";
+import { PublicFooter } from "@/components/layout/public-footer";
 
 function DashboardGuard({ children }: { children: React.ReactNode }) {
   const router = useRouter();
@@ -59,13 +60,12 @@ export default function CustomerLayout({
   children: React.ReactNode;
 }) {
   return (
-    
-    <div className="min-h-screen" style={{ backgroundColor: "#F8F6F2" }}>
-      <Header />
-
-      <div className="mx-auto max-w-7xl p-6">
+    <>
+      <PublicHeader />
+      <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
         <DashboardGuard>{children}</DashboardGuard>
       </div>
-    </div>
+      <PublicFooter />
+    </>
   );
 }

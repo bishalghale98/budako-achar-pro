@@ -210,8 +210,7 @@ export default function CustomerPage() {
           {/* User Profile */}
           <div className="flex items-center gap-3 border-b border-slate-100 pb-6">
             <div
-              className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-sm font-bold"
-              style={{ backgroundColor: "rgba(120, 27, 27, 0.1)", color: "#781B1B" }}
+              className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-maroon/10 text-sm font-bold text-maroon"
             >
               {initials}
             </div>
@@ -232,7 +231,7 @@ export default function CustomerPage() {
                   href={item.href}
                   className={
                     isActive
-                      ? "flex items-center gap-3 rounded-xl bg-[#781B1B] px-4 py-3 text-sm font-medium text-white"
+                      ? "flex items-center gap-3 rounded-xl bg-maroon px-4 py-3 text-sm font-medium text-white"
                       : "flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-medium text-slate-600 transition-colors hover:bg-slate-50"
                   }
                 >
@@ -264,12 +263,10 @@ export default function CustomerPage() {
       <div className="space-y-6 lg:col-span-3">
         {/* Welcome Banner */}
         <div
-          className="flex items-center gap-4 rounded-2xl border p-6"
-          style={{ backgroundColor: "#FDF6EC", borderColor: "#F4E4CE" }}
+          className="flex items-center gap-4 rounded-2xl border border-cream bg-cream/50 p-6"
         >
           <div
-            className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl"
-            style={{ backgroundColor: "rgba(244, 228, 206, 0.6)", color: "#781B1B" }}
+            className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-maroon/10 text-maroon"
           >
             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
               <path d="M15 21v-8a1 1 0 0 0-1-1h-4a1 1 0 0 0-1 1v8" />
@@ -277,7 +274,7 @@ export default function CustomerPage() {
             </svg>
           </div>
           <div>
-            <h1 className="text-xl font-bold" style={{ color: "#781B1B" }}>
+            <h1 className="text-xl font-bold text-maroon">
               Namaste, {user.name}
             </h1>
             <p className="text-sm text-slate-600">
@@ -310,7 +307,7 @@ export default function CustomerPage() {
             <Link
               key={action.title}
               href={action.href}
-              className="group flex items-start gap-4 rounded-2xl border border-slate-100 bg-white p-5 transition-colors hover:border-[#781B1B]/30"
+              className="group flex items-start gap-4 rounded-2xl border border-slate-100 bg-white p-5 transition-colors hover:border-maroon/30"
             >
               <div className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-xl ${action.iconBg} ${action.iconColor}`}>
                 {action.icon}
@@ -329,8 +326,7 @@ export default function CustomerPage() {
             <h2 className="font-semibold text-slate-900">Recent Orders</h2>
             <Link
               href="/customer/orders"
-              className="text-xs font-semibold hover:underline"
-              style={{ color: "#781B1B" }}
+              className="text-xs font-semibold text-maroon hover:underline"
             >
               View All
             </Link>
@@ -339,7 +335,7 @@ export default function CustomerPage() {
             {recentOrders.map((order) => (
               <div key={order.id} className="flex items-center justify-between px-6 py-4">
                 <div>
-                  <p className="text-sm font-bold" style={{ color: "#781B1B" }}>
+                  <p className="text-sm font-bold text-maroon">
                     {order.id}
                   </p>
                   <p className="text-xs text-slate-500">{order.date}</p>

@@ -73,7 +73,7 @@ export function ResetPasswordForm() {
     return (
       <Card className="w-full max-w-sm">
         <CardHeader className="text-center">
-          <CardTitle className="font-heading text-xl">Invalid link</CardTitle>
+          <CardTitle className="font-serif text-xl">Invalid link</CardTitle>
         </CardHeader>
         <CardContent>
           <Alert variant="destructive">
@@ -107,7 +107,7 @@ export function ResetPasswordForm() {
     return (
       <Card className="w-full max-w-sm">
         <CardHeader className="text-center">
-          <CardTitle className="font-heading text-xl">Password reset</CardTitle>
+          <CardTitle className="font-serif text-xl">Password reset</CardTitle>
         </CardHeader>
         <CardContent>
           <Alert>
@@ -126,7 +126,7 @@ export function ResetPasswordForm() {
   return (
     <Card className="w-full max-w-sm">
       <CardHeader className="text-center">
-        <CardTitle className="font-heading text-xl">Reset password</CardTitle>
+        <CardTitle className="font-serif text-xl">Reset password</CardTitle>
         <CardDescription>
           Enter your new password below.
         </CardDescription>
