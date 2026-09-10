@@ -23,7 +23,7 @@ export default function OrderSuccessPage() {
             <p className="font-bold text-darkText">#BKA-1024</p>
           </div>
           <p className="text-xs text-gray-500">
-            We'll contact you regarding delivery to your provided address in
+            We&apos;ll contact you regarding delivery to your provided address in
             Itahari.
           </p>
           <div className="space-y-3 pt-2">

@@ -24,6 +24,7 @@ export default function CartPage() {
                                         alt="Chicken Achar"
                                         fill
                                         className="object-cover"
+                                        sizes="64px"
                                     />
                                 </div>
                                 <div>
@@ -51,6 +52,7 @@ export default function CartPage() {
                                         alt="Buff Achar"
                                         fill
                                         className="object-cover"
+                                        sizes="64px"
                                     />
                                 </div>
                                 <div>

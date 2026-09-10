@@ -7,8 +7,7 @@ import {
   CheckCircle,
   MapPin,
   ArrowRight,
-  ShieldCheck,
-  Sparkles,
+
 } from "lucide-react";
 
 export default function Home() {
@@ -16,7 +15,7 @@ export default function Home() {
     <>
 
         {/* HERO SECTION */}
-        <section className="relative bg-gradient-to-br from-maroon/5 via-white to-gold/10 py-16 lg:py-24 overflow-hidden">
+        <section className="relative bg-linear-to-br from-maroon/5 via-white to-gold/10 py-16 lg:py-24 overflow-hidden">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
             <div className="space-y-6 text-center lg:text-left">
               <div className="inline-flex items-center gap-2 bg-gold/20 text-maroon px-3 py-1 rounded-full text-xs font-semibold">
@@ -45,7 +44,7 @@ export default function Home() {
               </div>
             </div>
             <div className="relative flex justify-center">
-              <div className="absolute -inset-1 bg-gradient-to-r from-gold to-maroon rounded-2xl blur-lg opacity-25"></div>
+              <div className="absolute -inset-1 bg-linear-to-r from-gold to-maroon rounded-2xl blur-lg opacity-25"></div>
               <div className="relative bg-white p-4 rounded-2xl shadow-xl border border-gray-100 max-w-md w-full">
                 <div className="h-80 bg-gray-100 rounded-xl overflow-hidden flex items-center justify-center relative">
                   <Image
@@ -53,6 +52,7 @@ export default function Home() {
                     alt="Buda Ko Achar Jar"
                     fill
                     className="object-cover"
+                    sizes="(max-width: 768px) 100vw, 50vw"
                   />
                   <span className="absolute bottom-3 left-3 bg-white/90 backdrop-blur px-3 py-1 rounded text-xs font-semibold text-maroon shadow">
                     Traditional Glass Jar · 500g
@@ -128,12 +128,13 @@ export default function Home() {
             {/* Product Card 1 */}
             <div className="bg-white rounded-xl border border-gray-200 overflow-hidden shadow-sm hover:shadow-md transition group">
               <div className="h-60 bg-gray-100 overflow-hidden relative">
-                <Image
-                  src="https://images.unsplash.com/photo-1540420773420-3366772f4999?auto=format&fit=crop&q=80&w=600"
-                  alt="Chicken Achar"
-                  fill
-                  className="object-cover group-hover:scale-105 transition duration-300"
-                />
+                  <Image
+                    src="https://images.unsplash.com/photo-1540420773420-3366772f4999?auto=format&fit=crop&q=80&w=600"
+                    alt="Chicken Achar"
+                    fill
+                    className="object-cover group-hover:scale-105 transition duration-300"
+                    sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                  />
                 <span className="absolute top-3 right-3 bg-white/90 backdrop-blur px-2.5 py-1 rounded-full text-xs font-semibold text-maroon shadow-sm">
                   500g
                 </span>
@@ -161,12 +162,13 @@ export default function Home() {
             {/* Product Card 2 */}
             <div className="bg-white rounded-xl border border-gray-200 overflow-hidden shadow-sm hover:shadow-md transition group">
               <div className="h-60 bg-gray-100 overflow-hidden relative">
-                <Image
-                  src="https://images.unsplash.com/photo-1555939594-58d7cb561ad1?auto=format&fit=crop&q=80&w=600"
-                  alt="Buff Achar"
-                  fill
-                  className="object-cover group-hover:scale-105 transition duration-300"
-                />
+                  <Image
+                    src="https://images.unsplash.com/photo-1555939594-58d7cb561ad1?auto=format&fit=crop&q=80&w=600"
+                    alt="Buff Achar"
+                    fill
+                    className="object-cover group-hover:scale-105 transition duration-300"
+                    sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                  />
                 <span className="absolute top-3 right-3 bg-white/90 backdrop-blur px-2.5 py-1 rounded-full text-xs font-semibold text-maroon shadow-sm">
                   500g
                 </span>
@@ -194,12 +196,13 @@ export default function Home() {
             {/* Product Card 3 */}
             <div className="bg-white rounded-xl border border-gray-200 overflow-hidden shadow-sm hover:shadow-md transition group">
               <div className="h-60 bg-gray-100 overflow-hidden relative">
-                <Image
-                  src="https://images.unsplash.com/photo-1588166524941-3bf61a9c41db?auto=format&fit=crop&q=80&w=600"
-                  alt="Mutton Achar"
-                  fill
-                  className="object-cover group-hover:scale-105 transition duration-300"
-                />
+                  <Image
+                    src="https://images.unsplash.com/photo-1588166524941-3bf61a9c41db?auto=format&fit=crop&q=80&w=600"
+                    alt="Mutton Achar"
+                    fill
+                    className="object-cover group-hover:scale-105 transition duration-300"
+                    sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                  />
                 <span className="absolute top-3 right-3 bg-white/90 backdrop-blur px-2.5 py-1 rounded-full text-xs font-semibold text-maroon shadow-sm">
                   500g
                 </span>
@@ -255,6 +258,7 @@ export default function Home() {
                   alt="Nepali spices and jar"
                   fill
                   className="object-cover"
+                  sizes="(max-width: 1024px) 100vw, 50vw"
                 />
               </div>
             </div>

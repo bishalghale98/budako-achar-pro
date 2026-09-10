@@ -18,6 +18,7 @@ export default function ProductDetailsPage() {
                 fill
                 className="object-cover"
                 priority
+                sizes="(max-width: 768px) 100vw, 50vw"
               />
             </div>
             <div className="grid grid-cols-4 gap-4">
@@ -27,6 +28,7 @@ export default function ProductDetailsPage() {
                   alt="Chicken Achar thumbnail 1"
                   fill
                   className="object-cover"
+                  sizes="80px"
                 />
               </div>
               <div className="h-20 bg-white border border-gray-200 rounded-lg overflow-hidden cursor-pointer opacity-70 relative">
@@ -35,6 +37,7 @@ export default function ProductDetailsPage() {
                   alt="Chicken Achar thumbnail 2"
                   fill
                   className="object-cover"
+                  sizes="80px"
                 />
               </div>
             </div>

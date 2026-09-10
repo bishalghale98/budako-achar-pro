@@ -80,6 +80,7 @@ export default function ProductsPage() {
                     alt="Chicken Achar"
                     fill
                     className="object-cover"
+                    sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
                   />
                 </div>
                 <div className="p-4">
@@ -110,6 +111,7 @@ export default function ProductsPage() {
                     alt="Buff Achar"
                     fill
                     className="object-cover"
+                    sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
                   />
                 </div>
                 <div className="p-4">
@@ -140,6 +142,7 @@ export default function ProductsPage() {
                     alt="Mutton Achar"
                     fill
                     className="object-cover"
+                    sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
                   />
                 </div>
                 <div className="p-4">
@@ -170,6 +173,7 @@ export default function ProductsPage() {
                     alt="Lapsi Achar"
                     fill
                     className="object-cover"
+                    sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
                   />
                 </div>
                 <div className="p-4">
@@ -200,6 +204,7 @@ export default function ProductsPage() {
                     alt="Timur Achar"
                     fill
                     className="object-cover"
+                    sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
                   />
                 </div>
                 <div className="p-4">
@@ -230,6 +235,7 @@ export default function ProductsPage() {
                     alt="Mixed Achar"
                     fill
                     className="object-cover"
+                    sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
                   />
                 </div>
                 <div className="p-4">
