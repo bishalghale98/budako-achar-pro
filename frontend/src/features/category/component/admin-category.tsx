@@ -1,6 +1,9 @@
 "use client";
 
 import { useState } from "react";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
 import {
   useGetAdminCategoriesQuery,
   useCreateAdminCategoryMutation,
@@ -23,13 +26,17 @@ import {
 import { ConfirmDeleteDialog } from "@/components/shared";
 import { Plus, Pencil, Trash2, FolderOpen, Search } from "lucide-react";
 
+const categorySchema = z.object({
+  name: z.string().min(1, "Category name is required").max(255, "Name too long"),
+});
+
+type CategoryFormValues = z.infer<typeof categorySchema>;
+
 export default function CategoryContent() {
   const [page, setPage] = useState(1);
   const [search, setSearch] = useState("");
   const [open, setOpen] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
-  const [name, setName] = useState("");
-  const [error, setError] = useState("");
 
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [deletingId, setDeletingId] = useState<string | null>(null);
@@ -43,17 +50,25 @@ export default function CategoryContent() {
   const categories = data?.categories ?? [];
   const pagination = data?.pagination;
 
+  const {
+    register,
+    handleSubmit,
+    reset,
+    setError,
+    formState: { errors },
+  } = useForm<CategoryFormValues>({
+    resolver: zodResolver(categorySchema),
+  });
+
   const openCreate = () => {
     setEditingId(null);
-    setName("");
-    setError("");
+    reset({ name: "" });
     setOpen(true);
   };
 
   const openEdit = (id: string, currentName: string) => {
     setEditingId(id);
-    setName(currentName);
-    setError("");
+    reset({ name: currentName });
     setOpen(true);
   };
 
@@ -63,20 +78,18 @@ export default function CategoryContent() {
     setDeleteDialogOpen(true);
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setError("");
-
+  const onSubmit = async (data: CategoryFormValues) => {
     try {
       if (editingId) {
-        await updateCategory({ id: editingId, name }).unwrap();
+        await updateCategory({ id: editingId, name: data.name }).unwrap();
       } else {
-        await createCategory({ name }).unwrap();
+        await createCategory({ name: data.name }).unwrap();
       }
       setOpen(false);
+      reset();
     } catch (err: unknown) {
       const apiError = err as { data?: { message?: string } };
-      setError(apiError?.data?.message || "Something went wrong");
+      setError("root", { message: apiError?.data?.message || "Something went wrong" });
     }
   };
 
@@ -235,25 +248,26 @@ export default function CategoryContent() {
             <DialogTitle>{editingId ? "Edit Category" : "Add Category"}</DialogTitle>
           </DialogHeader>
 
-          {error && (
-            <Alert variant="destructive">
-              <AlertDescription>{error}</AlertDescription>
-            </Alert>
-          )}
+          <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+            {errors.root && (
+              <Alert variant="destructive">
+                <AlertDescription>{errors.root.message}</AlertDescription>
+              </Alert>
+            )}
 
-          <form onSubmit={handleSubmit} className="space-y-4">
             <div className="space-y-2">
               <Label htmlFor="category-name" className="text-sm font-medium text-slate-700">
                 Category Name
               </Label>
               <Input
                 id="category-name"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
+                {...register("name")}
                 placeholder="e.g. Non-Veg Achar"
                 className="h-10"
-                required
               />
+              {errors.name && (
+                <p className="text-sm text-red-500">{errors.name.message}</p>
+              )}
             </div>
 
             <DialogFooter>
