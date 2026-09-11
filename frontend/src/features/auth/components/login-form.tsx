@@ -153,11 +153,11 @@ export function LoginForm() {
 
       {/* Divider */}
       <div className="relative flex py-2 items-center">
-        <div className="flex-grow border-t border-gray-200" />
-        <span className="flex-shrink mx-4 text-gray-400 text-xs uppercase tracking-wide">
+        <div className="grow border-t border-gray-200" />
+        <span className="shrink mx-4 text-gray-400 text-xs uppercase tracking-wide">
           or
         </span>
-        <div className="flex-grow border-t border-gray-200" />
+        <div className="grow border-t border-gray-200" />
       </div>
 
       {/* Register */}

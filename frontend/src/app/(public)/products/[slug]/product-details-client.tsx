@@ -67,8 +67,16 @@ export function ProductDetailsClient({
       <div className="space-y-4 pt-4 border-t border-gray-200">
         <QuantitySelector value={quantity} onChange={setQuantity} />
         <div className="flex flex-col sm:flex-row gap-4 pt-4">
-          <AddToCartButton />
-          <BuyNowButton />
+          <AddToCartButton
+            productId={product.id}
+            variantId={selectedVariantId}
+            quantity={quantity}
+          />
+          <BuyNowButton
+            productId={product.id}
+            variantId={selectedVariantId}
+            quantity={quantity}
+          />
         </div>
       </div>
 

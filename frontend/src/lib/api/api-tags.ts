@@ -4,6 +4,7 @@ export const tagTypes = [
   "Products",
   "Categories",
   "Reviews",
+  "Cart",
   "AdminProducts",
   "AdminVariants",
   "AdminImages",

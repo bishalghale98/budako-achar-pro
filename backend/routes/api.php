@@ -11,6 +11,8 @@ use App\Http\Controllers\Api\Auth\MeController;
 use App\Http\Controllers\Api\Auth\RegisterController;
 use App\Http\Controllers\Api\Auth\ResetPasswordController;
 use App\Http\Controllers\Api\User\ProfileController;
+use App\Http\Controllers\Api\CartController;
+use App\Http\Controllers\Api\CartItemController;
 use App\Http\Controllers\Api\ProductController;
 use App\Http\Controllers\Api\ProductReviewController;
 use App\Http\Controllers\Api\CategoryController;
@@ -19,12 +21,13 @@ use App\Http\Controllers\Api\Admin\AdminProductVariantController;
 use App\Http\Controllers\Api\Admin\AdminProductImageController;
 use App\Http\Controllers\Api\Admin\AdminProductReviewController;
 use App\Models\User;
+use Illuminate\Session\Middleware\StartSession;
 use Illuminate\Support\Facades\Route;
 
 // Public authentication routes
 Route::post('/register', RegisterController::class)->middleware('throttle:register');
 Route::post('/login', LoginController::class)
-    ->middleware([\Illuminate\Session\Middleware\StartSession::class, 'throttle:login']);
+    ->middleware([StartSession::class, 'throttle:login']);
 
 // Password recovery (public)
 Route::post('/forgot-password', ForgotPasswordController::class)->middleware('throttle:forgot-password');
@@ -40,11 +43,11 @@ Route::middleware('auth:sanctum')->group(function () {
     // Auth actions
     Route::get('/me', MeController::class);
     Route::post('/logout', LogoutController::class)
-        ->middleware([\Illuminate\Session\Middleware\StartSession::class]);
+        ->middleware([StartSession::class]);
     Route::post('/logout-all', LogoutAllController::class)
-        ->middleware([\Illuminate\Session\Middleware\StartSession::class, 'throttle:logout-all']);
+        ->middleware([StartSession::class, 'throttle:logout-all']);
     Route::post('/change-password', ChangePasswordController::class)
-        ->middleware([\Illuminate\Session\Middleware\StartSession::class]);
+        ->middleware([StartSession::class]);
 
     // Email verification resend
     Route::post('/email/verification-notification', [EmailVerificationController::class, 'send'])
@@ -65,6 +68,15 @@ Route::get('/products', [ProductController::class, 'index']);
 Route::get('/products/{slug}', [ProductController::class, 'show']);
 Route::get('/products/{slug}/reviews', [ProductController::class, 'reviews']);
 Route::get('/categories', [CategoryController::class, 'index']);
+
+// Guest cart (public, no auth required)
+Route::middleware(StartSession::class)->group(function () {
+    Route::get('/cart', [CartController::class, 'index']);
+    Route::delete('/cart', [CartController::class, 'destroy']);
+    Route::post('/cart/items', [CartItemController::class, 'store']);
+    Route::patch('/cart/items/{cartItem}', [CartItemController::class, 'update']);
+    Route::delete('/cart/items/{cartItem}', [CartItemController::class, 'destroy']);
+});
 
 // Admin routes
 Route::middleware(['auth:sanctum', 'role:' . Role::Admin->value])->prefix('admin')->group(function () {
