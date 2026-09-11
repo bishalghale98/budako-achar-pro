@@ -1,10 +1,9 @@
 "use client";
 
 import Link from "next/link";
-import Image from "next/image";
 import { useGetCartQuery, useUpdateCartItemMutation, useRemoveCartItemMutation } from "@/features/cart";
 import { Skeleton } from "@/components/ui/skeleton";
-import { OrderSummary } from "@/components/cart";
+import { CartItemCard, OrderSummary } from "@/components/cart";
 import { ShoppingBag } from "lucide-react";
 
 export default function CartPage() {
@@ -19,14 +18,19 @@ export default function CartPage() {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           <div className="lg:col-span-2 space-y-4">
             {Array.from({ length: 2 }).map((_, i) => (
-              <div key={i} className="bg-white p-6 rounded-xl border border-gray-200 shadow-sm flex items-center gap-4">
-                <Skeleton className="w-16 h-16 rounded-lg flex-shrink-0" />
+              <div key={i} className="bg-white p-4 rounded-xl border border-gray-200 shadow-sm flex items-center gap-4">
+                <Skeleton className="w-24 h-24 rounded-lg flex-shrink-0" />
                 <div className="flex-1 space-y-2">
-                  <Skeleton className="h-5 w-40" />
+                  <div className="flex justify-between">
+                    <Skeleton className="h-5 w-40" />
+                    <Skeleton className="h-5 w-5" />
+                  </div>
                   <Skeleton className="h-4 w-24" />
-                  <Skeleton className="h-4 w-20" />
+                  <div className="flex justify-between pt-1">
+                    <Skeleton className="h-4 w-16" />
+                    <Skeleton className="h-8 w-24" />
+                  </div>
                 </div>
-                <Skeleton className="h-8 w-20" />
               </div>
             ))}
           </div>
@@ -91,81 +95,12 @@ export default function CartPage() {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         <div className="lg:col-span-2 space-y-4">
           {cart.items.map((item) => (
-            <div
+            <CartItemCard
               key={item.id}
-              className="bg-white p-6 rounded-xl border border-gray-200 shadow-sm flex items-center justify-between"
-            >
-              <div className="flex items-center gap-4">
-                <div className="w-16 h-16 bg-gray-100 rounded-lg overflow-hidden flex-shrink-0 relative">
-                  {item.product.thumbnail_url ? (
-                    <Image
-                      src={item.product.thumbnail_url}
-                      alt={item.product.title}
-                      fill
-                      className="object-cover"
-                      sizes="64px"
-                    />
-                  ) : (
-                    <div className="w-full h-full flex items-center justify-center text-gray-400 text-xs">
-                      No img
-                    </div>
-                  )}
-                </div>
-                <div>
-                  <h3 className="font-serif font-bold text-base text-darkText">
-                    {item.product.title}
-                  </h3>
-                  <p className="text-xs text-gray-500">
-                    {item.variant.name}
-                    {item.variant.weight && (
-                      <> &middot; {item.variant.weight}{item.variant.unit}</>
-                    )}
-                  </p>
-                  <p className="text-maroon font-bold text-sm mt-1">
-                    NPR {item.unit_price}
-                  </p>
-                </div>
-              </div>
-              <div className="flex items-center gap-4">
-                <div className="inline-flex items-center border border-gray-300 rounded-lg bg-white">
-                  <button
-                    onClick={() => {
-                      if (item.quantity <= 1) {
-                        removeCartItem(item.id);
-                      } else {
-                        updateCartItem({
-                          cartItem: item.id,
-                          quantity: item.quantity - 1,
-                        });
-                      }
-                    }}
-                    className="px-3 py-1 text-gray-600 hover:bg-gray-100 transition text-sm"
-                  >
-                    -
-                  </button>
-                  <span className="px-3 py-1 text-sm font-semibold">
-                    {item.quantity}
-                  </span>
-                  <button
-                    onClick={() =>
-                      updateCartItem({
-                        cartItem: item.id,
-                        quantity: item.quantity + 1,
-                      })
-                    }
-                    className="px-3 py-1 text-gray-600 hover:bg-gray-100 transition text-sm"
-                  >
-                    +
-                  </button>
-                </div>
-                <button
-                  onClick={() => removeCartItem(item.id)}
-                  className="text-red-500 hover:text-red-700 text-sm font-medium transition"
-                >
-                  Remove
-                </button>
-              </div>
-            </div>
+              item={item}
+              onUpdateQuantity={(id, qty) => updateCartItem({ cartItem: id, quantity: qty })}
+              onRemove={(id) => removeCartItem(id)}
+            />
           ))}
         </div>
         <OrderSummary subtotal={cart.subtotal} />

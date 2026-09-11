@@ -5,8 +5,10 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Card, CardContent } from "@/components/ui/card";
 import { PaymentMethodRadio } from "./payment-method";
 import { PaymentProofUpload } from "./payment-proof-upload";
 
@@ -119,7 +121,7 @@ export function CustomerForm({
     hasError ? "border-destructive" : "";
 
   return (
-    <div className="bg-background sm:bg-card p-0 sm:p-8 rounded-none sm:rounded-xl border-0 sm:border border-border shadow-none sm:shadow-sm space-y-6">
+    <div className=" sm:bg-card p-0 sm:p-8 rounded-none sm:rounded-xl border-0 sm:border border-border shadow-none sm:shadow-sm space-y-6">
       <h2 className="font-serif text-xl font-bold text-darkText">
         Customer & Delivery Information
       </h2>
@@ -238,13 +240,11 @@ export function CustomerForm({
           <Label htmlFor="delivery_notes" className="text-xs font-bold uppercase text-muted-foreground">
             Delivery Notes (Optional)
           </Label>
-          <textarea
+          <Textarea
             id="delivery_notes"
             rows={2}
             placeholder="Special instructions for delivery"
-            className={`w-full min-h-[60px] rounded-lg border border-input bg-transparent px-3 py-2 text-base transition-colors outline-none placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 md:text-sm ${
-              errors.delivery_notes ? "border-destructive" : ""
-            }`}
+            className={errors.delivery_notes ? "border-destructive" : ""}
             {...register("delivery_notes")}
           />
         </div>
@@ -257,6 +257,82 @@ export function CustomerForm({
             error={errors.payment_method?.message}
           />
         </div>
+
+        {paymentMethod === "digital" && (
+          <Card>
+            <CardContent className="flex flex-col sm:flex-row items-center gap-6">
+              <div className="shrink-0">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src="https://images.unsplash.com/photo-1595079676339-1534801ad6cf?q=80&w=1170&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
+                  alt="QR Code"
+                  className="w-48 h-48 rounded-xl object-cover"
+                />
+              </div>
+              <div className="space-y-2 text-sm text-center sm:text-left">
+                <h4 className="font-bold text-darkText uppercase tracking-wide">
+                  eSewa / Khalti Payment
+                </h4>
+                <div className="space-y-1 text-muted-foreground">
+                  <p>
+                    <span className="font-medium text-darkText">Account Name:</span>{" "}
+                    Budako Achar Udyog
+                  </p>
+                  <p>
+                    <span className="font-medium text-darkText">Wallet Number:</span>{" "}
+                    9800000000
+                  </p>
+                </div>
+                <p className="text-xs text-muted-foreground">
+                  Scan the QR code or send payment to the number above. Then upload
+                  your payment screenshot below.
+                </p>
+              </div>
+            </CardContent>
+          </Card>
+        )}
+
+        {paymentMethod === "bank" && (
+          <Card>
+            <CardContent className="flex flex-col sm:flex-row items-center gap-6">
+              <div className="shrink-0">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src="https://images.unsplash.com/photo-1595079676339-1534801ad6cf?q=80&w=1170&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
+                  alt="QR Code"
+                  className="w-48 h-48 rounded-xl object-cover"
+                />
+              </div>
+              <div className="space-y-2 text-sm text-center sm:text-left">
+                <h4 className="font-bold text-darkText uppercase tracking-wide">
+                  Bank Transfer
+                </h4>
+                <div className="space-y-1 text-muted-foreground">
+                  <p>
+                    <span className="font-medium text-darkText">Bank:</span>{" "}
+                    Global IME Bank
+                  </p>
+                  <p>
+                    <span className="font-medium text-darkText">Account Name:</span>{" "}
+                    Budako Achar Udyog
+                  </p>
+                  <p>
+                    <span className="font-medium text-darkText">Account Number:</span>{" "}
+                    01234567890123
+                  </p>
+                  <p>
+                    <span className="font-medium text-darkText">Branch:</span>{" "}
+                    Biratnagar
+                  </p>
+                </div>
+                <p className="text-xs text-muted-foreground">
+                  Transfer the exact order amount to the account above. Then upload
+                  your payment screenshot below.
+                </p>
+              </div>
+            </CardContent>
+          </Card>
+        )}
 
         {paymentMethod !== "cod" && (
           <div className="pt-4 border-t border-border">

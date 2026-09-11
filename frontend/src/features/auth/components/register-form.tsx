@@ -7,8 +7,8 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { useRegisterMutation } from "@/features/auth/auth-api";
-import { Eye, EyeOff } from "lucide-react";
-import { useState } from "react";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 
 const registerSchema = z
   .object({
@@ -30,7 +30,6 @@ type RegisterFormValues = z.infer<typeof registerSchema>;
 export function RegisterForm() {
   const router = useRouter();
   const [registerUser, { isLoading, error }] = useRegisterMutation();
-  const [showPassword, setShowPassword] = useState(false);
 
   const {
     register,
@@ -66,11 +65,6 @@ export function RegisterForm() {
     }
   };
 
-  const inputClass = (field?: boolean) =>
-    `w-full px-4 py-3 border rounded-lg text-sm text-darkText focus:outline-none focus:border-maroon transition ${
-      field ? "border-red-400" : "border-gray-300"
-    }`;
-
   return (
     <div className="max-w-md w-full bg-white p-8 sm:p-10 rounded-2xl border border-gray-200 shadow-sm space-y-6">
       <div className="text-center space-y-2">
@@ -89,76 +83,71 @@ export function RegisterForm() {
       )}
 
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-        <div>
-          <label className="block text-xs font-bold uppercase text-gray-500 mb-1">
+        <div className="space-y-1.5">
+          <Label htmlFor="name" className="text-xs font-bold uppercase text-gray-500">
             Full Name
-          </label>
-          <input
+          </Label>
+          <Input
+            id="name"
             type="text"
             placeholder="Your name"
             autoComplete="name"
-            className={inputClass(!!errors.name)}
+            className={errors.name ? "border-destructive" : ""}
             {...register("name")}
           />
           {errors.name && (
-            <p className="text-xs text-red-500 mt-1">{errors.name.message}</p>
+            <p className="text-xs text-red-500">{errors.name.message}</p>
           )}
         </div>
 
-        <div>
-          <label className="block text-xs font-bold uppercase text-gray-500 mb-1">
+        <div className="space-y-1.5">
+          <Label htmlFor="email" className="text-xs font-bold uppercase text-gray-500">
             Email Address
-          </label>
-          <input
+          </Label>
+          <Input
+            id="email"
             type="email"
             placeholder="you@example.com"
             autoComplete="email"
-            className={inputClass(!!errors.email)}
+            className={errors.email ? "border-destructive" : ""}
             {...register("email")}
           />
           {errors.email && (
-            <p className="text-xs text-red-500 mt-1">{errors.email.message}</p>
+            <p className="text-xs text-red-500">{errors.email.message}</p>
           )}
         </div>
 
-        <div>
-          <label className="block text-xs font-bold uppercase text-gray-500 mb-1">
+        <div className="space-y-1.5">
+          <Label htmlFor="password" className="text-xs font-bold uppercase text-gray-500">
             Password
-          </label>
-          <div className="relative">
-            <input
-              type={showPassword ? "text" : "password"}
-              autoComplete="new-password"
-              placeholder="••••••••"
-              className={inputClass(!!errors.password)}
-              {...register("password")}
-            />
-            <button
-              type="button"
-              onClick={() => setShowPassword(!showPassword)}
-              className="absolute right-3 top-3.5 text-gray-500 hover:text-darkText transition"
-            >
-              {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-            </button>
-          </div>
-          {errors.password && (
-            <p className="text-xs text-red-500 mt-1">{errors.password.message}</p>
-          )}
-        </div>
-
-        <div>
-          <label className="block text-xs font-bold uppercase text-gray-500 mb-1">
-            Confirm Password
-          </label>
-          <input
+          </Label>
+          <Input
+            id="password"
             type="password"
             autoComplete="new-password"
             placeholder="••••••••"
-            className={inputClass(!!errors.password_confirmation)}
+            className={errors.password ? "border-destructive" : ""}
+            {...register("password")}
+          />
+          {errors.password && (
+            <p className="text-xs text-red-500">{errors.password.message}</p>
+          )}
+        </div>
+
+        <div className="space-y-1.5">
+          <Label htmlFor="password_confirmation" className="text-xs font-bold uppercase text-gray-500">
+            Confirm Password
+          </Label>
+          <Input
+            id="password_confirmation"
+            type="password"
+            autoComplete="new-password"
+            placeholder="••••••••"
+            className={errors.password_confirmation ? "border-destructive" : ""}
             {...register("password_confirmation")}
           />
           {errors.password_confirmation && (
-            <p className="text-xs text-red-500 mt-1">
+            <p className="text-xs text-red-500">
               {errors.password_confirmation.message}
             </p>
           )}
@@ -174,11 +163,11 @@ export function RegisterForm() {
       </form>
 
       <div className="relative flex py-2 items-center">
-        <div className="flex-grow border-t border-gray-200" />
-        <span className="flex-shrink mx-4 text-gray-400 text-xs uppercase tracking-wide">
+        <div className="grow border-t border-gray-200" />
+        <span className="shrink mx-4 text-gray-400 text-xs uppercase tracking-wide">
           or
         </span>
-        <div className="flex-grow border-t border-gray-200" />
+        <div className="grow border-t border-gray-200" />
       </div>
 
       <p className="text-center text-sm text-gray-600">

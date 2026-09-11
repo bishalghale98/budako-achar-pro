@@ -1,5 +1,10 @@
 import Link from "next/link";
 import { MessageCircle } from "lucide-react";
+import {
+  Tooltip,
+  TooltipTrigger,
+  TooltipContent,
+} from "@/components/ui/tooltip";
 
 const footerLinks = {
   shop: [
@@ -103,16 +108,22 @@ export function PublicFooter() {
       </footer>
 
       {/* WhatsApp FAB */}
-      <a
-        href="https://wa.me/9779800000000"
-        target="_blank"
-        rel="noopener noreferrer"
-        className="fixed bottom-6 right-6 z-50 flex items-center gap-2 rounded-full bg-[#25D366] px-4 py-3 text-sm font-medium text-white shadow-lg transition hover:bg-[#20ba59]"
-        aria-label="Chat on WhatsApp"
-      >
-        <MessageCircle className="size-5" />
-        <span className="hidden sm:inline">Chat on WhatsApp</span>
-      </a>
+      <Tooltip>
+        <TooltipTrigger
+          render={
+            <a
+              href="https://wa.me/9779800000000"
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label="Chat on WhatsApp"
+            />
+          }
+          className="fixed bottom-6 right-6 z-50 flex size-12 items-center justify-center rounded-full bg-[#25D366] text-white shadow-lg transition hover:bg-[#20ba59]"
+        >
+          <MessageCircle className="size-5" />
+        </TooltipTrigger>
+        <TooltipContent side="top">Chat on WhatsApp</TooltipContent>
+      </Tooltip>
     </>
   );
 }

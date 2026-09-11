@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { useForm } from "react-hook-form";
@@ -9,7 +9,8 @@ import { z } from "zod";
 import { useLoginMutation } from "@/features/auth/auth-api";
 import { getRoleHome } from "@/features/auth/components/role-guard";
 import { safeRedirect } from "@/features/auth/auth-utils";
-import { Eye, EyeOff } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 
 const loginSchema = z.object({
   email: z.string().min(1, "Email is required").email("Invalid email address"),
@@ -23,7 +24,6 @@ export function LoginForm() {
   const searchParams = useSearchParams();
   const next = searchParams.get("next");
   const [login, { isLoading, error }] = useLoginMutation();
-  const [showPassword, setShowPassword] = useState(false);
 
   const {
     register,
@@ -81,33 +81,32 @@ export function LoginForm() {
 
       {/* Form */}
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-        <div>
-          <label className="block text-xs font-bold uppercase text-gray-500 mb-1">
+        <div className="space-y-1.5">
+          <Label htmlFor="email" className="text-xs font-bold uppercase text-gray-500">
             Email Address
-          </label>
-          <input
+          </Label>
+          <Input
+            id="email"
             type="email"
             placeholder="you@example.com"
             autoComplete="email"
             aria-invalid={!!errors.email}
             aria-describedby={errors.email ? "email-error" : undefined}
-            className={`w-full px-4 py-3 border rounded-lg text-sm text-darkText focus:outline-none focus:border-maroon transition ${
-              errors.email ? "border-red-400" : "border-gray-300"
-            }`}
+            className={errors.email ? "border-destructive" : ""}
             {...register("email")}
           />
           {errors.email && (
-            <p id="email-error" className="text-xs text-red-500 mt-1">
+            <p id="email-error" className="text-xs text-red-500">
               {errors.email.message}
             </p>
           )}
         </div>
 
-        <div>
-          <div className="flex items-center justify-between mb-1">
-            <label className="block text-xs font-bold uppercase text-gray-500">
+        <div className="space-y-1.5">
+          <div className="flex items-center justify-between">
+            <Label htmlFor="password" className="text-xs font-bold uppercase text-gray-500">
               Password
-            </label>
+            </Label>
             <Link
               href="/forgot-password"
               className="text-xs text-maroon hover:underline font-medium"
@@ -115,28 +114,18 @@ export function LoginForm() {
               Forgot?
             </Link>
           </div>
-          <div className="relative">
-            <input
-              type={showPassword ? "text" : "password"}
-              autoComplete="current-password"
-              placeholder="••••••••"
-              aria-invalid={!!errors.password}
-              aria-describedby={errors.password ? "password-error" : undefined}
-              className={`w-full px-4 py-3 border rounded-lg text-sm text-darkText focus:outline-none focus:border-maroon transition ${
-                errors.password ? "border-red-400" : "border-gray-300"
-              }`}
-              {...register("password")}
-            />
-            <button
-              type="button"
-              onClick={() => setShowPassword(!showPassword)}
-              className="absolute right-3 top-3.5 text-gray-500 hover:text-darkText transition"
-            >
-              {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-            </button>
-          </div>
+          <Input
+            id="password"
+            type="password"
+            autoComplete="current-password"
+            placeholder="••••••••"
+            aria-invalid={!!errors.password}
+            aria-describedby={errors.password ? "password-error" : undefined}
+            className={errors.password ? "border-destructive" : ""}
+            {...register("password")}
+          />
           {errors.password && (
-            <p id="password-error" className="text-xs text-red-500 mt-1">
+            <p id="password-error" className="text-xs text-red-500">
               {errors.password.message}
             </p>
           )}

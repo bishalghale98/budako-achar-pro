@@ -6,6 +6,8 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { useForgotPasswordMutation } from "@/features/auth/auth-api";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 
 const forgotPasswordSchema = z.object({
   email: z.string().min(1, "Email is required").email("Invalid email address"),
@@ -88,21 +90,20 @@ export function ForgotPasswordForm() {
       )}
 
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-        <div>
-          <label className="block text-xs font-bold uppercase text-gray-500 mb-1">
+        <div className="space-y-1.5">
+          <Label htmlFor="email" className="text-xs font-bold uppercase text-gray-500">
             Email Address
-          </label>
-          <input
+          </Label>
+          <Input
+            id="email"
             type="email"
             placeholder="you@example.com"
             autoComplete="email"
-            className={`w-full px-4 py-3 border rounded-lg text-sm text-darkText focus:outline-none focus:border-maroon transition ${
-              errors.email ? "border-red-400" : "border-gray-300"
-            }`}
+            className={errors.email ? "border-destructive" : ""}
             {...register("email")}
           />
           {errors.email && (
-            <p className="text-xs text-red-500 mt-1">{errors.email.message}</p>
+            <p className="text-xs text-red-500">{errors.email.message}</p>
           )}
         </div>
 

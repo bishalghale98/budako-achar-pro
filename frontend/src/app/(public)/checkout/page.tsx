@@ -72,7 +72,7 @@ export default function CheckoutPage() {
           />
         </div>
 
-        <div className="bg-background sm:bg-card p-0 sm:p-6 rounded-none sm:rounded-xl border-0 sm:border border-border shadow-none sm:shadow-sm h-fit space-y-4">
+        <div className=" sm:bg-card p-0 sm:p-6 rounded-none sm:rounded-xl border-0 sm:border border-border shadow-none sm:shadow-sm h-fit space-y-4">
           <h3 className="font-serif font-bold text-lg text-darkText">
             Order Summary
           </h3>
