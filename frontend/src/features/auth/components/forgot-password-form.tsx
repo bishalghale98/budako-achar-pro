@@ -4,16 +4,10 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { z } from "zod";
 import { useForgotPasswordMutation } from "@/features/auth/auth-api";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-
-const forgotPasswordSchema = z.object({
-  email: z.string().min(1, "Email is required").email("Invalid email address"),
-});
-
-type ForgotPasswordFormValues = z.infer<typeof forgotPasswordSchema>;
+import { forgotPasswordSchema, type ForgotPasswordFormValues } from "./auth-schemas";
 
 export function ForgotPasswordForm() {
   const [forgotPassword, { isLoading, error }] = useForgotPasswordMutation();

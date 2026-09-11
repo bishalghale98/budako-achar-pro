@@ -3,7 +3,6 @@
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { z } from "zod";
 import {
   useGetAdminCategoriesQuery,
   useCreateAdminCategoryMutation,
@@ -25,12 +24,7 @@ import {
 } from "@/components/ui/dialog";
 import { ConfirmDeleteDialog } from "@/components/shared";
 import { Plus, Pencil, Trash2, FolderOpen, Search } from "lucide-react";
-
-const categorySchema = z.object({
-  name: z.string().min(1, "Category name is required").max(255, "Name too long"),
-});
-
-type CategoryFormValues = z.infer<typeof categorySchema>;
+import { categorySchema, type CategoryFormValues } from "./category-schema";
 
 export default function CategoryContent() {
   const [page, setPage] = useState(1);

@@ -5,19 +5,12 @@ import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { z } from "zod";
 import { useLoginMutation } from "@/features/auth/auth-api";
 import { getRoleHome } from "@/features/auth/components/role-guard";
 import { safeRedirect } from "@/features/auth/auth-utils";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-
-const loginSchema = z.object({
-  email: z.string().min(1, "Email is required").email("Invalid email address"),
-  password: z.string().min(1, "Password is required"),
-});
-
-type LoginFormValues = z.infer<typeof loginSchema>;
+import { loginSchema, type LoginFormValues } from "./auth-schemas";
 
 export function LoginForm() {
   const router = useRouter();

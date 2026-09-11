@@ -3,29 +3,13 @@
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { z } from "zod";
 import { useChangePasswordMutation } from "@/features/auth/auth-api";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Lock } from "lucide-react";
-
-const changePasswordSchema = z
-  .object({
-    current_password: z.string().min(1, "Current password is required"),
-    password: z
-      .string()
-      .min(1, "New password is required")
-      .min(8, "Password must be at least 8 characters"),
-    password_confirmation: z.string().min(1, "Please confirm your password"),
-  })
-  .refine((data) => data.password === data.password_confirmation, {
-    message: "Passwords do not match",
-    path: ["password_confirmation"],
-  });
-
-type ChangePasswordFormValues = z.infer<typeof changePasswordSchema>;
+import { changePasswordSchema, type ChangePasswordFormValues } from "./auth-schemas";
 
 export function ChangePasswordForm() {
   const [changePassword, { isLoading, error }] = useChangePasswordMutation();
