@@ -1,12 +1,11 @@
 "use client";
 
-import Link from "next/link";
-import type { Category } from "@/data/products";
+import type { Category } from "@/features/products/product-types";
 
 interface SidebarFiltersProps {
   categories: Category[];
   activeCategory: string;
-  onCategoryChange: (slug: string) => void;
+  onCategoryChange: (id: string) => void;
 }
 
 export function SidebarFilters({
@@ -21,20 +20,32 @@ export function SidebarFilters({
           Categories
         </h3>
         <ul className="space-y-2 text-sm">
+          <li>
+            <button
+              onClick={() => onCategoryChange("all")}
+              className={`block py-1 text-left w-full ${
+                activeCategory === "all"
+                  ? "text-maroon font-semibold"
+                  : "text-gray-600 hover:text-maroon"
+              }`}
+            >
+              All Products
+            </button>
+          </li>
           {categories.map((cat) => (
             <li key={cat.id}>
               <button
-                onClick={() => onCategoryChange(cat.slug)}
+                onClick={() => onCategoryChange(cat.id)}
                 className={`block py-1 text-left w-full ${
-                  activeCategory === cat.slug
+                  activeCategory === cat.id
                     ? "text-maroon font-semibold"
                     : "text-gray-600 hover:text-maroon"
                 }`}
               >
                 {cat.name}
-                {cat.count !== undefined && (
+                {cat.products_count !== undefined && (
                   <span className="ml-1 text-xs text-gray-400">
-                    ({cat.count})
+                    ({cat.products_count})
                   </span>
                 )}
               </button>

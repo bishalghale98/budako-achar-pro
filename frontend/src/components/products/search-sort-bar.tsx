@@ -1,7 +1,5 @@
 "use client";
 
-import type { sortOptions } from "@/data/products";
-
 interface SearchSortBarProps {
   searchQuery: string;
   onSearchChange: (query: string) => void;

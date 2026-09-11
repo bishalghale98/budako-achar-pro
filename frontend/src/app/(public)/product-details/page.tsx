@@ -1,40 +1,47 @@
-"use client";
-
-import { useState } from "react";
-import { productDetails } from "@/data/product-details";
+import { notFound } from "next/navigation";
+import { getProductBySlug } from "@/lib/server/product";
 import {
   ProductGallery,
   ProductInfo,
-  QuantitySelector,
-  AddToCartButton,
-  BuyNowButton,
   ProductDetailsSection,
 } from "@/components/product-details";
+import { ProductDetailsClient } from "./product-details-client";
 
-export default function ProductDetailsPage() {
-  const [quantity, setQuantity] = useState(1);
+interface Props {
+  searchParams: Promise<{ slug?: string }>;
+}
+
+export default async function ProductDetailsPage({ searchParams }: Props) {
+  const { slug } = await searchParams;
+
+  if (!slug) {
+    notFound();
+  }
+
+  let productData;
+  try {
+    productData = await getProductBySlug(slug);
+  } catch {
+    notFound();
+  }
+
+  const product = productData.product;
+  const images = product.images ?? [];
+  const description = product.description ?? product.short_description ?? "";
 
   return (
     <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
-        <ProductGallery images={productDetails.images} />
+        <ProductGallery images={images} />
 
         <div className="space-y-6">
-          <ProductInfo product={productDetails} />
-          <p className="text-gray-600 text-sm leading-relaxed">
-            {productDetails.description}
-          </p>
-          <div className="space-y-4 pt-4 border-t border-gray-200">
-            <QuantitySelector value={quantity} onChange={setQuantity} />
-            <div className="flex flex-col sm:flex-row gap-4 pt-4">
-              <AddToCartButton />
-              <BuyNowButton />
-            </div>
-          </div>
-          <ProductDetailsSection
-            ingredients={productDetails.ingredients}
-            storageInfo={productDetails.storageInfo}
-          />
+          <ProductInfo product={product} />
+          {description && (
+            <p className="text-gray-600 text-sm leading-relaxed">
+              {description}
+            </p>
+          )}
+          <ProductDetailsClient product={product} />
         </div>
       </div>
     </main>

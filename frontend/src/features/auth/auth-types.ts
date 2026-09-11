@@ -3,7 +3,7 @@ export type Role = "customer" | "admin";
 export type AuthStatus = "idle" | "loading" | "authenticated" | "unauthenticated";
 
 export type User = {
-  id: number;
+  id: string;
   name: string;
   email: string;
   role?: Role;

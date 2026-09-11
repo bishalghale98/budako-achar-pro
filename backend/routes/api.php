@@ -18,6 +18,7 @@ use App\Http\Controllers\Api\Admin\AdminProductController;
 use App\Http\Controllers\Api\Admin\AdminProductVariantController;
 use App\Http\Controllers\Api\Admin\AdminProductImageController;
 use App\Http\Controllers\Api\Admin\AdminProductReviewController;
+use App\Models\User;
 use Illuminate\Support\Facades\Route;
 
 // Public authentication routes
@@ -70,7 +71,7 @@ Route::middleware(['auth:sanctum', 'role:' . Role::Admin->value])->prefix('admin
     Route::get('/users', function () {
         return response()->json([
             'success' => true,
-            'users' => \App\Models\User::all()->only('id', 'name', 'email', 'role', 'email_verified_at', 'created_at'),
+            'users' => User::all()->only(['id', 'name', 'email', 'role', 'email_verified_at', 'created_at']),
         ]);
     });
 
