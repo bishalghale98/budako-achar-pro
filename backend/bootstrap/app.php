@@ -37,4 +37,13 @@ return Application::configure(basePath: dirname(__DIR__))
                 ], 422);
             }
         });
+
+        $exceptions->renderable(function (\App\Exceptions\OrderException $e, Request $request) {
+            if ($request->is('api/*')) {
+                return response()->json([
+                    'success' => false,
+                    'message' => $e->getMessage(),
+                ], 422);
+            }
+        });
     })->create();

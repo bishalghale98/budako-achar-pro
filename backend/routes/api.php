@@ -13,6 +13,7 @@ use App\Http\Controllers\Api\Auth\ResetPasswordController;
 use App\Http\Controllers\Api\User\ProfileController;
 use App\Http\Controllers\Api\CartController;
 use App\Http\Controllers\Api\CartItemController;
+use App\Http\Controllers\Api\OrderController;
 use App\Http\Controllers\Api\ProductController;
 use App\Http\Controllers\Api\ProductReviewController;
 use App\Http\Controllers\Api\CategoryController;
@@ -76,6 +77,9 @@ Route::middleware(StartSession::class)->group(function () {
     Route::post('/cart/items', [CartItemController::class, 'store']);
     Route::patch('/cart/items/{cartItem}', [CartItemController::class, 'update']);
     Route::delete('/cart/items/{cartItem}', [CartItemController::class, 'destroy']);
+
+    // Guest checkout
+    Route::post('/orders', [OrderController::class, 'store']);
 });
 
 // Admin routes

@@ -2,19 +2,57 @@
 
 import Link from "next/link";
 import Image from "next/image";
+import { useRouter } from "next/navigation";
 import { useGetCartQuery } from "@/features/cart";
-import { paymentMethods, checkoutPage } from "@/data/checkout";
+import { usePlaceOrderMutation } from "@/features/order";
+import { checkoutPage } from "@/data/checkout";
 import { CustomerForm } from "@/components/checkout";
 import { Skeleton } from "@/components/ui/skeleton";
 
 export default function CheckoutPage() {
+  const router = useRouter();
   const { data, isLoading, isError } = useGetCartQuery();
+  const [placeOrder, { isLoading: isSubmitting, error }] =
+    usePlaceOrderMutation();
 
   const cart = data?.cart;
   const items = cart?.items ?? [];
   const subtotal = cart?.subtotal ?? 0;
   const deliveryFee = checkoutPage.deliveryFee;
   const total = subtotal + deliveryFee;
+
+  const handleSubmit = async (formData: {
+    customer_name: string;
+    customer_phone: string;
+    customer_email: string;
+    address_line: string;
+    city: string;
+    province: string;
+    delivery_notes?: string;
+    payment_method: string;
+    payment_proof?: File | null;
+  }) => {
+    const body = new FormData();
+    body.append("customer_name", formData.customer_name);
+    body.append("customer_phone", formData.customer_phone);
+    body.append("customer_email", formData.customer_email);
+    body.append("address_line", formData.address_line);
+    body.append("city", formData.city);
+    body.append("province", formData.province);
+    if (formData.delivery_notes) {
+      body.append("delivery_notes", formData.delivery_notes);
+    }
+    body.append("payment_method", formData.payment_method);
+    if (formData.payment_proof) {
+      body.append("payment_proof", formData.payment_proof);
+    }
+
+    const result = await placeOrder(body).unwrap();
+    router.push(`/order-success?order=${result.order.order_number}`);
+  };
+
+  const serverError = (error as { data?: { message?: string } })?.data
+    ?.message;
 
   return (
     <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
@@ -27,7 +65,9 @@ export default function CheckoutPage() {
           <CustomerForm
             defaultCity={checkoutPage.defaultCity}
             defaultProvince={checkoutPage.defaultProvince}
-            paymentMethods={paymentMethods}
+            onSubmit={handleSubmit}
+            isSubmitting={isSubmitting}
+            serverError={serverError}
           />
         </div>
 
@@ -95,16 +135,6 @@ export default function CheckoutPage() {
               </div>
             </div>
           )}
-
-          <Link
-            href="/order-success"
-            className="block w-full py-3.5 bg-maroon text-white font-medium text-center rounded-lg hover:bg-maroon-hover transition shadow-sm disabled:opacity-50 disabled:cursor-not-allowed"
-            onClick={(e) => {
-              if (items.length === 0) e.preventDefault();
-            }}
-          >
-            Place Order
-          </Link>
         </div>
       </div>
     </main>
