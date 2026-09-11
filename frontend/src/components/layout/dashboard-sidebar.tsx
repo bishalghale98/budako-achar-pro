@@ -19,9 +19,9 @@ import { useLogoutMutation } from "@/features/auth/auth-api";
 import { useRouter } from "next/navigation";
 
 const sidebarNav = [
-  { title: "Dashboard", href: "/customer" },
-  { title: "Profile", href: "/settings/profile" },
-  { title: "Security", href: "/settings/security" },
+  { title: "Dashboard", href: "/admin/dashboard" },
+  { title: "Profile", href: "/admin/profile" },
+  { title: "Security", href: "/admin/security" },
 ];
 
 function SidebarNav({

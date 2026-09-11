@@ -18,23 +18,31 @@ export default function CartPage() {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           <div className="lg:col-span-2 space-y-4">
             {Array.from({ length: 2 }).map((_, i) => (
-              <div key={i} className="bg-white p-4 rounded-xl border border-gray-200 shadow-sm flex items-center gap-4">
+              <div key={i} className="bg-background sm:bg-card p-4 sm:p-5 rounded-none sm:rounded-xl border-0 sm:border border-border shadow-none sm:shadow-sm flex items-center gap-4">
                 <Skeleton className="w-24 h-24 rounded-lg flex-shrink-0" />
-                <div className="flex-1 space-y-2">
-                  <div className="flex justify-between">
-                    <Skeleton className="h-5 w-40" />
-                    <Skeleton className="h-5 w-5" />
-                  </div>
+                <div className="flex-1 space-y-3">
+                  <Skeleton className="h-5 w-40" />
                   <Skeleton className="h-4 w-24" />
                   <div className="flex justify-between pt-1">
                     <Skeleton className="h-4 w-16" />
-                    <Skeleton className="h-8 w-24" />
+                    <Skeleton className="h-8 w-24 rounded-lg" />
                   </div>
                 </div>
               </div>
             ))}
           </div>
-          <Skeleton className="h-64 rounded-xl" />
+          <div className="bg-background sm:bg-card p-0 sm:p-6 rounded-none sm:rounded-xl border-0 sm:border border-border shadow-none sm:shadow-sm h-fit space-y-4">
+            <Skeleton className="h-6 w-32" />
+            <div className="space-y-3 pt-2 border-t border-border">
+              {Array.from({ length: 3 }).map((_, i) => (
+                <div key={i} className="flex justify-between">
+                  <Skeleton className="h-4 w-32" />
+                  <Skeleton className="h-4 w-16" />
+                </div>
+              ))}
+            </div>
+            <Skeleton className="h-10 w-full rounded-lg" />
+          </div>
         </div>
       </main>
     );
