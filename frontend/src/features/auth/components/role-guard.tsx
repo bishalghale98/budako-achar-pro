@@ -6,7 +6,7 @@ import { useAuth, useHasAnyRole } from "@/features/auth/auth-hooks";
 import type { Role } from "@/features/auth/auth-types";
 
 export const roleHome: Record<string, string> = {
-  admin: "/dashboard",
+  admin: "/customer",
   customer: "/customer",
 };
 
