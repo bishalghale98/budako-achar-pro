@@ -11,6 +11,13 @@ use App\Http\Controllers\Api\Auth\MeController;
 use App\Http\Controllers\Api\Auth\RegisterController;
 use App\Http\Controllers\Api\Auth\ResetPasswordController;
 use App\Http\Controllers\Api\User\ProfileController;
+use App\Http\Controllers\Api\ProductController;
+use App\Http\Controllers\Api\ProductReviewController;
+use App\Http\Controllers\Api\CategoryController;
+use App\Http\Controllers\Api\Admin\AdminProductController;
+use App\Http\Controllers\Api\Admin\AdminProductVariantController;
+use App\Http\Controllers\Api\Admin\AdminProductImageController;
+use App\Http\Controllers\Api\Admin\AdminProductReviewController;
 use Illuminate\Support\Facades\Route;
 
 // Public authentication routes
@@ -45,7 +52,18 @@ Route::middleware('auth:sanctum')->group(function () {
     // Profile
     Route::get('/user/profile', [ProfileController::class, 'show']);
     Route::patch('/user/profile', [ProfileController::class, 'update']);
+
+    // Product reviews (authenticated users)
+    Route::post('/products/{product}/reviews', [ProductReviewController::class, 'store']);
+    Route::patch('/products/{product}/reviews/{review}', [ProductReviewController::class, 'update']);
+    Route::delete('/products/{product}/reviews/{review}', [ProductReviewController::class, 'destroy']);
 });
+
+// Public product routes
+Route::get('/products', [ProductController::class, 'index']);
+Route::get('/products/{slug}', [ProductController::class, 'show']);
+Route::get('/products/{slug}/reviews', [ProductController::class, 'reviews']);
+Route::get('/categories', [CategoryController::class, 'index']);
 
 // Admin routes
 Route::middleware(['auth:sanctum', 'role:' . Role::Admin->value])->prefix('admin')->group(function () {
@@ -55,4 +73,20 @@ Route::middleware(['auth:sanctum', 'role:' . Role::Admin->value])->prefix('admin
             'users' => \App\Models\User::all()->only('id', 'name', 'email', 'role', 'email_verified_at', 'created_at'),
         ]);
     });
+
+    // Products
+    Route::apiResource('products', AdminProductController::class);
+
+    // Product variants
+    Route::apiResource('products/{product}/variants', AdminProductVariantController::class);
+
+    // Product images
+    Route::apiResource('products/{product}/images', AdminProductImageController::class);
+    Route::post('products/{product}/images/{image}/thumbnail', [AdminProductImageController::class, 'setThumbnail']);
+
+    // Product reviews moderation
+    Route::get('products/{product}/reviews', [AdminProductReviewController::class, 'index']);
+    Route::post('products/{product}/reviews/{review}/approve', [AdminProductReviewController::class, 'approve']);
+    Route::post('products/{product}/reviews/{review}/reject', [AdminProductReviewController::class, 'reject']);
+    Route::delete('products/{product}/reviews/{review}', [AdminProductReviewController::class, 'destroy']);
 });

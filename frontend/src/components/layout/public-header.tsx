@@ -6,6 +6,7 @@ import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { ShoppingBag, Menu, X } from "lucide-react";
 import { cn } from "cn";
+import { useAuth } from "@/features/auth/auth-hooks";
 
 const navLinks = [
   { href: "/", label: "Home" },
@@ -17,6 +18,8 @@ const navLinks = [
 export function PublicHeader() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const pathname = usePathname();
+
+  const { user } = useAuth()
 
   return (
     <>
@@ -54,18 +57,32 @@ export function PublicHeader() {
 
           {/* Actions */}
           <div className="flex items-center gap-3">
-            <Link
-              href="/login"
-              className="hidden sm:inline-flex px-4 py-2 text-sm font-medium text-gray-700 hover:text-maroon transition"
-            >
-              Login
-            </Link>
-            <Link
-              href="/register"
-              className="hidden sm:inline-flex px-4 py-2 text-sm font-medium bg-maroon text-white rounded-lg hover:bg-maroon-hover transition"
-            >
-              Register
-            </Link>
+
+            {user ? (
+              <Link
+                href="/customer"
+                className="hidden sm:inline-flex px-4 py-2 text-sm font-medium bg-maroon text-white rounded-lg hover:bg-maroon-hover transition"
+              >
+                Dashboard
+              </Link>
+            ) :
+              (
+                <>
+                  <Link
+                    href="/login"
+                    className="hidden sm:inline-flex px-4 py-2 text-sm font-medium text-gray-700 hover:text-maroon transition"
+                  >
+                    Login
+                  </Link>
+                  <Link
+                    href="/register"
+                    className="hidden sm:inline-flex px-4 py-2 text-sm font-medium bg-maroon text-white rounded-lg hover:bg-maroon-hover transition"
+                  >
+                    Register
+                  </Link>
+                </>
+              )}
+
             <Link
               href="/cart"
               className="relative p-2 text-gray-700 hover:text-maroon transition"
@@ -131,22 +148,33 @@ export function PublicHeader() {
           ))}
         </nav>
         <div className="border-t border-gray-100 p-4 space-y-2">
-          <Link
-            href="/login"
-            onClick={() => setMobileMenuOpen(false)}
-            className="block w-full text-center py-2.5 text-sm font-medium text-gray-700 border border-gray-300 rounded-lg hover:bg-gray-50 transition"
-          >
-            Login
-          </Link>
-          <Link
-            href="/register"
-            onClick={() => setMobileMenuOpen(false)}
-            className="block w-full text-center py-2.5 text-sm font-medium bg-maroon text-white rounded-lg hover:bg-maroon-hover transition"
-          >
-            Register
-          </Link>
-        </div>
-      </div>
+          {user ? (
+            <Link
+              href="/customer"
+              onClick={() => setMobileMenuOpen(false)}
+              className="block w-full text-center py-2.5 text-sm font-medium bg-maroon text-white rounded-lg hover:bg-maroon-hover transition"
+            >
+              Customer
+            </Link>
+          ) : (
+            <>
+              <Link
+                href="/login"
+                onClick={() => setMobileMenuOpen(false)}
+                className="block w-full text-center py-2.5 text-sm font-medium text-gray-700 border border-gray-300 rounded-lg hover:bg-gray-50 transition"
+              >
+                Login
+              </Link>
+              <Link
+                href="/register"
+                onClick={() => setMobileMenuOpen(false)}
+                className="block w-full text-center py-2.5 text-sm font-medium bg-maroon text-white rounded-lg hover:bg-maroon-hover transition"
+              >
+                Register
+              </Link>
+            </>)}
+        </div >
+      </div >
     </>
   );
 }
