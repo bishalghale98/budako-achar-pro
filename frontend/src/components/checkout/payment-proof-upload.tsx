@@ -1,6 +1,7 @@
 "use client";
 
 import { useRef, useState } from "react";
+import { Button } from "@/components/ui/button";
 import { Upload, X, Image as ImageIcon } from "lucide-react";
 
 interface PaymentProofUploadProps {
@@ -43,13 +44,13 @@ export function PaymentProofUpload({
       </label>
       <div
         className={`border-2 border-dashed rounded-lg p-4 text-center transition ${
-          error ? "border-red-400" : "border-gray-300 hover:border-maroon"
+          error ? "border-destructive" : "border-border hover:border-maroon"
         }`}
       >
         {preview ? (
           <div className="space-y-3">
             <div className="relative w-32 h-32 mx-auto">
-              <ImageIcon className="w-full h-full text-gray-300" />
+              <ImageIcon className="w-full h-full text-muted-foreground" />
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
                 src={preview}
@@ -58,28 +59,31 @@ export function PaymentProofUpload({
               />
             </div>
             <div className="flex items-center justify-center gap-2 text-sm">
-              <span className="text-gray-600 truncate max-w-[200px]">
+              <span className="text-muted-foreground truncate max-w-[200px]">
                 {value?.name}
               </span>
-              <button
+              <Button
                 type="button"
+                variant="ghost"
+                size="icon-xs"
                 onClick={handleRemove}
-                className="text-red-500 hover:text-red-700 transition"
+                className="text-destructive hover:text-destructive/80"
               >
                 <X className="h-4 w-4" />
-              </button>
+              </Button>
             </div>
           </div>
         ) : (
-          <button
+          <Button
             type="button"
+            variant="ghost"
             onClick={() => inputRef.current?.click()}
-            className="space-y-2 text-gray-500 hover:text-maroon transition"
+            className="space-y-2 text-muted-foreground hover:text-maroon h-auto py-4 flex-col"
           >
-            <Upload className="h-8 w-8 mx-auto" />
+            <Upload className="h-8 w-8" />
             <p className="text-sm">Click to upload payment screenshot</p>
-            <p className="text-xs text-gray-400">PNG, JPG up to 5MB</p>
-          </button>
+            <p className="text-xs text-muted-foreground">PNG, JPG up to 5MB</p>
+          </Button>
         )}
         <input
           ref={inputRef}
@@ -89,7 +93,9 @@ export function PaymentProofUpload({
           className="hidden"
         />
       </div>
-      {error && <p className="text-xs text-red-500 mt-1">{error}</p>}
+      {error && (
+        <p className="text-xs text-destructive mt-1">{error}</p>
+      )}
     </div>
   );
 }

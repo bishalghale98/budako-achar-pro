@@ -1,5 +1,7 @@
 "use client";
 
+import { Label } from "@/components/ui/label";
+
 interface PaymentMethodOption {
   id: string;
   label: string;
@@ -26,12 +28,12 @@ export function PaymentMethodRadio({
       </h3>
       <div className="space-y-2 text-sm">
         {methods.map((method) => (
-          <label
+          <Label
             key={method.id}
             className={`flex items-center gap-3 p-3 border rounded-lg cursor-pointer transition ${
               selected === method.id
                 ? "border-maroon bg-maroon/5"
-                : "border-gray-200 hover:bg-gray-50"
+                : "border-border hover:bg-muted"
             }`}
           >
             <input
@@ -40,20 +42,22 @@ export function PaymentMethodRadio({
               value={method.id}
               checked={selected === method.id}
               onChange={() => onChange(method.id)}
-              className="text-maroon focus:ring-maroon"
+              className="h-4 w-4 shrink-0 border-gray-300 text-maroon focus:ring-maroon"
             />
             <div>
-              <span className="font-medium">{method.label}</span>
+              <span className="font-medium text-darkText">{method.label}</span>
               {method.description && (
-                <p className="text-xs text-gray-500 mt-0.5">
+                <p className="text-xs text-muted-foreground mt-0.5">
                   {method.description}
                 </p>
               )}
             </div>
-          </label>
+          </Label>
         ))}
       </div>
-      {error && <p className="text-xs text-red-500 mt-1">{error}</p>}
+      {error && (
+        <p className="text-xs text-destructive mt-1">{error}</p>
+      )}
     </div>
   );
 }

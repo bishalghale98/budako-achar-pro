@@ -3,7 +3,10 @@
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { useState } from "react";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Button } from "@/components/ui/button";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 import { PaymentMethodRadio } from "./payment-method";
 import { PaymentProofUpload } from "./payment-proof-upload";
 
@@ -113,138 +116,140 @@ export function CustomerForm({
   };
 
   const inputClass = (hasError: boolean) =>
-    `w-full px-4 py-3 border rounded-lg text-sm text-darkText focus:outline-none focus:border-maroon transition ${
-      hasError ? "border-red-400" : "border-gray-300"
-    }`;
+    hasError ? "border-destructive" : "";
 
   return (
-    <div className="bg-white p-8 rounded-xl border border-gray-200 shadow-sm space-y-6">
+    <div className="bg-background sm:bg-card p-0 sm:p-8 rounded-none sm:rounded-xl border-0 sm:border border-border shadow-none sm:shadow-sm space-y-6">
       <h2 className="font-serif text-xl font-bold text-darkText">
         Customer & Delivery Information
       </h2>
 
       {serverError && !Object.keys(errors).length && (
-        <div className="bg-red-50 border border-red-200 text-red-700 text-sm rounded-lg px-4 py-3">
-          {serverError}
-        </div>
+        <Alert variant="destructive">
+          <AlertDescription>{serverError}</AlertDescription>
+        </Alert>
       )}
 
       <form onSubmit={handleSubmit(handleFormSubmit)} className="space-y-6">
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <div>
-            <label className="block text-xs font-bold uppercase text-gray-500 mb-1">
+          <div className="space-y-1.5">
+            <Label htmlFor="customer_name" className="text-xs font-bold uppercase text-muted-foreground">
               Full Name
-            </label>
-            <input
-              type="text"
+            </Label>
+            <Input
+              id="customer_name"
               placeholder="Your full name"
               className={inputClass(!!errors.customer_name)}
               {...register("customer_name")}
             />
             {errors.customer_name && (
-              <p className="text-xs text-red-500 mt-1">
+              <p className="text-xs text-destructive">
                 {errors.customer_name.message}
               </p>
             )}
           </div>
-          <div>
-            <label className="block text-xs font-bold uppercase text-gray-500 mb-1">
+          <div className="space-y-1.5">
+            <Label htmlFor="customer_phone" className="text-xs font-bold uppercase text-muted-foreground">
               Phone Number
-            </label>
-            <input
-              type="text"
+            </Label>
+            <Input
+              id="customer_phone"
               placeholder="98XXXXXXXX"
               className={inputClass(!!errors.customer_phone)}
               {...register("customer_phone")}
             />
             {errors.customer_phone && (
-              <p className="text-xs text-red-500 mt-1">
+              <p className="text-xs text-destructive">
                 {errors.customer_phone.message}
               </p>
             )}
           </div>
         </div>
 
-        <div>
-          <label className="block text-xs font-bold uppercase text-gray-500 mb-1">
+        <div className="space-y-1.5">
+          <Label htmlFor="customer_email" className="text-xs font-bold uppercase text-muted-foreground">
             Email Address
-          </label>
-          <input
+          </Label>
+          <Input
+            id="customer_email"
             type="email"
             placeholder="you@example.com"
             className={inputClass(!!errors.customer_email)}
             {...register("customer_email")}
           />
           {errors.customer_email && (
-            <p className="text-xs text-red-500 mt-1">
+            <p className="text-xs text-destructive">
               {errors.customer_email.message}
             </p>
           )}
         </div>
 
-        <div>
-          <label className="block text-xs font-bold uppercase text-gray-500 mb-1">
+        <div className="space-y-1.5">
+          <Label htmlFor="address_line" className="text-xs font-bold uppercase text-muted-foreground">
             Street Address
-          </label>
-          <input
-            type="text"
+          </Label>
+          <Input
+            id="address_line"
             placeholder="e.g. Sangeet Chowk"
             className={inputClass(!!errors.address_line)}
             {...register("address_line")}
           />
           {errors.address_line && (
-            <p className="text-xs text-red-500 mt-1">
+            <p className="text-xs text-destructive">
               {errors.address_line.message}
             </p>
           )}
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <div>
-            <label className="block text-xs font-bold uppercase text-gray-500 mb-1">
+          <div className="space-y-1.5">
+            <Label htmlFor="city" className="text-xs font-bold uppercase text-muted-foreground">
               City
-            </label>
-            <input
-              type="text"
+            </Label>
+            <Input
+              id="city"
               className={inputClass(!!errors.city)}
               {...register("city")}
             />
             {errors.city && (
-              <p className="text-xs text-red-500 mt-1">
+              <p className="text-xs text-destructive">
                 {errors.city.message}
               </p>
             )}
           </div>
-          <div>
-            <label className="block text-xs font-bold uppercase text-gray-500 mb-1">
+          <div className="space-y-1.5">
+            <Label htmlFor="province" className="text-xs font-bold uppercase text-muted-foreground">
               Province
-            </label>
-            <input
-              type="text"
+            </Label>
+            <Input
+              id="province"
               className={inputClass(!!errors.province)}
               {...register("province")}
             />
             {errors.province && (
-              <p className="text-xs text-red-500 mt-1">
+              <p className="text-xs text-destructive">
                 {errors.province.message}
               </p>
             )}
           </div>
         </div>
 
-        <div>
-          <label className="block text-xs font-bold uppercase text-gray-500 mb-1">
+        <div className="space-y-1.5">
+          <Label htmlFor="delivery_notes" className="text-xs font-bold uppercase text-muted-foreground">
             Delivery Notes (Optional)
-          </label>
+          </Label>
           <textarea
+            id="delivery_notes"
             rows={2}
             placeholder="Special instructions for delivery"
-            className={inputClass(!!errors.delivery_notes)}
+            className={`w-full min-h-[60px] rounded-lg border border-input bg-transparent px-3 py-2 text-base transition-colors outline-none placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 md:text-sm ${
+              errors.delivery_notes ? "border-destructive" : ""
+            }`}
             {...register("delivery_notes")}
           />
         </div>
 
-        <div className="pt-4 border-t border-gray-100">
+        <div className="pt-4 border-t border-border">
           <PaymentMethodRadio
             methods={paymentMethods}
             selected={paymentMethod}
@@ -254,7 +259,7 @@ export function CustomerForm({
         </div>
 
         {paymentMethod !== "cod" && (
-          <div className="pt-4 border-t border-gray-100">
+          <div className="pt-4 border-t border-border">
             <PaymentProofUpload
               value={watch("payment_proof") ?? null}
               onChange={(file) => setValue("payment_proof", file, { shouldValidate: true })}
@@ -263,13 +268,13 @@ export function CustomerForm({
           </div>
         )}
 
-        <button
+        <Button
           type="submit"
           disabled={isSubmitting}
-          className="w-full py-3.5 bg-maroon text-white font-medium rounded-lg hover:bg-maroon-hover transition shadow-sm text-sm disabled:opacity-60"
+          className="w-full py-3.5 bg-maroon text-white font-medium rounded-lg hover:bg-maroon-hover transition shadow-sm text-sm disabled:opacity-60 h-auto"
         >
           {isSubmitting ? "Placing Order..." : "Place Order"}
-        </button>
+        </Button>
       </form>
     </div>
   );

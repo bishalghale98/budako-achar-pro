@@ -8,6 +8,7 @@ import { usePlaceOrderMutation } from "@/features/order";
 import { checkoutPage } from "@/data/checkout";
 import { CustomerForm } from "@/components/checkout";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Button } from "@/components/ui/button";
 
 export default function CheckoutPage() {
   const router = useRouter();
@@ -71,13 +72,13 @@ export default function CheckoutPage() {
           />
         </div>
 
-        <div className="bg-white p-6 rounded-xl border border-gray-200 shadow-sm h-fit space-y-4">
+        <div className="bg-background sm:bg-card p-0 sm:p-6 rounded-none sm:rounded-xl border-0 sm:border border-border shadow-none sm:shadow-sm h-fit space-y-4">
           <h3 className="font-serif font-bold text-lg text-darkText">
             Order Summary
           </h3>
 
           {isLoading ? (
-            <div className="space-y-3 pt-2 border-t border-gray-100">
+            <div className="space-y-3 pt-2 border-t border-border">
               {Array.from({ length: 2 }).map((_, i) => (
                 <div key={i} className="flex justify-between">
                   <Skeleton className="h-4 w-32" />
@@ -86,8 +87,8 @@ export default function CheckoutPage() {
               ))}
             </div>
           ) : isError || items.length === 0 ? (
-            <div className="pt-2 border-t border-gray-100">
-              <p className="text-sm text-gray-500">Your cart is empty.</p>
+            <div className="pt-2 border-t border-border">
+              <p className="text-sm text-muted-foreground">Your cart is empty.</p>
               <Link
                 href="/products"
                 className="text-sm text-maroon hover:underline mt-2 inline-block"
@@ -96,10 +97,10 @@ export default function CheckoutPage() {
               </Link>
             </div>
           ) : (
-            <div className="space-y-3 text-sm text-gray-600 pt-2 border-t border-gray-100">
+            <div className="space-y-3 text-sm text-muted-foreground pt-2 border-t border-border">
               {items.map((item) => (
                 <div key={item.id} className="flex items-center gap-3">
-                  <div className="w-10 h-10 bg-gray-100 rounded-lg overflow-hidden flex-shrink-0 relative">
+                  <div className="w-10 h-10 bg-muted rounded-lg overflow-hidden flex-shrink-0 relative">
                     {item.product.thumbnail_url ? (
                       <Image
                         src={item.product.thumbnail_url}
@@ -109,7 +110,7 @@ export default function CheckoutPage() {
                         sizes="40px"
                       />
                     ) : (
-                      <div className="w-full h-full flex items-center justify-center text-gray-400 text-[8px]">
+                      <div className="w-full h-full flex items-center justify-center text-muted-foreground text-[8px]">
                         No img
                       </div>
                     )}
@@ -118,7 +119,7 @@ export default function CheckoutPage() {
                     <p className="font-medium text-darkText truncate">
                       {item.product.title} ({item.variant.name})
                     </p>
-                    <p className="text-xs text-gray-400">x{item.quantity}</p>
+                    <p className="text-xs text-muted-foreground">x{item.quantity}</p>
                   </div>
                   <span className="font-medium text-darkText">
                     NPR {item.subtotal}
@@ -129,7 +130,7 @@ export default function CheckoutPage() {
                 <span>Delivery</span>
                 <span>NPR {deliveryFee}</span>
               </div>
-              <div className="flex justify-between font-bold text-darkText text-base pt-2 border-t border-gray-100">
+              <div className="flex justify-between font-bold text-darkText text-base pt-2 border-t border-border">
                 <span>Total</span>
                 <span className="text-maroon">NPR {total}</span>
               </div>
