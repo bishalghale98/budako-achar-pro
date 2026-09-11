@@ -5,6 +5,7 @@ import { useEffect, useRef, useState } from "react";
 import { useAuth } from "@/features/auth/auth-hooks";
 import { DashboardSidebar } from "@/components/layout/dashboard-sidebar";
 import { DashboardHeader } from "@/components/layout/dashboard-header";
+import { Skeleton } from "@/components/ui/skeleton";
 
 function DashboardGuard({ children }: { children: React.ReactNode }) {
   const router = useRouter();
@@ -38,10 +39,13 @@ function DashboardGuard({ children }: { children: React.ReactNode }) {
   }
 
   return (
-    <div className="space-y-4">
-      <div className="h-7 w-32 animate-pulse rounded bg-muted" />
-      <div className="h-20 animate-pulse rounded bg-muted" />
-      <div className="h-20 animate-pulse rounded bg-muted" />
+    <div className="space-y-6">
+      <Skeleton className="h-9 w-48" />
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+        <Skeleton className="h-32 rounded-2xl" />
+        <Skeleton className="h-32 rounded-2xl" />
+      </div>
+      <Skeleton className="h-48 rounded-2xl" />
     </div>
   );
 }
@@ -52,7 +56,7 @@ export default function ProtectedLayout({
   children: React.ReactNode;
 }) {
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-slate-50">
       <DashboardSidebar />
       <div className="lg:pl-64">
         <DashboardHeader />

@@ -2,18 +2,22 @@
 
 import { useRouter } from "next/navigation";
 import { useUser, useIsLoading } from "@/features/auth/auth-hooks";
-import { LogoutButton } from "@/features/auth/components/logout-button";
+import { useLogoutMutation } from "@/features/auth/auth-api";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { PageHeader } from "@/components/shared";
 import { Skeleton } from "@/components/ui/skeleton";
+import { LogOut, Mail, CheckCircle, XCircle } from "lucide-react";
 
 export function DashboardSkeleton() {
   return (
-    <div className="space-y-4">
-      <Skeleton className="mb-6 h-7 w-32" />
-      <Skeleton className="h-20" />
-      <Skeleton className="h-20" />
+    <div className="space-y-6">
+      <Skeleton className="h-9 w-48" />
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+        <Skeleton className="h-32 rounded-2xl" />
+        <Skeleton className="h-32 rounded-2xl" />
+      </div>
+      <Skeleton className="h-48 rounded-2xl" />
     </div>
   );
 }
@@ -22,64 +26,120 @@ export function DashboardContent() {
   const router = useRouter();
   const user = useUser();
   const isLoading = useIsLoading();
+  const [logoutApi, { isLoading: isLoggingOut }] = useLogoutMutation();
 
   if (isLoading) return <DashboardSkeleton />;
   if (!user) return null;
 
-  const isUnverified = !user.email_verified_at;
+  const isVerified = !!user.email_verified_at;
+
+  const handleLogout = async () => {
+    try {
+      await logoutApi().unwrap();
+    } catch {
+      // ignore
+    } finally {
+      router.replace("/login");
+    }
+  };
 
   return (
-    <div className="mx-auto w-full max-w-5xl">
-      <PageHeader title="Dashboard" />
+    <div className="space-y-6">
+      {/* Welcome Banner */}
+      <div className="flex items-center gap-4 rounded-2xl border border-cream bg-cream/50 p-6">
+        <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-maroon/10 text-maroon">
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <rect width="7" height="9" x="3" y="3" rx="1" />
+            <rect width="7" height="5" x="14" y="3" rx="1" />
+            <rect width="7" height="9" x="14" y="12" rx="1" />
+            <rect width="7" height="5" x="3" y="16" rx="1" />
+          </svg>
+        </div>
+        <div>
+          <h1 className="text-xl font-bold text-maroon">
+            Admin Dashboard
+          </h1>
+          <p className="text-sm text-slate-600">
+            Welcome back, {user.name}
+          </p>
+        </div>
+      </div>
 
-      {isUnverified && (
-        <div className="mb-6 rounded-lg border border-yellow-300 bg-yellow-50 p-4 dark:border-yellow-800 dark:bg-yellow-950">
-          <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-            <p className="text-sm text-yellow-800 dark:text-yellow-200">
-              Please verify your email address.
-            </p>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => router.push("/settings/security")}
-            >
-              Verify email
-            </Button>
+      {/* Quick Stats */}
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+        {/* Email Status Card */}
+        <div className="flex items-center gap-4 rounded-2xl border border-slate-100 bg-white p-5">
+          <div className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-xl ${isVerified ? "bg-emerald-50 text-emerald-700" : "bg-amber-50 text-amber-700"}`}>
+            {isVerified ? <CheckCircle className="h-5 w-5" /> : <XCircle className="h-5 w-5" />}
+          </div>
+          <div>
+            <p className="text-2xl font-bold text-slate-900">{isVerified ? "Yes" : "No"}</p>
+            <p className="text-xs text-slate-500">Email Verified</p>
           </div>
         </div>
-      )}
 
-      <div className="space-y-4">
-        <section className="rounded-lg border bg-background p-4 sm:border-border sm:bg-card">
-          <h2 className="mb-3 text-sm font-medium text-muted-foreground">
-            Profile
-          </h2>
-          <dl className="space-y-2 text-sm">
-            <div className="flex justify-between">
-              <dt className="text-muted-foreground">Name</dt>
-              <dd className="font-medium">{user.name}</dd>
-            </div>
-            <Separator />
-            <div className="flex justify-between">
-              <dt className="text-muted-foreground">Email</dt>
-              <dd className="font-medium">{user.email}</dd>
-            </div>
-            <Separator />
-            <div className="flex justify-between">
-              <dt className="text-muted-foreground">Verified</dt>
-              <dd className="font-medium">
-                {user.email_verified_at ? "Yes" : "No"}
-              </dd>
-            </div>
-          </dl>
-        </section>
+        {/* Role Card */}
+        <div className="flex items-center gap-4 rounded-2xl border border-slate-100 bg-white p-5">
+          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-amber-50 text-amber-700">
+            <Mail className="h-5 w-5" />
+          </div>
+          <div>
+            <p className="text-2xl font-bold text-slate-900 capitalize">{user.role || "User"}</p>
+            <p className="text-xs text-slate-500">Account Role</p>
+          </div>
+        </div>
+      </div>
 
-        <section className="rounded-lg border bg-background p-4 sm:border-border sm:bg-card">
-          <h2 className="mb-3 text-sm font-medium text-muted-foreground">
-            Session
-          </h2>
-          <LogoutButton variant="destructive">Sign out</LogoutButton>
-        </section>
+      {/* Profile Info */}
+      <div className="overflow-hidden rounded-2xl border border-slate-100 bg-white">
+        <div className="flex items-center justify-between border-b border-slate-100 px-6 py-5">
+          <h2 className="font-semibold text-slate-900">Profile Information</h2>
+        </div>
+        <div className="divide-y divide-slate-100">
+          <div className="flex items-center justify-between px-6 py-4">
+            <span className="text-sm text-slate-500">Name</span>
+            <span className="text-sm font-bold text-slate-900">{user.name}</span>
+          </div>
+          <div className="flex items-center justify-between px-6 py-4">
+            <span className="text-sm text-slate-500">Email</span>
+            <span className="text-sm font-bold text-slate-900">{user.email}</span>
+          </div>
+          <div className="flex items-center justify-between px-6 py-4">
+            <span className="text-sm text-slate-500">Email Verified</span>
+            <span className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-[11px] font-bold ${isVerified ? "bg-emerald-50 text-emerald-700" : "bg-amber-50 text-amber-700"}`}>
+              {isVerified ? "Verified" : "Not Verified"}
+            </span>
+          </div>
+          {user.role && (
+            <div className="flex items-center justify-between px-6 py-4">
+              <span className="text-sm text-slate-500">Role</span>
+              <span className="inline-flex items-center rounded-full bg-amber-50 px-2.5 py-0.5 text-[11px] font-bold text-amber-700 capitalize">
+                {user.role}
+              </span>
+            </div>
+          )}
+        </div>
+      </div>
+
+      {/* Session */}
+      <div className="overflow-hidden rounded-2xl border border-slate-100 bg-white">
+        <div className="flex items-center justify-between border-b border-slate-100 px-6 py-5">
+          <h2 className="font-semibold text-slate-900">Session</h2>
+        </div>
+        <div className="px-6 py-4">
+          <p className="mb-4 text-sm text-slate-500">
+            Sign out of your current session.
+          </p>
+          <Button
+            variant="destructive"
+            onClick={handleLogout}
+            disabled={isLoggingOut}
+            className="gap-2"
+          >
+            <LogOut className="h-4 w-4" />
+            {isLoggingOut ? "Signing out..." : "Sign out"}
+          </Button>
+        </div>
       </div>
     </div>
   );

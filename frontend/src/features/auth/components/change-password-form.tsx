@@ -8,14 +8,8 @@ import { useChangePasswordMutation } from "@/features/auth/auth-api";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
 import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Lock } from "lucide-react";
 
 const changePasswordSchema = z
   .object({
@@ -75,16 +69,15 @@ export function ChangePasswordForm() {
   };
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>Change password</CardTitle>
-        <CardDescription>
-          Update your password to keep your account secure.
-        </CardDescription>
-      </CardHeader>
-      <CardContent>
+    <div className="overflow-hidden rounded-2xl border border-slate-100 bg-white">
+      <div className="border-b border-slate-100 px-6 py-5">
+        <h2 className="font-semibold text-slate-900">Change Password</h2>
+        <p className="text-sm text-slate-500">Update your password to keep your account secure</p>
+      </div>
+
+      <div className="px-6 py-5">
         {successMessage && (
-          <Alert className="mb-4">
+          <Alert className="mb-4 border-emerald-200 bg-emerald-50 text-emerald-700">
             <AlertDescription>{successMessage}</AlertDescription>
           </Alert>
         )}
@@ -97,7 +90,9 @@ export function ChangePasswordForm() {
 
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
           <div className="space-y-2">
-            <Label htmlFor="current_password">Current password</Label>
+            <Label htmlFor="current_password" className="text-sm font-medium text-slate-700">
+              Current Password
+            </Label>
             <Input
               id="current_password"
               type="password"
@@ -105,16 +100,19 @@ export function ChangePasswordForm() {
               aria-invalid={!!errors.current_password}
               aria-describedby={errors.current_password ? "current-password-error" : undefined}
               {...register("current_password")}
+              className="h-10"
             />
             {errors.current_password && (
-              <p id="current-password-error" className="text-sm text-destructive">
+              <p id="current-password-error" className="text-sm text-red-500">
                 {errors.current_password.message}
               </p>
             )}
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="password">New password</Label>
+            <Label htmlFor="password" className="text-sm font-medium text-slate-700">
+              New Password
+            </Label>
             <Input
               id="password"
               type="password"
@@ -122,16 +120,19 @@ export function ChangePasswordForm() {
               aria-invalid={!!errors.password}
               aria-describedby={errors.password ? "password-error" : undefined}
               {...register("password")}
+              className="h-10"
             />
             {errors.password && (
-              <p id="password-error" className="text-sm text-destructive">
+              <p id="password-error" className="text-sm text-red-500">
                 {errors.password.message}
               </p>
             )}
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="password_confirmation">Confirm new password</Label>
+            <Label htmlFor="password_confirmation" className="text-sm font-medium text-slate-700">
+              Confirm New Password
+            </Label>
             <Input
               id="password_confirmation"
               type="password"
@@ -139,19 +140,27 @@ export function ChangePasswordForm() {
               aria-invalid={!!errors.password_confirmation}
               aria-describedby={errors.password_confirmation ? "password-confirmation-error" : undefined}
               {...register("password_confirmation")}
+              className="h-10"
             />
             {errors.password_confirmation && (
-              <p id="password-confirmation-error" className="text-sm text-destructive">
+              <p id="password-confirmation-error" className="text-sm text-red-500">
                 {errors.password_confirmation.message}
               </p>
             )}
           </div>
 
-          <Button type="submit" disabled={isLoading}>
-            {isLoading ? "Changing..." : "Change password"}
-          </Button>
+          <div className="flex justify-end pt-2">
+            <Button
+              type="submit"
+              disabled={isLoading}
+              className="bg-maroon text-white hover:bg-maroon-hover gap-2"
+            >
+              <Lock className="h-4 w-4" />
+              {isLoading ? "Changing..." : "Change password"}
+            </Button>
+          </div>
         </form>
-      </CardContent>
-    </Card>
+      </div>
+    </div>
   );
 }
