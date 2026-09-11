@@ -5,6 +5,7 @@ import type {
   ProductVariant,
   ProductImage,
   ProductReview,
+  Category,
 } from "../products/product-types";
 
 interface AdminProductsResponse {
@@ -53,10 +54,27 @@ interface MessageResponse {
   message: string;
 }
 
+interface AdminCategoriesResponse {
+  success: boolean;
+  categories: Category[];
+  pagination: {
+    current_page: number;
+    last_page: number;
+    per_page: number;
+    total: number;
+  };
+}
+
+interface AdminCategoryResponse {
+  success: boolean;
+  message: string;
+  category: Category;
+}
+
 export const adminApi = createApi({
   reducerPath: "adminApi",
   baseQuery: baseQueryWithCsrf,
-  tagTypes: ["AdminProducts", "AdminVariants", "AdminImages", "AdminReviews", "AdminUsers"],
+  tagTypes: ["AdminProducts", "AdminVariants", "AdminImages", "AdminReviews", "AdminUsers", "AdminCategories"],
   endpoints: (builder) => ({
     // ─── Users ──────────────────────────────────────
     getAdminUsers: builder.query<AdminUsersResponse, void>({
@@ -334,6 +352,54 @@ export const adminApi = createApi({
       }),
       invalidatesTags: ["AdminReviews"],
     }),
+
+    // ─── Categories ─────────────────────────────────
+    getAdminCategories: builder.query<
+      AdminCategoriesResponse,
+      { page?: number; per_page?: number; search?: string }
+    >({
+      query: (params) => ({
+        url: "/api/admin/categories",
+        params,
+        headers: { Accept: "application/json" },
+      }),
+      providesTags: ["AdminCategories"],
+    }),
+
+    createAdminCategory: builder.mutation<
+      AdminCategoryResponse,
+      { name: string }
+    >({
+      query: (body) => ({
+        url: "/api/admin/categories",
+        method: "POST",
+        body,
+        headers: { Accept: "application/json" },
+      }),
+      invalidatesTags: ["AdminCategories"],
+    }),
+
+    updateAdminCategory: builder.mutation<
+      AdminCategoryResponse,
+      { id: string; name: string }
+    >({
+      query: ({ id, ...body }) => ({
+        url: `/api/admin/categories/${id}`,
+        method: "PUT",
+        body,
+        headers: { Accept: "application/json" },
+      }),
+      invalidatesTags: ["AdminCategories"],
+    }),
+
+    deleteAdminCategory: builder.mutation<MessageResponse, string>({
+      query: (id) => ({
+        url: `/api/admin/categories/${id}`,
+        method: "DELETE",
+        headers: { Accept: "application/json" },
+      }),
+      invalidatesTags: ["AdminCategories"],
+    }),
   }),
 });
 
@@ -357,4 +423,8 @@ export const {
   useApproveAdminReviewMutation,
   useRejectAdminReviewMutation,
   useDeleteAdminReviewMutation,
+  useGetAdminCategoriesQuery,
+  useCreateAdminCategoryMutation,
+  useUpdateAdminCategoryMutation,
+  useDeleteAdminCategoryMutation,
 } = adminApi;

@@ -21,6 +21,7 @@ use App\Http\Controllers\Api\Admin\AdminProductController;
 use App\Http\Controllers\Api\Admin\AdminProductVariantController;
 use App\Http\Controllers\Api\Admin\AdminProductImageController;
 use App\Http\Controllers\Api\Admin\AdminProductReviewController;
+use App\Http\Controllers\Api\Admin\AdminCategoryController;
 use App\Models\User;
 use Illuminate\Session\Middleware\StartSession;
 use Illuminate\Support\Facades\Route;
@@ -106,4 +107,7 @@ Route::middleware(['auth:sanctum', 'role:' . Role::Admin->value])->prefix('admin
     Route::post('products/{product}/reviews/{review}/approve', [AdminProductReviewController::class, 'approve']);
     Route::post('products/{product}/reviews/{review}/reject', [AdminProductReviewController::class, 'reject']);
     Route::delete('products/{product}/reviews/{review}', [AdminProductReviewController::class, 'destroy']);
+
+    // Categories
+    Route::apiResource('categories', AdminCategoryController::class);
 });
