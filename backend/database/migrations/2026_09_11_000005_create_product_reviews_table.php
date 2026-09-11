@@ -9,9 +9,11 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('product_reviews', function (Blueprint $table) {
-            $table->id();
-            $table->foreignId('product_id')->constrained()->cascadeOnDelete();
-            $table->foreignId('user_id')->constrained()->cascadeOnDelete();
+            $table->string('id')->primary();
+            $table->string('product_id');
+            $table->foreign('product_id')->references('id')->on('products')->cascadeOnDelete();
+            $table->string('user_id');
+            $table->foreign('user_id')->references('id')->on('users')->cascadeOnDelete();
             $table->unsignedTinyInteger('rating');
             $table->string('title')->nullable();
             $table->text('comment')->nullable();

@@ -9,8 +9,9 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('product_variants', function (Blueprint $table) {
-            $table->id();
-            $table->foreignId('product_id')->constrained()->cascadeOnDelete();
+            $table->string('id')->primary();
+            $table->string('product_id');
+            $table->foreign('product_id')->references('id')->on('products')->cascadeOnDelete();
             $table->string('name');
             $table->decimal('weight', 8, 2)->default(0);
             $table->string('unit')->default('g');

@@ -20,7 +20,7 @@ class ProductVariantFactory extends Factory
 
         return [
             'product_id' => Product::factory(),
-            'name' => $displayWeight . $unit,
+            'name' => $displayWeight . $unit->value,
             'weight' => $displayWeight,
             'unit' => $unit,
             'price' => fake()->randomFloat(2, 150, 800),

@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Traits\HasCuid;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -10,7 +11,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 #[Fillable(['product_id', 'image_url', 'is_thumbnail', 'sort_order'])]
 class ProductImage extends Model
 {
-    use HasFactory;
+    use HasCuid, HasFactory;
 
     protected function casts(): array
     {

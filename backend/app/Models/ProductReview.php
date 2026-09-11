@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Enums\ReviewStatus;
+use App\Traits\HasCuid;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -11,7 +12,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 #[Fillable(['product_id', 'user_id', 'rating', 'title', 'comment', 'status'])]
 class ProductReview extends Model
 {
-    use HasFactory;
+    use HasCuid, HasFactory;
 
     protected function casts(): array
     {
