@@ -1,8 +1,7 @@
 import Image from "next/image";
-import type { ProductImage } from "@/data/product-details";
 
 interface ProductImageProps {
-  image: ProductImage;
+  image: { src: string; alt: string };
   priority?: boolean;
 }
 

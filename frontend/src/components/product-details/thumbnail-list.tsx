@@ -1,11 +1,10 @@
 "use client";
 
 import Image from "next/image";
-import type { ProductImage } from "@/data/product-details";
 import { cn } from "cn";
 
 interface ThumbnailListProps {
-  thumbnails: ProductImage[];
+  thumbnails: { src: string; alt: string }[];
   activeIndex: number;
   onSelect: (index: number) => void;
 }

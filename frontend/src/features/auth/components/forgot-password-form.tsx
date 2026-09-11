@@ -1,21 +1,11 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Link from "next/link";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { useForgotPasswordMutation } from "@/features/auth/auth-api";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import { Alert, AlertDescription } from "@/components/ui/alert";
 
 const forgotPasswordSchema = z.object({
   email: z.string().min(1, "Email is required").email("Invalid email address"),
@@ -63,58 +53,82 @@ export function ForgotPasswordForm() {
 
   if (successMessage) {
     return (
-      <Card className="w-full max-w-sm">
-        <CardHeader className="text-center">
-          <CardTitle className="font-serif text-xl">Check your email</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <Alert>
-            <AlertDescription>{successMessage}</AlertDescription>
-          </Alert>
-        </CardContent>
-      </Card>
+      <div className="max-w-md w-full bg-white p-8 sm:p-10 rounded-2xl border border-gray-200 shadow-sm space-y-6">
+        <div className="text-center space-y-2">
+          <h1 className="font-serif text-3xl font-bold text-darkText">
+            Check Your Email
+          </h1>
+          <p className="text-gray-500 text-sm">{successMessage}</p>
+        </div>
+        <Link
+          href="/login"
+          className="block w-full py-3.5 bg-maroon text-white font-medium rounded-lg hover:bg-maroon-hover transition shadow-sm text-sm text-center"
+        >
+          Back to Sign In
+        </Link>
+      </div>
     );
   }
 
   return (
-    <Card className="w-full max-w-sm">
-      <CardHeader className="text-center">
-        <CardTitle className="font-serif text-xl">Forgot password?</CardTitle>
-        <CardDescription>
+    <div className="max-w-md w-full bg-white p-8 sm:p-10 rounded-2xl border border-gray-200 shadow-sm space-y-6">
+      <div className="text-center space-y-2">
+        <h1 className="font-serif text-3xl font-bold text-darkText">
+          Forgot Password?
+        </h1>
+        <p className="text-gray-500 text-sm">
           Enter your email and we&apos;ll send you a reset link.
-        </CardDescription>
-      </CardHeader>
-      <CardContent>
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-          {generalError && !fieldErrors && (
-            <Alert variant="destructive">
-              <AlertDescription>{generalError}</AlertDescription>
-            </Alert>
+        </p>
+      </div>
+
+      {generalError && !fieldErrors && (
+        <div className="bg-red-50 border border-red-200 text-red-700 text-sm rounded-lg px-4 py-3">
+          {generalError}
+        </div>
+      )}
+
+      <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+        <div>
+          <label className="block text-xs font-bold uppercase text-gray-500 mb-1">
+            Email Address
+          </label>
+          <input
+            type="email"
+            placeholder="you@example.com"
+            autoComplete="email"
+            className={`w-full px-4 py-3 border rounded-lg text-sm text-darkText focus:outline-none focus:border-maroon transition ${
+              errors.email ? "border-red-400" : "border-gray-300"
+            }`}
+            {...register("email")}
+          />
+          {errors.email && (
+            <p className="text-xs text-red-500 mt-1">{errors.email.message}</p>
           )}
+        </div>
 
-          <div className="space-y-2">
-            <Label htmlFor="email">Email</Label>
-            <Input
-              id="email"
-              type="email"
-              placeholder="you@example.com"
-              autoComplete="email"
-              aria-invalid={!!errors.email}
-              aria-describedby={errors.email ? "email-error" : undefined}
-              {...register("email")}
-            />
-            {errors.email && (
-              <p id="email-error" className="text-sm text-destructive">
-                {errors.email.message}
-              </p>
-            )}
-          </div>
+        <button
+          type="submit"
+          disabled={isLoading}
+          className="w-full py-3.5 bg-maroon text-white font-medium rounded-lg hover:bg-maroon-hover transition shadow-sm text-sm disabled:opacity-60"
+        >
+          {isLoading ? "Sending..." : "Send Reset Link"}
+        </button>
+      </form>
 
-          <Button type="submit" className="w-full" disabled={isLoading}>
-            {isLoading ? "Sending..." : "Send reset link"}
-          </Button>
-        </form>
-      </CardContent>
-    </Card>
+      <div className="relative flex py-2 items-center">
+        <div className="flex-grow border-t border-gray-200" />
+        <span className="flex-shrink mx-4 text-gray-400 text-xs uppercase tracking-wide">
+          or
+        </span>
+        <div className="flex-grow border-t border-gray-200" />
+      </div>
+
+      <p className="text-center text-sm text-gray-600">
+        Remember your password?{" "}
+        <Link href="/login" className="text-maroon font-bold hover:underline">
+          Sign in
+        </Link>
+      </p>
+    </div>
   );
 }

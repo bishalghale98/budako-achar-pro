@@ -12,6 +12,7 @@ export async function getProducts(params?: {
   category_id?: string;
   featured?: boolean;
   search?: string;
+  sort?: string;
 }): Promise<ProductsResponse> {
   const searchParams = new URLSearchParams();
   if (params?.page) searchParams.set("page", String(params.page));
@@ -19,6 +20,7 @@ export async function getProducts(params?: {
   if (params?.category_id) searchParams.set("category_id", params.category_id);
   if (params?.featured !== undefined) searchParams.set("featured", String(params.featured));
   if (params?.search) searchParams.set("search", params.search);
+  if (params?.sort) searchParams.set("sort", params.sort);
 
   const query = searchParams.toString();
   return serverFetch<ProductsResponse>(`/api/products${query ? `?${query}` : ""}`);

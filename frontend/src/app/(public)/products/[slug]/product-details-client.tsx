@@ -3,6 +3,7 @@
 import { useState } from "react";
 import type { Product } from "@/features/products/product-types";
 import {
+  ProductInfo,
   QuantitySelector,
   AddToCartButton,
   BuyNowButton,
@@ -11,9 +12,13 @@ import {
 
 interface ProductDetailsClientProps {
   product: Product;
+  description: string;
 }
 
-export function ProductDetailsClient({ product }: ProductDetailsClientProps) {
+export function ProductDetailsClient({
+  product,
+  description,
+}: ProductDetailsClientProps) {
   const [quantity, setQuantity] = useState(1);
   const [selectedVariantId, setSelectedVariantId] = useState(
     product.variants?.[0]?.id ?? ""
@@ -25,6 +30,12 @@ export function ProductDetailsClient({ product }: ProductDetailsClientProps) {
 
   return (
     <>
+      <ProductInfo product={product} selectedVariant={selectedVariant} />
+
+      {description && (
+        <p className="text-gray-600 text-sm leading-relaxed">{description}</p>
+      )}
+
       {product.variants && product.variants.length > 1 && (
         <div className="space-y-2 pt-4 border-t border-gray-200">
           <h4 className="font-bold text-darkText text-sm">Select Size</h4>
@@ -41,9 +52,10 @@ export function ProductDetailsClient({ product }: ProductDetailsClientProps) {
                 } ${variant.stock === 0 ? "opacity-50 cursor-not-allowed" : ""}`}
               >
                 {variant.name}
+                <span className="ml-1">NPR {variant.price}</span>
                 {variant.compare_price && (
                   <span className="ml-1 text-xs line-through opacity-60">
-                    NPR {variant.compare_price}
+                    {variant.compare_price}
                   </span>
                 )}
               </button>

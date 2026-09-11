@@ -7,7 +7,7 @@ interface AboutHeroSectionProps {
 
 export function AboutHeroSection({ data }: AboutHeroSectionProps) {
   return (
-    <section className="bg-gradient-to-br from-maroon/5 via-white to-gold/10 py-16 sm:py-20">
+    <section className="bg-linear-to-br from-maroon/5 via-white to-gold/10 py-12 sm:py-20">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="grid grid-cols-1 items-center gap-12 lg:grid-cols-2">
           <div>

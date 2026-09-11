@@ -28,6 +28,11 @@ export function ProductInfo({ product, selectedVariant }: ProductInfoProps) {
         {unit && (
           <span className="text-xs text-gray-500 font-normal">/ {unit}</span>
         )}
+        {selectedVariant?.compare_price && (
+          <span className="ml-2 text-sm line-through text-gray-500">
+            NPR {selectedVariant.compare_price}
+          </span>
+        )}
       </p>
     </div>
   );

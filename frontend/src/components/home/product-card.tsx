@@ -57,7 +57,7 @@ export function ProductCard({ product }: ProductCardProps) {
             {lowestPrice !== null ? `NPR ${lowestPrice}` : "Contact"}
           </span>
           <Link
-            href={`/product-details?slug=${product.slug}`}
+            href={`/products/${product.slug}`}
             className="px-4 py-2 bg-maroon text-white text-sm font-medium rounded-lg hover:bg-maroon-hover transition"
           >
             View Details

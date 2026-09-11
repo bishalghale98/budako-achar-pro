@@ -1,10 +1,11 @@
-import { PageHeader } from "@/components/shared";
+import { AppBreadcrumb, PageHeader } from "@/components/shared";
 import { StoreInfoCard, MapPlaceholder, ContactForm } from "@/components/contact";
 import { contactInfo, contactPage } from "@/data/contact";
 
 export default function ContactPage() {
   return (
     <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+      <AppBreadcrumb items={[{ label: "Contact" }]} />
       <PageHeader
         title={contactPage.heading}
         description={contactPage.description}

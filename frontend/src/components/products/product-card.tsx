@@ -59,7 +59,7 @@ export function ProductCard({ product }: ProductCardProps) {
             )}
           </span>
           <Link
-            href={`/product-details?slug=${product.slug}`}
+            href={`/products/${product.slug}`}
             className="px-3 py-1.5 bg-maroon text-white text-xs font-medium rounded hover:bg-maroon-hover transition"
           >
             View

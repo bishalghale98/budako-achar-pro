@@ -14,11 +14,23 @@ class ProductController extends Controller
     public function index(Request $request): AnonymousResourceCollection
     {
         $products = Product::with(['category', 'images', 'variants'])
-            ->where('status', 'active')
+            ->where('products.status', 'active')
             ->when($request->category_id, fn ($q, $categoryId) => $q->where('category_id', $categoryId))
             ->when($request->featured !== null, fn ($q, $featured) => $q->where('featured', $featured))
             ->when($request->search, fn ($q, $search) => $q->where('title', 'like', "%{$search}%"))
-            ->orderByDesc('created_at')
+            ->when(
+                $request->sort,
+                fn ($q, $sort) => match ($sort) {
+                    'price_asc' => $q->withMin('variants', 'price')
+                        ->orderBy('variants_min_price'),
+                    'price_desc' => $q->withMax('variants', 'price')
+                        ->orderByDesc('variants_max_price'),
+                    'name' => $q->orderBy('title'),
+                    'featured' => $q->orderBy('featured', 'desc'),
+                    default => null,
+                }
+            )
+            ->orderByDesc('products.created_at')
             ->paginate($request->per_page ?? 20);
 
         return ProductResource::collection($products);

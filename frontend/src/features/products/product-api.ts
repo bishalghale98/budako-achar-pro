@@ -22,6 +22,7 @@ export const productApi = createApi({
         category_id?: string;
         featured?: boolean;
         search?: string;
+        sort?: string;
       }
     >({
       query: (params) => ({

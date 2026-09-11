@@ -7,17 +7,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { useResetPasswordMutation } from "@/features/auth/auth-api";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Eye, EyeOff } from "lucide-react";
 
 const resetPasswordSchema = z
   .object({
@@ -43,6 +33,7 @@ export function ResetPasswordForm() {
 
   const [resetPassword, { isLoading, error }] = useResetPasswordMutation();
   const [successMessage, setSuccessMessage] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
 
   const {
     register,
@@ -71,26 +62,22 @@ export function ResetPasswordForm() {
 
   if (!token) {
     return (
-      <Card className="w-full max-w-sm">
-        <CardHeader className="text-center">
-          <CardTitle className="font-serif text-xl">Invalid link</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <Alert variant="destructive">
-            <AlertDescription>
-              This password reset link is invalid or has expired.
-            </AlertDescription>
-          </Alert>
-          <p className="mt-4 text-center text-sm text-muted-foreground">
-            <Link
-              href="/forgot-password"
-              className="font-medium text-foreground underline underline-offset-4 hover:text-foreground/80"
-            >
-              Request a new reset link
-            </Link>
+      <div className="max-w-md w-full bg-white p-8 sm:p-10 rounded-2xl border border-gray-200 shadow-sm space-y-6">
+        <div className="text-center space-y-2">
+          <h1 className="font-serif text-3xl font-bold text-darkText">
+            Invalid Link
+          </h1>
+          <p className="text-gray-500 text-sm">
+            This password reset link is invalid or has expired.
           </p>
-        </CardContent>
-      </Card>
+        </div>
+        <Link
+          href="/forgot-password"
+          className="block w-full py-3.5 bg-maroon text-white font-medium rounded-lg hover:bg-maroon-hover transition shadow-sm text-sm text-center"
+        >
+          Request a New Reset Link
+        </Link>
+      </div>
     );
   }
 
@@ -105,97 +92,113 @@ export function ResetPasswordForm() {
 
   if (successMessage) {
     return (
-      <Card className="w-full max-w-sm">
-        <CardHeader className="text-center">
-          <CardTitle className="font-serif text-xl">Password reset</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <Alert>
-            <AlertDescription>
-              {successMessage} Please log in with your new password.
-            </AlertDescription>
-          </Alert>
-          <Button className="w-full mt-4" onClick={() => router.push("/login")}>
-            Go to login
-          </Button>
-        </CardContent>
-      </Card>
+      <div className="max-w-md w-full bg-white p-8 sm:p-10 rounded-2xl border border-gray-200 shadow-sm space-y-6">
+        <div className="text-center space-y-2">
+          <h1 className="font-serif text-3xl font-bold text-darkText">
+            Password Reset
+          </h1>
+          <p className="text-gray-500 text-sm">
+            {successMessage} Please log in with your new password.
+          </p>
+        </div>
+        <button
+          onClick={() => router.push("/login")}
+          className="w-full py-3.5 bg-maroon text-white font-medium rounded-lg hover:bg-maroon-hover transition shadow-sm text-sm"
+        >
+          Go to Sign In
+        </button>
+      </div>
     );
   }
 
+  const inputClass = (field?: boolean) =>
+    `w-full px-4 py-3 border rounded-lg text-sm text-darkText focus:outline-none focus:border-maroon transition ${
+      field ? "border-red-400" : "border-gray-300"
+    }`;
+
   return (
-    <Card className="w-full max-w-sm">
-      <CardHeader className="text-center">
-        <CardTitle className="font-serif text-xl">Reset password</CardTitle>
-        <CardDescription>
-          Enter your new password below.
-        </CardDescription>
-      </CardHeader>
-      <CardContent>
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-          {generalError && !fieldErrors && (
-            <Alert variant="destructive">
-              <AlertDescription>{generalError}</AlertDescription>
-            </Alert>
+    <div className="max-w-md w-full bg-white p-8 sm:p-10 rounded-2xl border border-gray-200 shadow-sm space-y-6">
+      <div className="text-center space-y-2">
+        <h1 className="font-serif text-3xl font-bold text-darkText">
+          Reset Password
+        </h1>
+        <p className="text-gray-500 text-sm">Enter your new password below.</p>
+      </div>
+
+      {generalError && !fieldErrors && (
+        <div className="bg-red-50 border border-red-200 text-red-700 text-sm rounded-lg px-4 py-3">
+          {generalError}
+        </div>
+      )}
+
+      <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+        <div>
+          <label className="block text-xs font-bold uppercase text-gray-500 mb-1">
+            Email Address
+          </label>
+          <input
+            type="email"
+            placeholder="you@example.com"
+            autoComplete="email"
+            className={inputClass(!!errors.email)}
+            {...register("email")}
+          />
+          {errors.email && (
+            <p className="text-xs text-red-500 mt-1">{errors.email.message}</p>
           )}
+        </div>
 
-          <div className="space-y-2">
-            <Label htmlFor="email">Email</Label>
-            <Input
-              id="email"
-              type="email"
-              placeholder="you@example.com"
-              autoComplete="email"
-              aria-invalid={!!errors.email}
-              aria-describedby={errors.email ? "email-error" : undefined}
-              {...register("email")}
-            />
-            {errors.email && (
-              <p id="email-error" className="text-sm text-destructive">
-                {errors.email.message}
-              </p>
-            )}
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="password">New password</Label>
-            <Input
-              id="password"
-              type="password"
+        <div>
+          <label className="block text-xs font-bold uppercase text-gray-500 mb-1">
+            New Password
+          </label>
+          <div className="relative">
+            <input
+              type={showPassword ? "text" : "password"}
               autoComplete="new-password"
-              aria-invalid={!!errors.password}
-              aria-describedby={errors.password ? "password-error" : undefined}
+              placeholder="••••••••"
+              className={inputClass(!!errors.password)}
               {...register("password")}
             />
-            {errors.password && (
-              <p id="password-error" className="text-sm text-destructive">
-                {errors.password.message}
-              </p>
-            )}
+            <button
+              type="button"
+              onClick={() => setShowPassword(!showPassword)}
+              className="absolute right-3 top-3.5 text-gray-500 hover:text-darkText transition"
+            >
+              {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+            </button>
           </div>
+          {errors.password && (
+            <p className="text-xs text-red-500 mt-1">{errors.password.message}</p>
+          )}
+        </div>
 
-          <div className="space-y-2">
-            <Label htmlFor="password_confirmation">Confirm new password</Label>
-            <Input
-              id="password_confirmation"
-              type="password"
-              autoComplete="new-password"
-              aria-invalid={!!errors.password_confirmation}
-              aria-describedby={errors.password_confirmation ? "password-confirmation-error" : undefined}
-              {...register("password_confirmation")}
-            />
-            {errors.password_confirmation && (
-              <p id="password-confirmation-error" className="text-sm text-destructive">
-                {errors.password_confirmation.message}
-              </p>
-            )}
-          </div>
+        <div>
+          <label className="block text-xs font-bold uppercase text-gray-500 mb-1">
+            Confirm New Password
+          </label>
+          <input
+            type="password"
+            autoComplete="new-password"
+            placeholder="••••••••"
+            className={inputClass(!!errors.password_confirmation)}
+            {...register("password_confirmation")}
+          />
+          {errors.password_confirmation && (
+            <p className="text-xs text-red-500 mt-1">
+              {errors.password_confirmation.message}
+            </p>
+          )}
+        </div>
 
-          <Button type="submit" className="w-full" disabled={isLoading}>
-            {isLoading ? "Resetting..." : "Reset password"}
-          </Button>
-        </form>
-      </CardContent>
-    </Card>
+        <button
+          type="submit"
+          disabled={isLoading}
+          className="w-full py-3.5 bg-maroon text-white font-medium rounded-lg hover:bg-maroon-hover transition shadow-sm text-sm disabled:opacity-60"
+        >
+          {isLoading ? "Resetting..." : "Reset Password"}
+        </button>
+      </form>
+    </div>
   );
 }

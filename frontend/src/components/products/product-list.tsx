@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useDebounce } from "@/hooks/use-debounce";
 import {
   useGetProductsQuery,
 } from "@/features/products/product-api";
@@ -11,6 +12,15 @@ import { ProductGrid } from "./product-grid";
 import { LoadingState, ErrorState } from "@/components/shared";
 import type { Product, Category } from "@/features/products/product-types";
 
+const SORT_MAP: Record<string, string> = {
+  Featured: "featured",
+  "Price: Low to High": "price_asc",
+  "Price: High to Low": "price_desc",
+  Name: "name",
+};
+
+const SORT_OPTIONS = Object.keys(SORT_MAP);
+
 interface ProductListProps {
   initialProducts: Product[];
   initialCategories: Category[];
@@ -20,54 +30,23 @@ export function ProductList({
   initialProducts,
   initialCategories,
 }: ProductListProps) {
-  const [searchQuery, setSearchQuery] = useState("");
+  const [searchInput, setSearchInput] = useState("");
+  const debouncedSearch = useDebounce(searchInput);
   const [sortOption, setSortOption] = useState("Featured");
   const [activeCategory, setActiveCategory] = useState("all");
   const [page, setPage] = useState(1);
 
   const { data: categoriesData } = useGetCategoriesQuery();
-  const { data: productsData, isLoading, isError } = useGetProductsQuery(
-    {
-      page,
-      per_page: 12,
-      category_id: activeCategory === "all" ? undefined : activeCategory,
-      search: searchQuery || undefined,
-    },
-    {
-      skip:
-        !searchQuery &&
-        activeCategory === "all" &&
-        page === 1 &&
-        sortOption === "Featured",
-    }
-  );
+  const { data: productsData, isLoading, isError } = useGetProductsQuery({
+    page,
+    per_page: 12,
+    category_id: activeCategory === "all" ? undefined : activeCategory,
+    search: debouncedSearch || undefined,
+    sort: SORT_MAP[sortOption] ?? "featured",
+  });
 
   const categories = categoriesData?.categories ?? initialCategories;
-  let products = productsData?.data ?? initialProducts;
-
-  switch (sortOption) {
-    case "Price: Low to High":
-      products = [...products].sort((a, b) => {
-        const aPrice = a.variants?.[0]?.price ?? 0;
-        const bPrice = b.variants?.[0]?.price ?? 0;
-        return aPrice - bPrice;
-      });
-      break;
-    case "Price: High to Low":
-      products = [...products].sort((a, b) => {
-        const aPrice = a.variants?.[0]?.price ?? 0;
-        const bPrice = b.variants?.[0]?.price ?? 0;
-        return bPrice - aPrice;
-      });
-      break;
-    case "Name":
-      products = [...products].sort((a, b) => a.title.localeCompare(b.title));
-      break;
-    default:
-      products = [...products].sort(
-        (a, b) => (b.featured ? 1 : 0) - (a.featured ? 1 : 0)
-      );
-  }
+  const products = productsData?.data ?? initialProducts;
 
   if (isLoading) return <LoadingState />;
   if (isError) return <ErrorState />;
@@ -85,19 +64,14 @@ export function ProductList({
 
       <div className="lg:col-span-3 space-y-6">
         <SearchSortBar
-          searchQuery={searchQuery}
+          searchQuery={searchInput}
           onSearchChange={(q) => {
-            setSearchQuery(q);
+            setSearchInput(q);
             setPage(1);
           }}
           sortOption={sortOption}
           onSortChange={setSortOption}
-          sortOptions={[
-            "Featured",
-            "Price: Low to High",
-            "Price: High to Low",
-            "Name",
-          ]}
+          sortOptions={SORT_OPTIONS}
         />
         <ProductGrid products={products} />
 

@@ -1,3 +1,4 @@
+import { AppBreadcrumb } from "@/components/shared";
 import { PageHeader } from "@/components/shared";
 import { ProductList } from "@/components/products/product-list";
 import { getProducts, getCategories } from "@/lib/server/product";
@@ -10,6 +11,7 @@ export default async function ProductsPage() {
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+      <AppBreadcrumb items={[{ label: "Products" }]} />
       <PageHeader
         title="Our Achar Collection"
         description="Discover our collection of traditional Nepali achar made with authentic spices."
