@@ -99,6 +99,8 @@ export default function AdminProductForm() {
       slug: "",
       short_description: "",
       description: "",
+      ingredients: "",
+      storage_info: "",
       featured: false,
       status: "active",
       variants: [
@@ -107,7 +109,7 @@ export default function AdminProductForm() {
           weight: 0,
           unit: "g",
           price: 0,
-          compare_price: undefined,
+          compare_price: null,
           stock: 0,
           sku: "",
           status: "active",
@@ -208,6 +210,8 @@ export default function AdminProductForm() {
         category_id: data.category_id,
         short_description: data.short_description || undefined,
         description: data.description || undefined,
+        ingredients: data.ingredients || undefined,
+        storage_info: data.storage_info || undefined,
         featured: data.featured,
         status: data.status,
       }).unwrap();
@@ -221,7 +225,7 @@ export default function AdminProductForm() {
           weight: variant.weight,
           unit: variant.unit,
           price: variant.price,
-          compare_price: variant.compare_price || undefined,
+          compare_price: variant.compare_price ?? undefined,
           stock: variant.stock,
           sku: variant.sku || undefined,
           status: variant.status,
@@ -500,6 +504,48 @@ export default function AdminProductForm() {
                 </p>
               )}
             </div>
+
+            <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
+              <div className="space-y-2">
+                <Label
+                  htmlFor="ingredients"
+                  className="text-sm font-semibold text-slate-700"
+                >
+                  Ingredients
+                </Label>
+                <Textarea
+                  id="ingredients"
+                  {...register("ingredients")}
+                  placeholder="e.g. Lapsi pulp, unrefined sugarcane jaggery, secret spice blends..."
+                  className="min-h-[80px] border-slate-200 focus:border-maroon focus:ring-maroon/20"
+                />
+                {errors.ingredients && (
+                  <p className="text-xs font-medium text-red-500">
+                    {errors.ingredients.message}
+                  </p>
+                )}
+              </div>
+
+              <div className="space-y-2">
+                <Label
+                  htmlFor="storage_info"
+                  className="text-sm font-semibold text-slate-700"
+                >
+                  Storage Information
+                </Label>
+                <Textarea
+                  id="storage_info"
+                  {...register("storage_info")}
+                  placeholder="e.g. Store in a cool, dry place. Use a clean, dry spoon for serving. Keep tightly sealed."
+                  className="min-h-[80px] border-slate-200 focus:border-maroon focus:ring-maroon/20"
+                />
+                {errors.storage_info && (
+                  <p className="text-xs font-medium text-red-500">
+                    {errors.storage_info.message}
+                  </p>
+                )}
+              </div>
+            </div>
           </div>
         </div>
 
@@ -574,7 +620,7 @@ export default function AdminProductForm() {
                     <Input
                       type="number"
                       step="0.01"
-                      {...register(`variants.${index}.weight`)}
+                      {...register(`variants.${index}.weight`, { valueAsNumber: true })}
                       placeholder="0"
                       className="h-10 border-slate-200 focus:border-maroon focus:ring-maroon/20"
                     />
@@ -605,7 +651,7 @@ export default function AdminProductForm() {
                     <Input
                       type="number"
                       step="0.01"
-                      {...register(`variants.${index}.price`)}
+                      {...register(`variants.${index}.price`, { valueAsNumber: true })}
                       placeholder="0"
                       className="h-10 border-slate-200 focus:border-maroon focus:ring-maroon/20"
                     />
@@ -623,7 +669,7 @@ export default function AdminProductForm() {
                     <Input
                       type="number"
                       step="0.01"
-                      {...register(`variants.${index}.compare_price`)}
+                      {...register(`variants.${index}.compare_price`, { valueAsNumber: true })}
                       placeholder="Optional"
                       className="h-10 border-slate-200 focus:border-maroon focus:ring-maroon/20"
                     />
@@ -637,7 +683,7 @@ export default function AdminProductForm() {
                     </Label>
                     <Input
                       type="number"
-                      {...register(`variants.${index}.stock`)}
+                      {...register(`variants.${index}.stock`, { valueAsNumber: true })}
                       placeholder="0"
                       className="h-10 border-slate-200 focus:border-maroon focus:ring-maroon/20"
                     />
@@ -679,7 +725,7 @@ export default function AdminProductForm() {
                   weight: 0,
                   unit: "g",
                   price: 0,
-                  compare_price: undefined,
+                  compare_price: null,
                   stock: 0,
                   sku: "",
                   status: "active",

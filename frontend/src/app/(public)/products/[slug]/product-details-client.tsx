@@ -81,8 +81,8 @@ export function ProductDetailsClient({
       </div>
 
       <ProductDetailsSection
-        ingredients={product.description ?? "Authentic Nepali ingredients."}
-        storageInfo="Store in a cool, dry place. Use a clean, dry spoon for serving. Keep tightly sealed."
+        ingredients={product.ingredients ?? "Authentic Nepali ingredients."}
+        storageInfo={product.storage_info ?? "Store in a cool, dry place. Use a clean, dry spoon for serving. Keep tightly sealed."}
       />
     </>
   );

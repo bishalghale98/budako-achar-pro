@@ -36,6 +36,8 @@ export interface Product {
   slug: string;
   short_description: string | null;
   description: string | null;
+  ingredients: string | null;
+  storage_info: string | null;
   rating: number;
   review_count: number;
   featured: boolean;

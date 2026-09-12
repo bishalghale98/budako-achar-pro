@@ -123,6 +123,8 @@ export const adminApi = createApi({
         slug: string;
         short_description?: string;
         description?: string;
+        ingredients?: string;
+        storage_info?: string;
         featured?: boolean;
         status?: string;
       }
@@ -145,6 +147,8 @@ export const adminApi = createApi({
         slug?: string;
         short_description?: string;
         description?: string;
+        ingredients?: string;
+        storage_info?: string;
         featured?: boolean;
         status?: string;
       }

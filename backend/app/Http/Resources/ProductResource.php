@@ -15,6 +15,8 @@ class ProductResource extends JsonResource
             'slug' => $this->slug,
             'short_description' => $this->short_description,
             'description' => $this->description,
+            'ingredients' => $this->ingredients,
+            'storage_info' => $this->storage_info,
             'rating' => (float) $this->rating,
             'review_count' => $this->review_count,
             'featured' => $this->featured,

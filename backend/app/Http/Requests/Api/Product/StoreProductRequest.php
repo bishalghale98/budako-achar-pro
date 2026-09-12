@@ -19,6 +19,8 @@ class StoreProductRequest extends FormRequest
             'slug' => ['required', 'string', 'max:255', 'unique:products,slug'],
             'short_description' => ['nullable', 'string', 'max:500'],
             'description' => ['nullable', 'string'],
+            'ingredients' => ['nullable', 'string'],
+            'storage_info' => ['nullable', 'string'],
             'featured' => ['sometimes', 'boolean'],
             'status' => ['sometimes', 'string', 'in:active,inactive'],
         ];

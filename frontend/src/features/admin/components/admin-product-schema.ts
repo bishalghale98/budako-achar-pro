@@ -5,7 +5,10 @@ export const variantSchema = z.object({
   weight: z.number().min(0, "Weight must be at least 0"),
   unit: z.enum(["g", "kg"]),
   price: z.number().min(0, "Price must be at least 0"),
-  compare_price: z.number().min(0).nullable().optional(),
+  compare_price: z.preprocess(
+    (v) => (v === "" || v === undefined || v === null ? null : Number(v)),
+    z.number().min(0).nullable()
+  ),
   stock: z.number().int().min(0),
   sku: z.string().max(255).optional(),
   status: z.enum(["active", "inactive"]),
@@ -17,6 +20,8 @@ export const productSchema = z.object({
   slug: z.string().min(1, "Slug is required").max(255),
   short_description: z.string().max(500).optional(),
   description: z.string().optional(),
+  ingredients: z.string().optional(),
+  storage_info: z.string().optional(),
   featured: z.boolean(),
   status: z.enum(["active", "inactive"]),
   variants: z
