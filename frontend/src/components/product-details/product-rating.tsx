@@ -21,7 +21,7 @@ export function ProductRating({ rating, reviewCount }: ProductRatingProps) {
   return (
     <div className="flex items-center gap-2 mb-2">
       <StarRating rating={rating} />
-      <span className="text-xs font-bold text-darkText">
+      <span className="text-xs font-bold text-foreground">
         {rating} ({reviewCount} Reviews)
       </span>
     </div>

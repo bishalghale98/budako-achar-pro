@@ -20,16 +20,16 @@ export function ProductInfo({ product, selectedVariant }: ProductInfoProps) {
         rating={product.rating}
         reviewCount={product.review_count}
       />
-      <h1 className="font-serif text-3xl lg:text-4xl font-bold text-darkText">
+      <h1 className="font-serif text-3xl lg:text-4xl font-bold text-foreground">
         {product.title}
       </h1>
       <p className="text-maroon font-bold text-2xl mt-2">
         NPR {price}{" "}
         {unit && (
-          <span className="text-xs text-gray-500 font-normal">/ {unit}</span>
+          <span className="text-xs text-muted-foreground font-normal">/ {unit}</span>
         )}
         {selectedVariant?.compare_price && (
-          <span className="ml-2 text-sm line-through text-gray-500">
+          <span className="ml-2 text-sm line-through text-muted-foreground">
             NPR {selectedVariant.compare_price}
           </span>
         )}

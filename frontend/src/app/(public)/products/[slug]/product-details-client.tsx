@@ -33,22 +33,22 @@ export function ProductDetailsClient({
       <ProductInfo product={product} selectedVariant={selectedVariant} />
 
       {description && (
-        <p className="text-gray-600 text-sm leading-relaxed">{description}</p>
+        <p className="text-muted-foreground text-sm leading-relaxed">{description}</p>
       )}
 
       {product.variants && product.variants.length > 1 && (
-        <div className="space-y-2 pt-4 border-t border-gray-200">
-          <h4 className="font-bold text-darkText text-sm">Select Size</h4>
+        <div className="space-y-2 pt-4 border-t border-border">
+          <h4 className="font-bold text-foreground text-sm">Select Size</h4>
           <div className="flex flex-wrap gap-2">
             {product.variants.map((variant) => (
               <button
                 key={variant.id}
                 onClick={() => setSelectedVariantId(variant.id)}
                 disabled={variant.stock === 0}
-                className={`px-4 py-2 rounded-lg border text-sm font-medium transition ${
+                className={`min-h-11 px-4 py-2 rounded-lg border text-sm font-medium transition ${
                   variant.id === selectedVariantId
-                    ? "border-maroon bg-maroon text-white"
-                    : "border-gray-200 bg-white text-gray-700 hover:border-maroon"
+                    ? "border-primary bg-primary text-primary-foreground"
+                    : "border-border bg-card text-card-foreground hover:border-primary"
                 } ${variant.stock === 0 ? "opacity-50 cursor-not-allowed" : ""}`}
               >
                 {variant.name}
@@ -64,7 +64,7 @@ export function ProductDetailsClient({
         </div>
       )}
 
-      <div className="space-y-4 pt-4 border-t border-gray-200">
+      <div className="space-y-4 pt-4 border-t border-border">
         <QuantitySelector value={quantity} onChange={setQuantity} />
         <div className="flex flex-col sm:flex-row gap-4 pt-4">
           <AddToCartButton

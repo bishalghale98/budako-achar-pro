@@ -7,7 +7,7 @@ interface ProductImageProps {
 
 export function ProductImage({ image, priority }: ProductImageProps) {
   return (
-    <div className="h-96 bg-white border border-gray-200 rounded-2xl overflow-hidden shadow-sm relative">
+    <div className="h-96 bg-card border border-border rounded-2xl overflow-hidden shadow-sm relative">
       <Image
         src={image.src}
         alt={image.alt}

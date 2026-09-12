@@ -14,7 +14,7 @@ export function ProductGallery({ images }: ProductGalleryProps) {
 
   if (images.length === 0) {
     return (
-      <div className="bg-gray-100 rounded-xl h-96 flex items-center justify-center text-gray-400">
+      <div className="bg-muted rounded-xl h-96 flex items-center justify-center text-muted-foreground">
         No images available
       </div>
     );

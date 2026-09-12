@@ -21,10 +21,10 @@ export function ThumbnailList({
           key={i}
           onClick={() => onSelect(i)}
           className={cn(
-            "h-20 bg-white border rounded-lg overflow-hidden cursor-pointer relative transition",
+            "h-20 bg-card border rounded-lg overflow-hidden cursor-pointer relative transition",
             activeIndex === i
-              ? "border-maroon"
-              : "border-gray-200 opacity-70 hover:opacity-100"
+              ? "border-primary"
+              : "border-border opacity-70 hover:opacity-100"
           )}
         >
           <Image
