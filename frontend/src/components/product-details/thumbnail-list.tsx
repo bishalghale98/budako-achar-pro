@@ -16,7 +16,7 @@ export function ThumbnailList({
   onSelect,
 }: ThumbnailListProps) {
   return (
-    <div className="grid grid-cols-4 gap-4">
+    <div className="flex gap-3 overflow-x-auto pb-1">
       {thumbnails.map((thumb, i) => (
         <Button
           key={i}
@@ -24,10 +24,10 @@ export function ThumbnailList({
           size="icon"
           onClick={() => onSelect(i)}
           className={cn(
-            "h-20 bg-card rounded-lg overflow-hidden relative p-0",
+            "h-20 w-20 shrink-0 bg-card rounded-lg overflow-hidden relative p-0 transition-all",
             activeIndex === i
-              ? "border-primary"
-              : "border-border opacity-70 hover:opacity-100"
+              ? "border-2 border-maroon ring-2 ring-maroon/20 opacity-100"
+              : "border-border opacity-60 hover:opacity-100 hover:border-muted-foreground/50"
           )}
         >
           <Image

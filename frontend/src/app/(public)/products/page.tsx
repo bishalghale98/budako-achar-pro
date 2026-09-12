@@ -1,7 +1,6 @@
 import { AppBreadcrumb } from "@/components/shared";
 import { PageHeader } from "@/components/shared";
 import { ProductList } from "@/components/products/product-list";
-import { getProducts, getCategories } from "@/lib/server/product";
 import { Metadata } from "next";
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -35,10 +34,6 @@ export async function generateMetadata(): Promise<Metadata> {
 
 
 export default async function ProductsPage() {
-  const [productsData, categoriesData] = await Promise.all([
-    getProducts({ per_page: 12 }),
-    getCategories(),
-  ]);
 
 
   return (

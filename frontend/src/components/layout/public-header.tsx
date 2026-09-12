@@ -118,6 +118,7 @@ export function PublicHeader() {
           {/* Cart Icon with Mini-Cart Popover */}
           <Popover open={cartOpen} onOpenChange={setCartOpen}>
             <PopoverTrigger
+              nativeButton={false}
               onMouseEnter={openCart}
               onMouseLeave={scheduleClose}
               render={
