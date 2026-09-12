@@ -2,6 +2,7 @@
 
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
+import Image from "next/image";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
@@ -235,11 +236,12 @@ export function CustomerForm({
           <Card>
             <CardContent className="flex flex-col sm:flex-row items-center gap-6">
               <div className="shrink-0">
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img
+                <Image
                   src="https://images.unsplash.com/photo-1595079676339-1534801ad6cf?q=80&w=1170&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
                   alt="QR Code"
-                  className="w-48 h-48 rounded-xl object-cover"
+                  className="rounded-xl object-cover"
+                  width={192}
+                  height={192}
                 />
               </div>
               <div className="space-y-2 text-sm text-center sm:text-left">
@@ -269,11 +271,12 @@ export function CustomerForm({
           <Card>
             <CardContent className="flex flex-col sm:flex-row items-center gap-6">
               <div className="shrink-0">
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img
+                <Image
                   src="https://images.unsplash.com/photo-1595079676339-1534801ad6cf?q=80&w=1170&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
                   alt="QR Code"
-                  className="w-48 h-48 rounded-xl object-cover"
+                  className="rounded-xl object-cover"
+                  width={192}
+                  height={192}
                 />
               </div>
               <div className="space-y-2 text-sm text-center sm:text-left">

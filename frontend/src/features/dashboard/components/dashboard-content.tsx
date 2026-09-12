@@ -68,52 +68,52 @@ export function DashboardContent() {
       {/* Quick Stats */}
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
         {/* Email Status Card */}
-        <div className="flex items-center gap-4 rounded-2xl border border-slate-100 bg-white p-5">
+        <div className="flex items-center gap-4 rounded-2xl border border-border bg-card p-5">
           <div className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-xl ${isVerified ? "bg-emerald-50 text-emerald-700" : "bg-amber-50 text-amber-700"}`}>
             {isVerified ? <CheckCircle className="h-5 w-5" /> : <XCircle className="h-5 w-5" />}
           </div>
           <div>
-            <p className="text-2xl font-bold text-slate-900">{isVerified ? "Yes" : "No"}</p>
-            <p className="text-xs text-slate-500">Email Verified</p>
+            <p className="text-2xl font-bold text-foreground">{isVerified ? "Yes" : "No"}</p>
+            <p className="text-xs text-muted-foreground">Email Verified</p>
           </div>
         </div>
 
         {/* Role Card */}
-        <div className="flex items-center gap-4 rounded-2xl border border-slate-100 bg-white p-5">
-          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-amber-50 text-amber-700">
+        <div className="flex items-center gap-4 rounded-2xl border border-border bg-card p-5">
+          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-accent/20 text-accent-foreground">
             <Mail className="h-5 w-5" />
           </div>
           <div>
-            <p className="text-2xl font-bold text-slate-900 capitalize">{user.role || "User"}</p>
-            <p className="text-xs text-slate-500">Account Role</p>
+            <p className="text-2xl font-bold text-foreground capitalize">{user.role || "User"}</p>
+            <p className="text-xs text-muted-foreground">Account Role</p>
           </div>
         </div>
       </div>
 
       {/* Profile Info */}
-      <div className="overflow-hidden rounded-2xl border border-slate-100 bg-white">
-        <div className="flex items-center justify-between border-b border-slate-100 px-6 py-5">
-          <h2 className="font-semibold text-slate-900">Profile Information</h2>
+      <div className="overflow-hidden rounded-2xl border border-border bg-card">
+        <div className="flex items-center justify-between border-b border-border px-6 py-5">
+          <h2 className="font-semibold text-foreground">Profile Information</h2>
         </div>
-        <div className="divide-y divide-slate-100">
+        <div className="divide-y divide-border">
           <div className="flex items-center justify-between px-6 py-4">
-            <span className="text-sm text-slate-500">Name</span>
-            <span className="text-sm font-bold text-slate-900">{user.name}</span>
+            <span className="text-sm text-muted-foreground">Name</span>
+            <span className="text-sm font-bold text-foreground">{user.name}</span>
           </div>
           <div className="flex items-center justify-between px-6 py-4">
-            <span className="text-sm text-slate-500">Email</span>
-            <span className="text-sm font-bold text-slate-900">{user.email}</span>
+            <span className="text-sm text-muted-foreground">Email</span>
+            <span className="text-sm font-bold text-foreground">{user.email}</span>
           </div>
           <div className="flex items-center justify-between px-6 py-4">
-            <span className="text-sm text-slate-500">Email Verified</span>
+            <span className="text-sm text-muted-foreground">Email Verified</span>
             <span className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-[11px] font-bold ${isVerified ? "bg-emerald-50 text-emerald-700" : "bg-amber-50 text-amber-700"}`}>
               {isVerified ? "Verified" : "Not Verified"}
             </span>
           </div>
           {user.role && (
             <div className="flex items-center justify-between px-6 py-4">
-              <span className="text-sm text-slate-500">Role</span>
-              <span className="inline-flex items-center rounded-full bg-amber-50 px-2.5 py-0.5 text-[11px] font-bold text-amber-700 capitalize">
+              <span className="text-sm text-muted-foreground">Role</span>
+              <span className="inline-flex items-center rounded-full bg-accent/20 px-2.5 py-0.5 text-[11px] font-bold text-accent-foreground capitalize">
                 {user.role}
               </span>
             </div>
@@ -122,12 +122,12 @@ export function DashboardContent() {
       </div>
 
       {/* Session */}
-      <div className="overflow-hidden rounded-2xl border border-slate-100 bg-white">
-        <div className="flex items-center justify-between border-b border-slate-100 px-6 py-5">
-          <h2 className="font-semibold text-slate-900">Session</h2>
+      <div className="overflow-hidden rounded-2xl border border-border bg-card">
+        <div className="flex items-center justify-between border-b border-border px-6 py-5">
+          <h2 className="font-semibold text-foreground">Session</h2>
         </div>
         <div className="px-6 py-4">
-          <p className="mb-4 text-sm text-slate-500">
+          <p className="mb-4 text-sm text-muted-foreground">
             Sign out of your current session.
           </p>
           <Button

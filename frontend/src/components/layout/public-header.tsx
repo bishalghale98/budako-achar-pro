@@ -6,6 +6,7 @@ import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { ShoppingBag, Menu, X } from "lucide-react";
 import { cn } from "cn";
+import { Button } from "@/components/ui/button";
 import { useAuth } from "@/features/auth/auth-hooks";
 import { useGetCartQuery } from "@/features/cart";
 
@@ -184,13 +185,15 @@ export function PublicHeader() {
               )}
             </div>
 
-            <button
+            <Button
+              variant="ghost"
+              size="icon"
               onClick={() => setMobileMenuOpen(true)}
-              className="md:hidden p-2 text-gray-700 hover:text-maroon transition focus:outline-none"
+              className="md:hidden text-gray-700 hover:text-maroon"
               aria-label="Toggle Menu"
             >
               <Menu className="w-6 h-6" />
-            </button>
+            </Button>
           </div>
         </div>
       </header>
@@ -213,13 +216,15 @@ export function PublicHeader() {
       >
         <div className="flex items-center justify-between p-4 border-b border-gray-200">
           <span className="font-serif text-lg font-bold text-maroon">Menu</span>
-          <button
+          <Button
+            variant="ghost"
+            size="icon"
             onClick={() => setMobileMenuOpen(false)}
             className="p-2 text-gray-700 hover:text-maroon transition focus:outline-none"
             aria-label="Close Menu"
           >
             <X className="w-5 h-5" />
-          </button>
+          </Button>
         </div>
         <nav className="p-4 space-y-1">
           {navLinks.map((link) => (

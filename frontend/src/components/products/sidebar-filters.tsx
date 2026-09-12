@@ -1,6 +1,7 @@
 "use client";
 
 import type { Category } from "@/features/products/product-types";
+import { Button } from "@/components/ui/button";
 
 interface SidebarFiltersProps {
   categories: Category[];
@@ -21,22 +22,24 @@ export function SidebarFilters({
         </h3>
         <ul className="space-y-2 text-sm">
           <li>
-            <button
+            <Button
+              variant="ghost"
               onClick={() => onCategoryChange("all")}
-              className={`block py-1 text-left w-full ${
+              className={`block py-1 text-left w-full justify-start ${
                 activeCategory === "all"
                   ? "text-maroon font-semibold"
                   : "text-gray-600 hover:text-maroon"
               }`}
             >
               All Products
-            </button>
+            </Button>
           </li>
           {categories.map((cat) => (
             <li key={cat.id}>
-              <button
+              <Button
+                variant="ghost"
                 onClick={() => onCategoryChange(cat.id)}
-                className={`block py-1 text-left w-full ${
+                className={`block py-1 text-left w-full justify-start ${
                   activeCategory === cat.id
                     ? "text-maroon font-semibold"
                     : "text-gray-600 hover:text-maroon"
@@ -48,7 +51,7 @@ export function SidebarFilters({
                     ({cat.products_count})
                   </span>
                 )}
-              </button>
+              </Button>
             </li>
           ))}
         </ul>

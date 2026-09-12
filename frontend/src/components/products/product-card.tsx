@@ -4,9 +4,10 @@ import type { Product } from "@/features/products/product-types";
 
 interface ProductCardProps {
   product: Product;
+  priority?: boolean;
 }
 
-export function ProductCard({ product }: ProductCardProps) {
+export function ProductCard({ product, priority }: ProductCardProps) {
   const thumbnail = product.images?.find((img) => img.is_thumbnail) ?? product.images?.[0];
   const lowestPrice = product.variants?.length
     ? Math.min(...product.variants.map((v) => v.price))
@@ -23,6 +24,7 @@ export function ProductCard({ product }: ProductCardProps) {
             fill
             className="object-cover"
             sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+            priority={priority}
           />
         ) : (
           <div className="w-full h-full flex items-center justify-center text-gray-400 text-sm">

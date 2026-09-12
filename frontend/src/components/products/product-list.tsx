@@ -9,8 +9,10 @@ import { useGetCategoriesQuery } from "@/features/products/category-api";
 import { SidebarFilters } from "./sidebar-filters";
 import { SearchSortBar } from "./search-sort-bar";
 import { ProductGrid } from "./product-grid";
-import { LoadingState, ErrorState } from "@/components/shared";
+import {  ErrorState } from "@/components/shared";
+import { Button } from "@/components/ui/button";
 import type { Product, Category } from "@/features/products/product-types";
+import { ProductListSkeleton } from "./product-list-skeleton";
 
 const SORT_MAP: Record<string, string> = {
   Featured: "featured",
@@ -21,15 +23,10 @@ const SORT_MAP: Record<string, string> = {
 
 const SORT_OPTIONS = Object.keys(SORT_MAP);
 
-interface ProductListProps {
-  initialProducts: Product[];
-  initialCategories: Category[];
-}
 
-export function ProductList({
-  initialProducts,
-  initialCategories,
-}: ProductListProps) {
+
+export function ProductList() {
+
   const [searchInput, setSearchInput] = useState("");
   const debouncedSearch = useDebounce(searchInput);
   const [sortOption, setSortOption] = useState("Featured");
@@ -45,16 +42,16 @@ export function ProductList({
     sort: SORT_MAP[sortOption] ?? "featured",
   });
 
-  const categories = categoriesData?.categories ?? initialCategories;
-  const products = productsData?.data ?? initialProducts;
+  const categories = categoriesData?.categories;
+  const products = productsData?.data;
 
-  if (isLoading) return <LoadingState />;
+  if (isLoading) return <ProductListSkeleton />;
   if (isError) return <ErrorState />;
 
   return (
     <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
       <SidebarFilters
-        categories={categories}
+        categories={categories as Category[]}
         activeCategory={activeCategory}
         onCategoryChange={(id) => {
           setActiveCategory(id);
@@ -73,7 +70,7 @@ export function ProductList({
           onSortChange={setSortOption}
           sortOptions={SORT_OPTIONS}
         />
-        <ProductGrid products={products} />
+        <ProductGrid products={products as Product[]} />
 
         {productsData && productsData.last_page > 1 && (
           <div className="flex justify-center gap-2 mt-8">
@@ -81,17 +78,15 @@ export function ProductList({
               { length: productsData.last_page },
               (_, i) => i + 1
             ).map((p) => (
-              <button
+              <Button
                 key={p}
+                variant={p === page ? "default" : "outline"}
+                size="sm"
                 onClick={() => setPage(p)}
-                className={`px-3 py-1 rounded text-sm ${
-                  p === page
-                    ? "bg-maroon text-white"
-                    : "bg-white border border-gray-200 text-gray-600 hover:bg-gray-50"
-                }`}
+                className={p === page ? "bg-maroon text-white hover:bg-maroon-hover" : ""}
               >
                 {p}
-              </button>
+              </Button>
             ))}
           </div>
         )}

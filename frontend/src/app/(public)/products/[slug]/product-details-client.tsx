@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import type { Product } from "@/features/products/product-types";
+import { Button } from "@/components/ui/button";
 import {
   ProductInfo,
   QuantitySelector,
@@ -41,8 +42,10 @@ export function ProductDetailsClient({
           <h4 className="font-bold text-foreground text-sm">Select Size</h4>
           <div className="flex flex-wrap gap-2">
             {product.variants.map((variant) => (
-              <button
+              <Button
                 key={variant.id}
+                variant="outline"
+                size="lg"
                 onClick={() => setSelectedVariantId(variant.id)}
                 disabled={variant.stock === 0}
                 className={`min-h-11 px-4 py-2 rounded-lg border text-sm font-medium transition ${
@@ -58,7 +61,7 @@ export function ProductDetailsClient({
                     {variant.compare_price}
                   </span>
                 )}
-              </button>
+              </Button>
             ))}
           </div>
         </div>

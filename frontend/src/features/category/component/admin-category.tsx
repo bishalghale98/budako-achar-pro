@@ -105,7 +105,7 @@ export default function CategoryContent() {
     <div className="space-y-6">
       {/* Header */}
       <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold text-slate-900">Categories</h1>
+        <h1 className="text-2xl font-bold text-foreground">Categories</h1>
         <Button onClick={openCreate} className="bg-maroon text-white hover:bg-maroon-hover gap-2">
           <Plus className="h-4 w-4" />
           New Category
@@ -114,7 +114,7 @@ export default function CategoryContent() {
 
       {/* Search */}
       <div className="relative max-w-sm">
-        <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+        <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
         <Input
           placeholder="Search categories..."
           value={search}
@@ -127,25 +127,25 @@ export default function CategoryContent() {
       </div>
 
       {/* Table */}
-      <div className="overflow-hidden rounded-2xl border border-slate-100 bg-white">
+      <div className="overflow-hidden rounded-2xl border border-border bg-card">
         <table className="w-full">
           <thead>
-            <tr className="border-b border-slate-100 bg-slate-50">
-              <th className="text-left px-6 py-3 text-xs font-semibold text-slate-500 uppercase tracking-wider">
+            <tr className="border-b border-border bg-muted/50">
+              <th className="text-left px-6 py-3 text-xs font-semibold text-muted-foreground uppercase tracking-wider">
                 Name
               </th>
-              <th className="text-left px-6 py-3 text-xs font-semibold text-slate-500 uppercase tracking-wider">
+              <th className="text-left px-6 py-3 text-xs font-semibold text-muted-foreground uppercase tracking-wider">
                 Slug
               </th>
-              <th className="text-center px-6 py-3 text-xs font-semibold text-slate-500 uppercase tracking-wider">
+              <th className="text-center px-6 py-3 text-xs font-semibold text-muted-foreground uppercase tracking-wider">
                 Products
               </th>
-              <th className="text-right px-6 py-3 text-xs font-semibold text-slate-500 uppercase tracking-wider">
+              <th className="text-right px-6 py-3 text-xs font-semibold text-muted-foreground uppercase tracking-wider">
                 Actions
               </th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-slate-100">
+          <tbody className="divide-y divide-border">
             {isLoading ? (
               Array.from({ length: 5 }).map((_, i) => (
                 <tr key={i}>
@@ -158,9 +158,9 @@ export default function CategoryContent() {
             ) : categories.length === 0 ? (
               <tr>
                 <td colSpan={4} className="px-6 py-16 text-center">
-                  <FolderOpen className="h-12 w-12 text-slate-300 mx-auto mb-4" />
-                  <h3 className="text-lg font-semibold text-slate-900 mb-1">No categories yet</h3>
-                  <p className="text-sm text-slate-500 mb-4">Create your first category to get started.</p>
+                  <FolderOpen className="h-12 w-12 text-muted-foreground/30 mx-auto mb-4" />
+                  <h3 className="text-lg font-semibold text-foreground mb-1">No categories yet</h3>
+                  <p className="text-sm text-muted-foreground mb-4">Create your first category to get started.</p>
                   <Button onClick={openCreate} className="bg-maroon text-white hover:bg-maroon-hover gap-2">
                     <Plus className="h-4 w-4" />
                     New Category
@@ -169,12 +169,12 @@ export default function CategoryContent() {
               </tr>
             ) : (
               categories.map((category) => (
-                <tr key={category.id} className="hover:bg-slate-50 transition-colors">
+                <tr key={category.id} className="hover:bg-muted/50 transition-colors">
                   <td className="px-6 py-4">
-                    <span className="font-medium text-slate-900">{category.name}</span>
+                    <span className="font-medium text-foreground">{category.name}</span>
                   </td>
                   <td className="px-6 py-4">
-                    <span className="text-sm text-slate-500">{category.slug}</span>
+                    <span className="text-sm text-muted-foreground">{category.slug}</span>
                   </td>
                   <td className="px-6 py-4 text-center">
                     <span className="inline-flex items-center rounded-full bg-maroon/10 px-2.5 py-0.5 text-xs font-bold text-maroon">
@@ -196,7 +196,7 @@ export default function CategoryContent() {
                         variant="outline"
                         size="sm"
                         onClick={() => openDeleteDialog(category.id, category.name)}
-                        className="gap-1.5 text-red-600 hover:bg-red-50 hover:text-red-700 border-red-200"
+                        className="gap-1.5 text-destructive hover:bg-destructive/10 hover:text-destructive border-destructive/20"
                       >
                         <Trash2 className="h-3.5 w-3.5" />
                         Delete
@@ -221,7 +221,7 @@ export default function CategoryContent() {
           >
             Previous
           </Button>
-          <span className="text-sm text-slate-500">
+          <span className="text-sm text-muted-foreground">
             Page {pagination.current_page} of {pagination.last_page}
           </span>
           <Button
@@ -250,7 +250,7 @@ export default function CategoryContent() {
             )}
 
             <div className="space-y-2">
-              <Label htmlFor="category-name" className="text-sm font-medium text-slate-700">
+              <Label htmlFor="category-name" className="text-sm font-medium text-foreground">
                 Category Name
               </Label>
               <Input

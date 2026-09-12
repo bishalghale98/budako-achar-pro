@@ -1,7 +1,9 @@
 "use client";
 
 import { useRef, useState } from "react";
+import Image from "next/image";
 import { Button } from "@/components/ui/button";
+import { Label } from "@/components/ui/label";
 import { Upload, X, Image as ImageIcon } from "lucide-react";
 
 interface PaymentProofUploadProps {
@@ -39,9 +41,9 @@ export function PaymentProofUpload({
 
   return (
     <div>
-      <label className="block text-xs font-bold uppercase text-gray-500 mb-1">
+      <Label className="block text-xs font-bold uppercase text-gray-500 mb-1">
         Payment Screenshot *
-      </label>
+      </Label>
       <div
         className={`border-2 border-dashed rounded-lg p-4 text-center transition ${
           error ? "border-destructive" : "border-border hover:border-maroon"
@@ -51,11 +53,11 @@ export function PaymentProofUpload({
           <div className="space-y-3">
             <div className="relative w-32 h-32 mx-auto">
               <ImageIcon className="w-full h-full text-muted-foreground" />
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img
+              <Image
                 src={preview}
                 alt="Payment proof"
                 className="absolute inset-0 w-full h-full object-contain"
+                fill
               />
             </div>
             <div className="flex items-center justify-center gap-2 text-sm">

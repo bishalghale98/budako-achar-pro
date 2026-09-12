@@ -1,3 +1,4 @@
+import Image from "next/image";
 import type { BrandStory } from "@/data/about";
 
 interface BrandStorySectionProps {
@@ -10,11 +11,12 @@ export function BrandStorySection({ data }: BrandStorySectionProps) {
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="grid grid-cols-1 items-center gap-12 lg:grid-cols-2">
           <div className="order-2 lg:order-1">
-            <div className="h-80 overflow-hidden rounded-2xl bg-gray-100 sm:h-96">
-              <img
+            <div className="relative h-80 overflow-hidden rounded-2xl bg-gray-100 sm:h-96">
+              <Image
                 src={data.image}
                 alt={data.imageAlt}
                 className="h-full w-full object-cover"
+                fill
               />
             </div>
           </div>

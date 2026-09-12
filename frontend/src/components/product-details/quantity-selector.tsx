@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { Label } from "@/components/ui/label";
+import { Button } from "@/components/ui/button";
 
 interface QuantitySelectorProps {
   value: number;
@@ -10,23 +11,27 @@ interface QuantitySelectorProps {
 export function QuantitySelector({ value, onChange }: QuantitySelectorProps) {
   return (
     <div>
-      <label className="block text-xs font-bold uppercase text-muted-foreground mb-2">
+      <Label className="block text-xs font-bold uppercase text-muted-foreground mb-2">
         Quantity
-      </label>
+      </Label>
       <div className="inline-flex items-center border border-border rounded-lg bg-card">
-        <button
+        <Button
+          variant="ghost"
+          size="icon"
           onClick={() => onChange(Math.max(1, value - 1))}
-          className="px-3 py-1 text-muted-foreground hover:bg-muted transition"
+          className="px-3 py-1 text-muted-foreground hover:bg-muted transition h-8 w-8"
         >
           -
-        </button>
+        </Button>
         <span className="px-4 py-1 text-sm font-semibold">{value}</span>
-        <button
+        <Button
+          variant="ghost"
+          size="icon"
           onClick={() => onChange(value + 1)}
-          className="px-3 py-1 text-muted-foreground hover:bg-muted transition"
+          className="px-3 py-1 text-muted-foreground hover:bg-muted transition h-8 w-8"
         >
           +
-        </button>
+        </Button>
       </div>
     </div>
   );

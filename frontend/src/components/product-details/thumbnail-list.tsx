@@ -2,6 +2,7 @@
 
 import Image from "next/image";
 import { cn } from "cn";
+import { Button } from "@/components/ui/button";
 
 interface ThumbnailListProps {
   thumbnails: { src: string; alt: string }[];
@@ -17,11 +18,13 @@ export function ThumbnailList({
   return (
     <div className="grid grid-cols-4 gap-4">
       {thumbnails.map((thumb, i) => (
-        <button
+        <Button
           key={i}
+          variant="outline"
+          size="icon"
           onClick={() => onSelect(i)}
           className={cn(
-            "h-20 bg-card border rounded-lg overflow-hidden cursor-pointer relative transition",
+            "h-20 bg-card rounded-lg overflow-hidden relative p-0",
             activeIndex === i
               ? "border-primary"
               : "border-border opacity-70 hover:opacity-100"
@@ -34,7 +37,7 @@ export function ThumbnailList({
             className="object-cover"
             sizes="80px"
           />
-        </button>
+        </Button>
       ))}
     </div>
   );

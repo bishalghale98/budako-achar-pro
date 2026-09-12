@@ -2,6 +2,7 @@
 
 import Image from "next/image";
 import type { CartItem } from "@/features/cart";
+import { Button } from "@/components/ui/button";
 
 interface CartItemCardProps {
   item: CartItem;
@@ -36,13 +37,15 @@ export function CartItemCard({ item, onUpdateQuantity, onRemove }: CartItemCardP
           <h3 className="font-serif font-bold text-sm sm:text-base text-darkText leading-snug line-clamp-2">
             {item.product.title}
           </h3>
-          <button
+          <Button
+            variant="ghost"
+            size="icon"
             onClick={() => onRemove(item.id)}
-            className="text-gray-400 hover:text-red-500 transition text-lg leading-none flex-shrink-0 mt-0.5"
+            className="text-gray-400 hover:text-red-500 transition h-6 w-6 flex-shrink-0 mt-0.5"
             aria-label="Remove item"
           >
             ×
-          </button>
+          </Button>
         </div>
 
         {/* Variant */}
@@ -60,7 +63,9 @@ export function CartItemCard({ item, onUpdateQuantity, onRemove }: CartItemCardP
           </p>
 
           <div className="inline-flex items-center border border-gray-300 rounded-lg bg-white">
-            <button
+            <Button
+              variant="ghost"
+              size="icon"
               onClick={() => {
                 if (item.quantity <= 1) {
                   onRemove(item.id);
@@ -68,19 +73,21 @@ export function CartItemCard({ item, onUpdateQuantity, onRemove }: CartItemCardP
                   onUpdateQuantity(item.id, item.quantity - 1);
                 }
               }}
-              className="px-3 py-1 text-gray-600 hover:bg-gray-100 transition text-sm"
+              className="px-3 py-1 text-gray-600 hover:bg-gray-100 transition text-sm h-8 w-8"
             >
               -
-            </button>
+            </Button>
             <span className="px-3 py-1 text-sm font-semibold tabular-nums min-w-[2rem] text-center">
               {item.quantity}
             </span>
-            <button
+            <Button
+              variant="ghost"
+              size="icon"
               onClick={() => onUpdateQuantity(item.id, item.quantity + 1)}
-              className="px-3 py-1 text-gray-600 hover:bg-gray-100 transition text-sm"
+              className="px-3 py-1 text-gray-600 hover:bg-gray-100 transition text-sm h-8 w-8"
             >
               +
-            </button>
+            </Button>
           </div>
         </div>
       </div>

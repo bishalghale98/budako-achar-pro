@@ -7,6 +7,7 @@ import { useLogoutMutation } from "@/features/auth/auth-api";
 import { PublicHeader } from "@/components/layout/public-header";
 import { PublicFooter } from "@/components/layout/public-footer";
 import { LayoutDashboard, ClipboardList, MapPin, User, Heart, LogOut, Shield } from "lucide-react";
+import { Button } from "@/components/ui/button";
 import CustomerLoading from "./customer/loading";
 
 const sidebarNav = [
@@ -115,13 +116,14 @@ function DashboardLayoutContent({ children }: { children: React.ReactNode }) {
 
           {/* Logout */}
           <div className="mt-6 border-t border-slate-100 pt-6">
-            <button
+            <Button
+              variant="ghost"
               onClick={handleLogout}
-              className="flex w-full items-center gap-3 rounded-xl px-4 py-3 text-sm font-medium text-slate-600 transition-colors hover:bg-red-50 hover:text-red-600"
+              className="flex w-full items-center gap-3 rounded-xl px-4 py-3 text-sm font-medium text-slate-600 transition-colors hover:bg-red-50 hover:text-red-600 justify-start"
             >
               <LogOut className="h-4.5 w-4.5" />
               Log Out
-            </button>
+            </Button>
           </div>
         </div>
       </div>

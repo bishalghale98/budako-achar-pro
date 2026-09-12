@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useAddCartItemMutation } from "@/features/cart";
+import { Button } from "@/components/ui/button";
 import { ShoppingBag } from "lucide-react";
 
 interface AddToCartButtonProps {
@@ -41,14 +42,14 @@ export function AddToCartButton({
 
   return (
     <div className="flex-1 space-y-2">
-      <button
+      <Button
         onClick={handleClick}
         disabled={isLoading || !variantId}
         className="w-full py-3.5 bg-maroon text-white font-medium rounded-lg text-center hover:bg-maroon-hover transition shadow-sm disabled:opacity-50 disabled:cursor-not-allowed inline-flex items-center justify-center gap-2"
       >
         <ShoppingBag className="w-4 h-4" />
         {isLoading ? "Adding..." : "Add to Cart"}
-      </button>
+      </Button>
       {success && (
         <p className="text-sm text-green-600 text-center">Added to cart!</p>
       )}

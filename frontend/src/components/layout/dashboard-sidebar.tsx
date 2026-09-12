@@ -62,7 +62,7 @@ function SidebarNav({
               "flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-medium transition-colors",
               isActive
                 ? "bg-maroon text-white"
-                : "text-slate-600 hover:bg-slate-50"
+                : "text-muted-foreground hover:bg-accent"
             )}
           >
             {item.icon}
@@ -99,19 +99,19 @@ function SidebarUser() {
   };
 
   return (
-    <div className="border-t border-slate-100 p-4">
+    <div className="border-t border-border p-4">
       <div className="flex items-center gap-3">
-        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-maroon/10 text-sm font-bold text-maroon">
+        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-maroon/10 text-xs font-bold text-maroon">
           {initials}
         </div>
         <div className="min-w-0 flex-1">
-          <p className="truncate text-sm font-bold text-slate-900">{user.name}</p>
-          <p className="truncate text-xs text-slate-500">{user.email}</p>
+          <p className="truncate text-sm font-bold text-foreground">{user.name}</p>
+          <p className="truncate text-xs text-muted-foreground">{user.email}</p>
         </div>
       </div>
       <div className="mt-3 flex items-center gap-2">
         {user.role && (
-          <span className="inline-flex items-center rounded-full bg-amber-50 px-2.5 py-0.5 text-[11px] font-bold text-amber-700 capitalize">
+          <span className="inline-flex items-center rounded-full bg-accent/20 px-2.5 py-0.5 text-[11px] font-bold text-accent-foreground capitalize">
             {user.role}
           </span>
         )}
@@ -120,7 +120,7 @@ function SidebarUser() {
             variant="ghost"
             size="sm"
             onClick={handleLogout}
-            className="h-8 gap-1.5 px-2.5 text-xs text-slate-600 hover:bg-red-50 hover:text-red-600"
+            className="h-8 gap-1.5 px-2.5 text-xs text-muted-foreground hover:bg-destructive/10 hover:text-destructive"
           >
             <LogOut className="h-3.5 w-3.5" />
             Sign out
@@ -135,7 +135,7 @@ export function DashboardSidebar() {
   return (
     <>
       {/* Desktop sidebar */}
-      <aside className="hidden lg:fixed lg:inset-y-0 lg:z-50 lg:flex lg:w-64 lg:flex-col border-r border-slate-100 bg-white">
+      <aside className="hidden lg:fixed lg:inset-y-0 lg:z-50 lg:flex lg:w-64 lg:flex-col border-r border-border bg-card">
         <div className="flex h-16 items-center px-5">
           <Link href="/" className="flex items-center">
             <Image
@@ -176,8 +176,8 @@ export function MobileSidebarTrigger() {
       >
         <Menu className="h-5 w-5" />
       </SheetTrigger>
-      <SheetContent side="left" showCloseButton className="w-72 bg-white p-0">
-        <SheetHeader className="border-b border-slate-100 px-5 py-4">
+      <SheetContent side="left" showCloseButton className="w-72 bg-card p-0">
+        <SheetHeader className="border-b border-border px-5 py-4">
           <SheetTitle className="text-left">Navigation</SheetTitle>
         </SheetHeader>
         <div className="flex flex-1 flex-col px-3 py-4">

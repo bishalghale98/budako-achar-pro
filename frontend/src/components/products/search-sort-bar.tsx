@@ -1,6 +1,7 @@
 "use client";
 
 import { Input } from "@/components/ui/input";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 interface SearchSortBarProps {
   searchQuery: string;
@@ -24,19 +25,20 @@ export function SearchSortBar({
         placeholder="Search achar..."
         value={searchQuery}
         onChange={(e) => onSearchChange(e.target.value)}
-        className="w-full sm:w-72"
+        className="w-full sm:w-auto"
       />
-      <select
-        value={sortOption}
-        onChange={(e) => onSortChange(e.target.value)}
-        className="w-full sm:w-auto px-3 py-2 border border-input rounded-lg text-sm focus:outline-none focus:ring-3 focus:ring-ring/50 bg-background"
-      >
-        {sortOptions.map((opt) => (
-          <option key={opt} value={opt}>
-            Sort by: {opt}
-          </option>
-        ))}
-      </select>
+      <Select value={sortOption} onValueChange={(val) => val && onSortChange(val)}>
+        <SelectTrigger className="w-full sm:w-auto">
+          <SelectValue />
+        </SelectTrigger>
+        <SelectContent>
+          {sortOptions.map((opt) => (
+            <SelectItem key={opt} value={opt}>
+              Sort by: {opt}
+            </SelectItem>
+          ))}
+        </SelectContent>
+      </Select>
     </div>
   );
 }

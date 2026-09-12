@@ -7,6 +7,8 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForgotPasswordMutation } from "@/features/auth/auth-api";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Button } from "@/components/ui/button";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 import { forgotPasswordSchema, type ForgotPasswordFormValues } from "./auth-schemas";
 
 export function ForgotPasswordForm() {
@@ -78,9 +80,9 @@ export function ForgotPasswordForm() {
       </div>
 
       {generalError && !fieldErrors && (
-        <div className="bg-red-50 border border-red-200 text-red-700 text-sm rounded-lg px-4 py-3">
-          {generalError}
-        </div>
+        <Alert variant="destructive">
+          <AlertDescription>{generalError}</AlertDescription>
+        </Alert>
       )}
 
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
@@ -101,13 +103,13 @@ export function ForgotPasswordForm() {
           )}
         </div>
 
-        <button
+        <Button
           type="submit"
           disabled={isLoading}
           className="w-full py-3.5 bg-maroon text-white font-medium rounded-lg hover:bg-maroon-hover transition shadow-sm text-sm disabled:opacity-60"
         >
           {isLoading ? "Sending..." : "Send Reset Link"}
-        </button>
+        </Button>
       </form>
 
       <div className="relative flex py-2 items-center">

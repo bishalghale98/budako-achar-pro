@@ -3,6 +3,8 @@
 import { useState } from "react";
 import Link from "next/link";
 import { useSendVerificationEmailMutation } from "@/features/auth/auth-api";
+import { Button } from "@/components/ui/button";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 
 export function VerifyEmailCard() {
   const [sendVerification, { isLoading }] = useSendVerificationEmailMutation();
@@ -38,24 +40,19 @@ export function VerifyEmailCard() {
       </p>
 
       {message && (
-        <div
-          className={`text-sm rounded-lg px-4 py-3 ${
-            isError
-              ? "bg-red-50 border border-red-200 text-red-700"
-              : "bg-green-50 border border-green-200 text-green-700"
-          }`}
-        >
-          {message}
-        </div>
+        <Alert variant={isError ? "destructive" : "default"}>
+          <AlertDescription>{message}</AlertDescription>
+        </Alert>
       )}
 
-      <button
+      <Button
         onClick={handleResend}
         disabled={isLoading}
+        variant="outline"
         className="w-full py-3.5 border border-maroon text-maroon font-medium rounded-lg hover:bg-maroon hover:text-white transition shadow-sm text-sm disabled:opacity-60"
       >
         {isLoading ? "Sending..." : "Resend Verification Email"}
-      </button>
+      </Button>
 
       <div className="relative flex py-2 items-center">
         <div className="flex-grow border-t border-gray-200" />

@@ -3,6 +3,7 @@
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import { Button } from "@/components/ui/button";
 
 export function ContactForm() {
   return (
@@ -41,9 +42,9 @@ export function ContactForm() {
             placeholder="How can we help you?"
           />
         </div>
-        <button className="w-full py-3 bg-maroon text-white font-medium rounded-lg hover:bg-maroon-hover transition text-sm">
+        <Button className="w-full py-3 bg-maroon text-white font-medium rounded-lg hover:bg-maroon-hover transition text-sm">
           Send Message
-        </button>
+        </Button>
       </div>
     </div>
   );

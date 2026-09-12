@@ -7,7 +7,7 @@ export function DashboardHeader() {
   const user = useUser();
 
   return (
-    <header className="sticky top-0 z-40 flex h-16 items-center gap-4 border-b border-slate-100 bg-white px-4 sm:px-6">
+    <header className="sticky top-0 z-40 flex h-16 items-center gap-4 border-b border-border bg-card px-4 sm:px-6">
       <MobileSidebarTrigger />
 
       <div className="flex-1" />
@@ -15,8 +15,8 @@ export function DashboardHeader() {
       {user && (
         <div className="flex items-center gap-3">
           <div className="hidden text-right sm:block">
-            <p className="text-sm font-bold text-slate-900">{user.name}</p>
-            <p className="text-xs text-slate-500">{user.email}</p>
+            <p className="text-sm font-bold text-foreground">{user.name}</p>
+            <p className="text-xs text-muted-foreground">{user.email}</p>
           </div>
           <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-maroon/10 text-xs font-bold text-maroon">
             {user.name

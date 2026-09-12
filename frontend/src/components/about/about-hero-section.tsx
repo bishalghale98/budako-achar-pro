@@ -1,3 +1,4 @@
+import Image from "next/image";
 import Link from "next/link";
 import type { AboutHero } from "@/data/about";
 
@@ -22,11 +23,12 @@ export function AboutHeroSection({ data }: AboutHeroSectionProps) {
             </p>
           </div>
           <div className="relative">
-            <div className="h-80 overflow-hidden rounded-2xl bg-gray-100 sm:h-96">
-              <img
+            <div className="relative h-80 overflow-hidden rounded-2xl bg-gray-100 sm:h-96">
+              <Image
                 src={data.image}
                 alt={data.imageAlt}
                 className="h-full w-full object-cover"
+                fill
               />
             </div>
           </div>

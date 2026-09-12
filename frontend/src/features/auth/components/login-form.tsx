@@ -10,6 +10,8 @@ import { getRoleHome } from "@/features/auth/components/role-guard";
 import { safeRedirect } from "@/features/auth/auth-utils";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Button } from "@/components/ui/button";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 import { loginSchema, type LoginFormValues } from "./auth-schemas";
 
 export function LoginForm() {
@@ -67,9 +69,9 @@ export function LoginForm() {
 
       {/* Error */}
       {generalError && !fieldErrors && (
-        <div className="bg-red-50 border border-red-200 text-red-700 text-sm rounded-lg px-4 py-3">
-          {generalError}
-        </div>
+        <Alert variant="destructive">
+          <AlertDescription>{generalError}</AlertDescription>
+        </Alert>
       )}
 
       {/* Form */}
@@ -124,13 +126,13 @@ export function LoginForm() {
           )}
         </div>
 
-        <button
+        <Button
           type="submit"
           disabled={isLoading}
           className="w-full py-3.5 bg-maroon text-white font-medium rounded-lg hover:bg-maroon-hover transition shadow-sm text-sm disabled:opacity-60"
         >
           {isLoading ? "Signing in..." : "Sign In"}
-        </button>
+        </Button>
       </form>
 
       {/* Divider */}
