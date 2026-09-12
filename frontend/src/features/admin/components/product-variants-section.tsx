@@ -107,7 +107,9 @@ export function ProductVariantsSection({ register, errors, fields, append, remov
                   render={({ field }) => (
                     <Select value={field.value} onValueChange={field.onChange}>
                       <SelectTrigger className="w-full">
-                        <SelectValue />
+                        <SelectValue>
+                          {field.value === "kg" ? "Kilograms (kg)" : "Grams (g)"}
+                        </SelectValue>
                       </SelectTrigger>
                       <SelectContent>
                         <SelectItem value="g">Grams (g)</SelectItem>
@@ -174,7 +176,9 @@ export function ProductVariantsSection({ register, errors, fields, append, remov
                   render={({ field }) => (
                     <Select value={field.value} onValueChange={field.onChange}>
                       <SelectTrigger className="w-full">
-                        <SelectValue />
+                        <SelectValue>
+                          {field.value === "active" ? "Active" : "Inactive"}
+                        </SelectValue>
                       </SelectTrigger>
                       <SelectContent>
                         <SelectItem value="active">Active</SelectItem>

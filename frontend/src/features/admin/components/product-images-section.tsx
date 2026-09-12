@@ -4,7 +4,7 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { Upload, X, Star } from "lucide-react";
-import { MAX_IMAGES, type ImageEntry } from "./use-product-images";
+import { MAX_IMAGES, type ImageEntry, type ExistingImage } from "./use-product-images";
 
 function formatFileSize(bytes: number): string {
   if (bytes < 1024) return `${bytes} B`;
@@ -14,21 +14,32 @@ function formatFileSize(bytes: number): string {
 
 interface Props {
   images: ImageEntry[];
+  existingImages: ExistingImage[];
+  deletedImageIds: Set<string>;
   imageErrors: string[];
   fileInputRef: React.RefObject<HTMLInputElement | null>;
   onImageSelect: (e: React.ChangeEvent<HTMLInputElement>) => void;
   onRemoveImage: (index: number) => void;
+  onRemoveExistingImage: (id: string) => void;
   onSetThumbnail: (index: number) => void;
+  onSetExistingThumbnail: (id: string) => void;
 }
 
 export function ProductImagesSection({
   images,
+  existingImages,
+  deletedImageIds,
   imageErrors,
   fileInputRef,
   onImageSelect,
   onRemoveImage,
+  onRemoveExistingImage,
   onSetThumbnail,
+  onSetExistingThumbnail,
 }: Props) {
+  const activeExisting = existingImages.filter((img) => !deletedImageIds.has(img.id));
+  const totalImages = activeExisting.length + images.length;
+
   return (
     <div className="overflow-hidden rounded-2xl border border-border bg-card">
       <div className="border-b border-border bg-gradient-to-r from-cream/30 to-card px-6 py-4">
@@ -62,7 +73,7 @@ export function ProductImagesSection({
         <div
           onClick={() => fileInputRef.current?.click()}
           className={`flex cursor-pointer flex-col items-center justify-center rounded-xl border-2 border-dashed p-8 text-center transition-all ${
-            images.length >= MAX_IMAGES
+            totalImages >= MAX_IMAGES
               ? "border-border bg-muted cursor-not-allowed opacity-50"
               : "border-maroon/20 bg-cream/20 hover:border-maroon/40 hover:bg-cream/40"
           }`}
@@ -77,7 +88,7 @@ export function ProductImagesSection({
             JPEG, PNG, or WebP. Maximum 5MB per file.
           </p>
           <p className="mt-2 text-xs text-muted-foreground">
-            {images.length} / {MAX_IMAGES} images selected
+            {totalImages} / {MAX_IMAGES} images selected
           </p>
         </div>
 
@@ -90,7 +101,66 @@ export function ProductImagesSection({
           className="hidden"
         />
 
-        {/* Image Preview Grid */}
+        {/* Existing Server Images */}
+        {activeExisting.length > 0 && (
+          <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4">
+            {activeExisting.map((img) => (
+              <div
+                key={img.id}
+                className={`group relative overflow-hidden rounded-xl border-2 bg-card transition-all ${
+                  img.is_thumbnail
+                    ? "border-maroon shadow-md shadow-maroon/10"
+                    : "border-border hover:border-border"
+                }`}
+              >
+                <div className="aspect-square relative bg-muted">
+                  <Image
+                    src={img.image_url}
+                    alt="Product image"
+                    className="h-full w-full object-cover"
+                    fill
+                    sizes="200px"
+                  />
+                  {img.is_thumbnail && (
+                    <div className="absolute top-2 left-2">
+                      <span className="inline-flex items-center gap-1 rounded-full bg-maroon px-2 py-0.5 text-[10px] font-bold text-white shadow-sm">
+                        <Star className="h-2.5 w-2.5 fill-current" />
+                        Thumbnail
+                      </span>
+                    </div>
+                  )}
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="icon"
+                    onClick={() => onRemoveExistingImage(img.id)}
+                    className="absolute top-2 right-2 flex h-7 w-7 items-center justify-center rounded-full bg-black/50 text-white opacity-0 transition-opacity hover:bg-black/70 group-hover:opacity-100"
+                    aria-label="Remove image"
+                  >
+                    <X className="h-3.5 w-3.5" />
+                  </Button>
+                </div>
+                <div className="border-t border-border p-2.5">
+                  <p className="truncate text-xs font-medium text-muted-foreground">
+                    Existing image
+                  </p>
+                  {!img.is_thumbnail && (
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      onClick={() => onSetExistingThumbnail(img.id)}
+                      className="mt-1.5 text-xs font-semibold text-maroon hover:text-primary-hover h-auto p-0"
+                    >
+                      Set as Thumbnail
+                    </Button>
+                  )}
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+
+        {/* New Upload Previews */}
         {images.length > 0 && (
           <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4">
             {images.map((img, index) => (

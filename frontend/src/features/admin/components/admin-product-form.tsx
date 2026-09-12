@@ -7,8 +7,13 @@ import { useRouter } from "next/navigation";
 import { useUser } from "@/features/auth/auth-hooks";
 import {
   useCreateAdminProductMutation,
+  useUpdateAdminProductMutation,
   useCreateAdminVariantMutation,
+  useUpdateAdminVariantMutation,
+  useDeleteAdminVariantMutation,
   useCreateAdminImageMutation,
+  useDeleteAdminImageMutation,
+  useSetAdminThumbnailMutation,
   useGetAdminCategoriesQuery,
 } from "@/features/admin/admin-api";
 import { Button } from "@/components/ui/button";
@@ -20,6 +25,7 @@ import { useProductImages } from "./use-product-images";
 import { ProductBasicInfoSection } from "./product-basic-info-section";
 import { ProductVariantsSection } from "./product-variants-section";
 import { ProductImagesSection } from "./product-images-section";
+import type { Product, ProductVariant } from "@/features/products/product-types";
 
 function generateSlug(title: string): string {
   return title
@@ -28,18 +34,45 @@ function generateSlug(title: string): string {
     .replace(/^-|-$/g, "");
 }
 
-export default function AdminProductForm() {
+interface AdminProductFormProps {
+  initialData?: Product;
+}
+
+function hasVariantChanged(
+  original: ProductVariant,
+  submitted: ProductFormValues["variants"][0]
+): boolean {
+  return (
+    original.name !== submitted.name ||
+    original.weight !== submitted.weight ||
+    original.unit !== submitted.unit ||
+    original.price !== submitted.price ||
+    original.compare_price !== (submitted.compare_price ?? null) ||
+    original.stock !== submitted.stock ||
+    (original.sku ?? "") !== submitted.sku ||
+    original.status !== submitted.status
+  );
+}
+
+export default function AdminProductForm({ initialData }: AdminProductFormProps) {
   const router = useRouter();
   const user = useUser();
   const slugManuallyEdited = useRef(false);
+  const isEditing = !!initialData;
 
   const { data: categoriesData } = useGetAdminCategoriesQuery({ per_page: 100 });
   const categories = categoriesData?.categories ?? [];
 
   const [createProduct, { isLoading: isCreatingProduct }] =
     useCreateAdminProductMutation();
+  const [updateProduct, { isLoading: isUpdatingProduct }] =
+    useUpdateAdminProductMutation();
   const [createVariant] = useCreateAdminVariantMutation();
+  const [updateVariant] = useUpdateAdminVariantMutation();
+  const [deleteVariant] = useDeleteAdminVariantMutation();
   const [createImage] = useCreateAdminImageMutation();
+  const [deleteImage] = useDeleteAdminImageMutation();
+  const [setThumbnail] = useSetAdminThumbnailMutation();
 
   const {
     register,
@@ -52,29 +85,52 @@ export default function AdminProductForm() {
   } = useForm<ProductFormValues>({
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     resolver: standardSchemaResolver(productSchema) as any,
-    defaultValues: {
-      title: "",
-      category_id: "",
-      slug: "",
-      short_description: "",
-      description: "",
-      ingredients: "",
-      storage_info: "",
-      featured: false,
-      status: "active",
-      variants: [
-        {
-          name: "",
-          weight: 0,
-          unit: "g",
-          price: 0,
-          compare_price: null,
-          stock: 0,
-          sku: "",
+    defaultValues: initialData
+      ? {
+          title: initialData.title,
+          slug: initialData.slug,
+          category_id: initialData.category?.id ?? "",
+          short_description: initialData.short_description ?? "",
+          description: initialData.description ?? "",
+          ingredients: initialData.ingredients ?? "",
+          storage_info: initialData.storage_info ?? "",
+          featured: initialData.featured,
+          status: initialData.status,
+          variants: (initialData.variants ?? []).map((v) => ({
+            id: v.id,
+            name: v.name,
+            weight: v.weight,
+            unit: v.unit,
+            price: v.price,
+            compare_price: v.compare_price,
+            stock: v.stock,
+            sku: v.sku ?? "",
+            status: v.status,
+          })),
+        }
+      : {
+          title: "",
+          category_id: "",
+          slug: "",
+          short_description: "",
+          description: "",
+          ingredients: "",
+          storage_info: "",
+          featured: false,
           status: "active",
+          variants: [
+            {
+              name: "",
+              weight: 0,
+              unit: "g",
+              price: 0,
+              compare_price: null,
+              stock: 0,
+              sku: "",
+              status: "active",
+            },
+          ],
         },
-      ],
-    },
   });
 
   const { fields, append, remove } = useFieldArray({
@@ -85,23 +141,40 @@ export default function AdminProductForm() {
   const titleValue = watch("title");
 
   useEffect(() => {
-    if (!slugManuallyEdited.current) {
+    if (!slugManuallyEdited.current && !isEditing) {
       setValue("slug", generateSlug(titleValue || ""));
     }
-  }, [titleValue, setValue]);
+  }, [titleValue, setValue, isEditing]);
 
   const {
     images,
+    existingImages,
+    deletedImageIds,
+    thumbnailImageId,
     imageErrors,
     fileInputRef,
+    initExistingImages,
     handleImageSelect,
     removeImage,
-    setThumbnail,
+    removeExistingImage,
+    setThumbnail: setNewThumbnail,
+    setExistingThumbnail,
     clearErrors,
   } = useProductImages();
 
+  useEffect(() => {
+    if (initialData?.images) {
+      initExistingImages(initialData.images);
+    }
+  }, [initialData, initExistingImages]);
+
   const onSubmit = async (data: ProductFormValues) => {
-    if (images.length === 0) {
+    const activeExisting = existingImages.filter(
+      (img) => !deletedImageIds.has(img.id)
+    );
+    const totalImages = activeExisting.length + images.length;
+
+    if (totalImages === 0) {
       setError("root", { message: "At least one image is required" });
       return;
     }
@@ -109,41 +182,134 @@ export default function AdminProductForm() {
     clearErrors();
 
     try {
-      const productResult = await createProduct({
-        title: data.title,
-        slug: data.slug,
-        category_id: data.category_id,
-        short_description: data.short_description || undefined,
-        description: data.description || undefined,
-        ingredients: data.ingredients || undefined,
-        storage_info: data.storage_info || undefined,
-        featured: data.featured,
-        status: data.status,
-      }).unwrap();
+      let productId: string;
 
-      const productId = productResult.product.id;
-
-      for (const variant of data.variants) {
-        await createVariant({
-          productId,
-          name: variant.name,
-          weight: variant.weight,
-          unit: variant.unit,
-          price: variant.price,
-          compare_price: variant.compare_price ?? undefined,
-          stock: variant.stock,
-          sku: variant.sku || undefined,
-          status: variant.status,
+      if (isEditing) {
+        await updateProduct({
+          id: initialData.id,
+          title: data.title,
+          slug: data.slug,
+          category_id: data.category_id,
+          short_description: data.short_description || undefined,
+          description: data.description || undefined,
+          ingredients: data.ingredients || undefined,
+          storage_info: data.storage_info || undefined,
+          featured: data.featured,
+          status: data.status,
         }).unwrap();
-      }
+        productId = initialData.id;
 
-      for (let i = 0; i < images.length; i++) {
-        const body = new FormData();
-        body.append("image", images[i].file);
-        body.append("is_thumbnail", images[i].is_thumbnail ? "1" : "0");
-        body.append("sort_order", i.toString());
+        // Diff variants
+        const submittedVariantIds = new Set(
+          data.variants.filter((v) => v.id).map((v) => v.id)
+        );
 
-        await createImage({ productId, formData: body }).unwrap();
+        // Delete removed variants
+        for (const original of initialData.variants ?? []) {
+          if (!submittedVariantIds.has(original.id)) {
+            await deleteVariant({
+              productId,
+              variantId: original.id,
+            }).unwrap();
+          }
+        }
+
+        // Update existing or create new variants
+        for (const variant of data.variants) {
+          if (variant.id) {
+            const original = (initialData.variants ?? []).find(
+              (v) => v.id === variant.id
+            );
+            if (original && hasVariantChanged(original, variant)) {
+              await updateVariant({
+                productId,
+                variantId: variant.id,
+                name: variant.name,
+                weight: variant.weight,
+                unit: variant.unit,
+                price: variant.price,
+                compare_price: variant.compare_price ?? undefined,
+                stock: variant.stock,
+                sku: variant.sku || undefined,
+                status: variant.status,
+              }).unwrap();
+            }
+          } else {
+            await createVariant({
+              productId,
+              name: variant.name,
+              weight: variant.weight,
+              unit: variant.unit,
+              price: variant.price,
+              compare_price: variant.compare_price ?? undefined,
+              stock: variant.stock,
+              sku: variant.sku || undefined,
+              status: variant.status,
+            }).unwrap();
+          }
+        }
+
+        // Delete removed images
+        for (const imageId of deletedImageIds) {
+          await deleteImage({ productId, imageId }).unwrap();
+        }
+
+        // Upload new images
+        for (let i = 0; i < images.length; i++) {
+          const body = new FormData();
+          body.append("image", images[i].file);
+          body.append("is_thumbnail", images[i].is_thumbnail ? "1" : "0");
+          body.append(
+            "sort_order",
+            (activeExisting.length + i).toString()
+          );
+          await createImage({ productId, formData: body }).unwrap();
+        }
+
+        // Apply thumbnail change if needed
+        if (thumbnailImageId) {
+          await setThumbnail({
+            productId,
+            imageId: thumbnailImageId,
+          }).unwrap();
+        }
+      } else {
+        // Create mode
+        const productResult = await createProduct({
+          title: data.title,
+          slug: data.slug,
+          category_id: data.category_id,
+          short_description: data.short_description || undefined,
+          description: data.description || undefined,
+          ingredients: data.ingredients || undefined,
+          storage_info: data.storage_info || undefined,
+          featured: data.featured,
+          status: data.status,
+        }).unwrap();
+
+        productId = productResult.product.id;
+
+        for (const variant of data.variants) {
+          await createVariant({
+            productId,
+            name: variant.name,
+            weight: variant.weight,
+            unit: variant.unit,
+            price: variant.price,
+            compare_price: variant.compare_price ?? undefined,
+            stock: variant.stock,
+            sku: variant.sku || undefined,
+            status: variant.status,
+          }).unwrap();
+        }
+
+        for (let i = 0; i < images.length; i++) {
+          const body = new FormData();
+          body.append("image", images[i].file);
+          body.append("is_thumbnail", images[i].is_thumbnail ? "1" : "0");
+          body.append("sort_order", i.toString());
+          await createImage({ productId, formData: body }).unwrap();
+        }
       }
 
       router.push("/admin/products");
@@ -155,7 +321,7 @@ export default function AdminProductForm() {
     }
   };
 
-  const isSubmitting = isCreatingProduct;
+  const isSubmitting = isCreatingProduct || isUpdatingProduct;
 
   return (
     <div className="space-y-6">
@@ -166,10 +332,12 @@ export default function AdminProductForm() {
         </div>
         <div className="flex-1">
           <h1 className="font-serif text-xl font-bold text-maroon">
-            Add New Product
+            {isEditing ? "Edit Product" : "Add New Product"}
           </h1>
           <p className="text-sm text-muted-foreground">
-            Create a new product with variants and images for your store.
+            {isEditing
+              ? "Update product details, variants, and images."
+              : "Create a new product with variants and images for your store."}
           </p>
         </div>
         {user && (
@@ -223,7 +391,13 @@ export default function AdminProductForm() {
             className="bg-maroon text-white hover:bg-maroon-hover shadow-sm"
             disabled={isSubmitting}
           >
-            {isSubmitting ? "Saving..." : "Save Product"}
+            {isSubmitting
+              ? isEditing
+                ? "Updating..."
+                : "Saving..."
+              : isEditing
+                ? "Update Product"
+                : "Save Product"}
           </Button>
         </div>
       </div>
@@ -261,11 +435,15 @@ export default function AdminProductForm() {
 
         <ProductImagesSection
           images={images}
+          existingImages={existingImages}
+          deletedImageIds={deletedImageIds}
           imageErrors={imageErrors}
           fileInputRef={fileInputRef}
           onImageSelect={handleImageSelect}
           onRemoveImage={removeImage}
-          onSetThumbnail={setThumbnail}
+          onRemoveExistingImage={removeExistingImage}
+          onSetThumbnail={setNewThumbnail}
+          onSetExistingThumbnail={setExistingThumbnail}
         />
 
         {/* Bottom Action Bar */}
@@ -284,7 +462,13 @@ export default function AdminProductForm() {
             className="bg-maroon text-white hover:bg-maroon-hover shadow-sm"
             disabled={isSubmitting}
           >
-            {isSubmitting ? "Saving..." : "Save Product"}
+            {isSubmitting
+              ? isEditing
+                ? "Updating..."
+                : "Saving..."
+              : isEditing
+                ? "Update Product"
+                : "Save Product"}
           </Button>
         </div>
       </form>

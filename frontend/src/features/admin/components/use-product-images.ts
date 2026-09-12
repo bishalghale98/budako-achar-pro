@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useCallback, useEffect, useRef } from "react";
+import type { ProductImage } from "@/features/products/product-types";
 
 const MAX_FILE_SIZE = 5 * 1024 * 1024;
 const ACCEPTED_TYPES = ["image/jpeg", "image/png", "image/webp"];
@@ -10,6 +11,13 @@ export interface ImageEntry {
   file: File;
   preview: string;
   is_thumbnail: boolean;
+}
+
+export interface ExistingImage {
+  id: string;
+  image_url: string;
+  is_thumbnail: boolean;
+  sort_order: number;
 }
 
 function validateImage(file: File): string | null {
@@ -24,6 +32,9 @@ function validateImage(file: File): string | null {
 
 export function useProductImages() {
   const [images, setImages] = useState<ImageEntry[]>([]);
+  const [existingImages, setExistingImages] = useState<ExistingImage[]>([]);
+  const [deletedImageIds, setDeletedImageIds] = useState<Set<string>>(new Set());
+  const [thumbnailImageId, setThumbnailImageId] = useState<string | null>(null);
   const [imageErrors, setImageErrors] = useState<string[]>([]);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const mountedRef = useRef(false);
@@ -43,13 +54,28 @@ export function useProductImages() {
     };
   }, []);
 
+  const initExistingImages = useCallback((serverImages: ProductImage[]) => {
+    const mapped = serverImages.map((img) => ({
+      id: img.id,
+      image_url: img.image_url,
+      is_thumbnail: img.is_thumbnail,
+      sort_order: img.sort_order,
+    }));
+    setExistingImages(mapped);
+
+    const thumb = mapped.find((img) => img.is_thumbnail);
+    setThumbnailImageId(thumb?.id ?? null);
+    setDeletedImageIds(new Set());
+  }, []);
+
   const handleImageSelect = useCallback(
     (e: React.ChangeEvent<HTMLInputElement>) => {
       const files = e.target.files;
       if (!files) return;
 
+      const totalImages = existingImages.length + images.length;
       const newErrors: string[] = [];
-      const remainingSlots = MAX_IMAGES - images.length;
+      const remainingSlots = MAX_IMAGES - totalImages;
       const filesToProcess = Array.from(files).slice(0, remainingSlots);
 
       if (files.length > remainingSlots) {
@@ -69,7 +95,7 @@ export function useProductImages() {
         newImages.push({
           file,
           preview: URL.createObjectURL(file),
-          is_thumbnail: images.length === 0 && newImages.length === 0,
+          is_thumbnail: totalImages === 0 && newImages.length === 0,
         });
       }
 
@@ -80,7 +106,7 @@ export function useProductImages() {
         fileInputRef.current.value = "";
       }
     },
-    [images.length]
+    [existingImages.length, images.length]
   );
 
   const removeImage = useCallback((index: number) => {
@@ -95,9 +121,31 @@ export function useProductImages() {
     });
   }, []);
 
+  const removeExistingImage = useCallback((id: string) => {
+    setExistingImages((prev) => {
+      const next = prev.filter((img) => img.id !== id);
+      if (thumbnailImageId === id && next.length > 0) {
+        setThumbnailImageId(next[0].id);
+      }
+      return next;
+    });
+    setDeletedImageIds((prev) => new Set(prev).add(id));
+  }, [thumbnailImageId]);
+
   const setThumbnail = useCallback((index: number) => {
     setImages((prev) =>
       prev.map((img, i) => ({ ...img, is_thumbnail: i === index }))
+    );
+    setThumbnailImageId(null);
+  }, []);
+
+  const setExistingThumbnail = useCallback((id: string) => {
+    setExistingImages((prev) =>
+      prev.map((img) => ({ ...img, is_thumbnail: img.id === id }))
+    );
+    setThumbnailImageId(id);
+    setImages((prev) =>
+      prev.map((img) => ({ ...img, is_thumbnail: false }))
     );
   }, []);
 
@@ -105,11 +153,17 @@ export function useProductImages() {
 
   return {
     images,
+    existingImages,
+    deletedImageIds,
+    thumbnailImageId,
     imageErrors,
     fileInputRef,
+    initExistingImages,
     handleImageSelect,
     removeImage,
+    removeExistingImage,
     setThumbnail,
+    setExistingThumbnail,
     clearErrors,
   };
 }

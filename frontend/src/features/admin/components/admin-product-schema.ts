@@ -1,6 +1,7 @@
 import { z } from "zod";
 
 export const variantSchema = z.object({
+  id: z.string().optional(),
   name: z.string().min(1, "Name is required").max(255),
   weight: z.number().min(0, "Weight must be at least 0"),
   unit: z.enum(["g", "kg"]),

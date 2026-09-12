@@ -29,7 +29,9 @@ export function SearchSortBar({
       />
       <Select value={sortOption} onValueChange={(val) => val && onSortChange(val)}>
         <SelectTrigger className="w-full sm:w-auto">
-          <SelectValue />
+          <SelectValue>
+            Sort by: {sortOption}
+          </SelectValue>
         </SelectTrigger>
         <SelectContent>
           {sortOptions.map((opt) => (

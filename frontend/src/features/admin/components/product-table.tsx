@@ -187,7 +187,12 @@ export function ProductTable({ products, isLoading, onDelete }: Props) {
                       <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
                         <Eye className="h-4 w-4 text-slate-500" />
                       </Button>
-                      <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className="h-8 w-8 p-0"
+                        onClick={() => router.push(`/admin/products/edit/${product.id}`)}
+                      >
                         <Pencil className="h-4 w-4 text-slate-500" />
                       </Button>
                       <Button

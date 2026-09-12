@@ -82,18 +82,23 @@ export function ProductBasicInfoSection({ register, errors, categories, control 
           <Controller
             name="category_id"
             control={control}
-            render={({ field }) => (
-              <Select value={field.value} onValueChange={field.onChange}>
-                <SelectTrigger id="category_id" className="w-full">
-                  <SelectValue placeholder="Select a category" />
-                </SelectTrigger>
-                <SelectContent>
-                  {categories.map((cat) => (
-                    <SelectItem key={cat.id} value={cat.id}>{cat.name}</SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            )}
+            render={({ field }) => {
+              const selectedCategory = categories.find((cat) => cat.id === field.value);
+              return (
+                <Select value={field.value} onValueChange={field.onChange}>
+                  <SelectTrigger id="category_id" className="w-full">
+                    <SelectValue placeholder={selectedCategory?.name ?? "Select a category"}>
+                      {selectedCategory?.name ?? "Select a category"}
+                    </SelectValue>
+                  </SelectTrigger>
+                  <SelectContent>
+                    {categories.map((cat) => (
+                      <SelectItem key={cat.id} value={cat.id}>{cat.name}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              );
+            }}
           />
           {errors.category_id && (
             <p className="text-xs font-medium text-red-500">{errors.category_id.message}</p>
@@ -114,7 +119,9 @@ export function ProductBasicInfoSection({ register, errors, categories, control 
                   onValueChange={(val) => field.onChange(val === "true")}
                 >
                   <SelectTrigger id="featured" className="w-full">
-                    <SelectValue />
+                    <SelectValue>
+                      {field.value ? "Yes - Show on homepage" : "No"}
+                    </SelectValue>
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="false">No</SelectItem>
@@ -135,7 +142,9 @@ export function ProductBasicInfoSection({ register, errors, categories, control 
               render={({ field }) => (
                 <Select value={field.value} onValueChange={field.onChange}>
                   <SelectTrigger id="status" className="w-full">
-                    <SelectValue />
+                    <SelectValue>
+                      {field.value === "active" ? "Active" : "Inactive"}
+                    </SelectValue>
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="active">Active</SelectItem>
