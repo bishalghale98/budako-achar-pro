@@ -13,7 +13,7 @@ class ProductController extends Controller
 {
     public function index(Request $request): AnonymousResourceCollection
     {
-        $products = Product::with(['category', 'images', 'variants'])
+        $products = Product::with(['category', 'images', 'variants' => fn ($q) => $q->where('status', 'active')])
             ->where('products.status', 'active')
             ->when($request->category_id, fn ($q, $categoryId) => $q->where('category_id', $categoryId))
             ->when($request->featured !== null, fn ($q, $featured) => $q->where('featured', $featured))
@@ -38,7 +38,7 @@ class ProductController extends Controller
 
     public function show(string $slug): JsonResponse
     {
-        $product = Product::with(['category', 'images', 'variants'])
+        $product = Product::with(['category', 'images', 'variants' => fn ($q) => $q->where('status', 'active')])
             ->where('slug', $slug)
             ->where('status', 'active')
             ->firstOrFail();

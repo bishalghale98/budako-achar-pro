@@ -31,6 +31,14 @@ class StoreProductImageRequest extends FormRequest
                     'Either an image file or an image URL is required.'
                 );
             }
+
+            $product = $this->route('product');
+            if ($product && $product->images()->count() >= 10) {
+                $validator->errors()->add(
+                    'image',
+                    'This product already has the maximum number of images (10).'
+                );
+            }
         });
     }
 }

@@ -2,14 +2,16 @@ import Link from "next/link";
 
 interface OrderSummaryProps {
   subtotal: number;
-  deliveryFee?: string;
+  deliveryFee: number;
+  total: number;
   checkoutLink?: string;
   checkoutText?: string;
 }
 
 export function OrderSummary({
   subtotal,
-  deliveryFee = "Calculated at Checkout",
+  deliveryFee,
+  total,
   checkoutLink = "/checkout",
   checkoutText = "Proceed to Checkout",
 }: OrderSummaryProps) {
@@ -25,11 +27,11 @@ export function OrderSummary({
         </div>
         <div className="flex justify-between">
           <span>Delivery</span>
-          <span>{deliveryFee}</span>
+          <span>NPR {deliveryFee}</span>
         </div>
         <div className="flex justify-between font-bold text-darkText text-base pt-2 border-t border-gray-100">
           <span>Total</span>
-          <span className="text-maroon">NPR {subtotal}</span>
+          <span className="text-maroon">NPR {total}</span>
         </div>
       </div>
       <Link

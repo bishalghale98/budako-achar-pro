@@ -9,6 +9,11 @@ class ProductResource extends JsonResource
 {
     public function toArray(Request $request): array
     {
+        $thumbnail = $this->images->firstWhere('is_thumbnail', true);
+        $activeVariants = $this->variants->where('status', 'active');
+        $totalStock = (int) $activeVariants->sum('stock');
+        $lowStockThreshold = (int) env('PRODUCT_LOW_STOCK_THRESHOLD', 5);
+
         return [
             'id' => $this->id,
             'title' => $this->title,
@@ -21,6 +26,10 @@ class ProductResource extends JsonResource
             'review_count' => $this->review_count,
             'featured' => $this->featured,
             'status' => $this->status->value,
+            'thumbnail_url' => $thumbnail?->image_url,
+            'total_stock' => $totalStock,
+            'is_available' => $totalStock > 0,
+            'low_stock' => $totalStock > 0 && $totalStock <= $lowStockThreshold,
             'category' => new CategoryResource($this->whenLoaded('category')),
             'images' => ProductImageResource::collection($this->whenLoaded('images')),
             'variants' => ProductVariantResource::collection($this->whenLoaded('variants')),

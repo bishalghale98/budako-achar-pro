@@ -13,6 +13,7 @@ use App\Http\Controllers\Api\Auth\ResetPasswordController;
 use App\Http\Controllers\Api\User\ProfileController;
 use App\Http\Controllers\Api\CartController;
 use App\Http\Controllers\Api\CartItemController;
+use App\Http\Controllers\Api\Customer\CustomerDashboardController;
 use App\Http\Controllers\Api\OrderController;
 use App\Http\Controllers\Api\ProductController;
 use App\Http\Controllers\Api\ProductReviewController;
@@ -59,6 +60,9 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/user/profile', [ProfileController::class, 'show']);
     Route::patch('/user/profile', [ProfileController::class, 'update']);
 
+    // Customer dashboard
+    Route::get('/customer/dashboard', [CustomerDashboardController::class, 'show']);
+
     // Product reviews (authenticated users)
     Route::post('/products/{product}/reviews', [ProductReviewController::class, 'store']);
     Route::patch('/products/{product}/reviews/{review}', [ProductReviewController::class, 'update']);
@@ -70,6 +74,7 @@ Route::get('/products', [ProductController::class, 'index']);
 Route::get('/products/{slug}', [ProductController::class, 'show']);
 Route::get('/products/{slug}/reviews', [ProductController::class, 'reviews']);
 Route::get('/categories', [CategoryController::class, 'index']);
+Route::get('/categories/{slug}', [CategoryController::class, 'showBySlug']);
 
 // Guest cart (public, no auth required)
 Route::middleware(StartSession::class)->group(function () {

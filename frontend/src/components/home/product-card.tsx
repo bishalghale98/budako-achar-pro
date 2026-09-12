@@ -7,17 +7,16 @@ interface ProductCardProps {
 }
 
 export function ProductCard({ product }: ProductCardProps) {
-  const thumbnail = product.images?.find((img) => img.is_thumbnail) ?? product.images?.[0];
   const lowestPrice = product.variants?.length
-    ? Math.min(...product.variants.map((v) => v.price))
+    ? Math.min(...product.variants.filter(v => v.status === "active").map((v) => v.price))
     : null;
 
   return (
     <div className="bg-white rounded-xl border border-gray-200 overflow-hidden shadow-sm hover:shadow-md transition group">
       <div className="h-60 bg-gray-100 overflow-hidden relative">
-        {thumbnail ? (
+        {product.thumbnail_url ? (
           <Image
-            src={thumbnail.image_url}
+            src={product.thumbnail_url}
             alt={product.title}
             fill
             className="object-cover group-hover:scale-105 transition duration-300"

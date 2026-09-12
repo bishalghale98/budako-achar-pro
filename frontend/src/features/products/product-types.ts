@@ -42,6 +42,10 @@ export interface Product {
   review_count: number;
   featured: boolean;
   status: ProductStatus;
+  thumbnail_url: string | null;
+  total_stock: number;
+  is_available: boolean;
+  low_stock: boolean;
   category?: Category;
   images?: ProductImage[];
   variants?: ProductVariant[];

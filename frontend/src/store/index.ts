@@ -5,6 +5,7 @@ import { categoryApi } from "@/features/products/category-api";
 import { adminApi } from "@/features/admin/admin-api";
 import { cartApi } from "@/features/cart/cart-api";
 import { orderApi } from "@/features/order/order-api";
+import { customerApi } from "@/features/customer/customer-api";
 import authReducer from "@/features/auth/auth-slice";
 
 export const makeStore = () =>
@@ -16,6 +17,7 @@ export const makeStore = () =>
       [adminApi.reducerPath]: adminApi.reducer,
       [cartApi.reducerPath]: cartApi.reducer,
       [orderApi.reducerPath]: orderApi.reducer,
+      [customerApi.reducerPath]: customerApi.reducer,
       auth: authReducer,
     },
     middleware: (getDefaultMiddleware) =>
@@ -25,7 +27,8 @@ export const makeStore = () =>
         .concat(categoryApi.middleware)
         .concat(adminApi.middleware)
         .concat(cartApi.middleware)
-        .concat(orderApi.middleware),
+        .concat(orderApi.middleware)
+        .concat(customerApi.middleware),
   });
 
 export type AppStore = ReturnType<typeof makeStore>;

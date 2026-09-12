@@ -14,24 +14,13 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Plus, Pencil, Trash2, Package, Eye, Star } from "lucide-react";
+import { formatDate } from "@/lib/utils";
 import type { Product } from "@/features/products/product-types";
 
 interface Props {
   products: Product[];
   isLoading: boolean;
   onDelete: (id: string, title: string) => void;
-}
-
-function getTotalStock(variants: { stock: number }[] | undefined) {
-  return variants?.reduce((sum, v) => sum + v.stock, 0) ?? 0;
-}
-
-function formatDate(date: string) {
-  return new Date(date).toLocaleDateString("en-US", {
-    month: "short",
-    day: "numeric",
-    year: "numeric",
-  });
 }
 
 export function ProductTable({ products, isLoading, onDelete }: Props) {
@@ -93,16 +82,13 @@ export function ProductTable({ products, isLoading, onDelete }: Props) {
             </TableRow>
           ) : (
             products.map((product) => {
-              const totalStock = getTotalStock(product.variants);
-              const thumbnail = product.images?.find((img) => img.is_thumbnail);
-
               return (
                 <TableRow key={product.id}>
                   <TableCell>
                     <div className="flex items-center gap-3">
-                      {thumbnail ? (
+                      {product.thumbnail_url ? (
                         <Image
-                          src={thumbnail.image_url}
+                          src={product.thumbnail_url}
                           alt={product.title}
                           className="rounded-lg object-cover border border-slate-100"
                           width={48}
@@ -131,16 +117,16 @@ export function ProductTable({ products, isLoading, onDelete }: Props) {
                   </TableCell>
 
                   <TableCell>
-                    {totalStock > 0 ? (
+                    {product.total_stock > 0 ? (
                       <Badge
                         variant="secondary"
                         className={
-                          totalStock <= 5
+                          product.low_stock
                             ? "bg-amber-50 text-amber-700 border-0"
                             : "bg-emerald-50 text-emerald-700 border-0"
                         }
                       >
-                        {totalStock} in stock
+                        {product.total_stock} in stock
                       </Badge>
                     ) : (
                       <Badge variant="secondary" className="bg-red-50 text-red-600 border-0">

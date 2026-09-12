@@ -18,4 +18,14 @@ class CategoryController extends Controller
             'categories' => CategoryResource::collection($categories),
         ]);
     }
+
+    public function showBySlug(string $slug): JsonResponse
+    {
+        $category = Category::withCount('products')->where('slug', $slug)->firstOrFail();
+
+        return response()->json([
+            'success' => true,
+            'category' => new CategoryResource($category),
+        ]);
+    }
 }

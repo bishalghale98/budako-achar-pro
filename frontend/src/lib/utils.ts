@@ -1,1 +1,13 @@
-export { cn } from "cn"
+export { cn } from "cn";
+
+export function formatPrice(price: number): string {
+  return `NPR ${price.toLocaleString()}`;
+}
+
+export function formatDate(date: string, style: "short" | "long" = "short"): string {
+  return new Date(date).toLocaleDateString("en-US", {
+    month: style === "long" ? "long" : "short",
+    day: "numeric",
+    year: "numeric",
+  });
+}

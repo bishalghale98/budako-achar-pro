@@ -44,8 +44,12 @@ export async function getCategories(): Promise<CategoriesResponse> {
 }
 
 export async function getCategoryBySlug(slug: string): Promise<Category | undefined> {
-  const { categories } = await getCategories();
-  return categories.find((cat) => cat.slug === slug);
+  try {
+    const { category } = await serverFetch<{ success: boolean; category: Category }>(`/api/categories/${slug}`);
+    return category;
+  } catch {
+    return undefined;
+  }
 }
 
 export async function getProductByCategorySlug(

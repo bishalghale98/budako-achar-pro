@@ -10,11 +10,15 @@ class CartResource extends JsonResource
     public function toArray(Request $request): array
     {
         $items = CartItemResource::collection($this->whenLoaded('items'));
+        $subtotal = (float) $this->items->sum(fn ($item) => $item->unit_price * $item->quantity);
+        $deliveryFee = (float) config('order.delivery_fee', 100);
 
         return [
             'id' => $this->id,
             'items' => $items,
-            'subtotal' => (float) $this->items->sum(fn ($item) => $item->unit_price * $item->quantity),
+            'subtotal' => $subtotal,
+            'delivery_fee' => $deliveryFee,
+            'total' => $subtotal + $deliveryFee,
             'item_count' => $this->items->count(),
             'total_quantity' => (int) $this->items->sum('quantity'),
             'created_at' => $this->created_at->toISOString(),

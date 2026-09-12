@@ -26,6 +26,8 @@ export interface Cart {
   id: string;
   items: CartItem[];
   subtotal: number;
+  delivery_fee: number;
+  total: number;
   item_count: number;
   total_quantity: number;
   created_at: string;

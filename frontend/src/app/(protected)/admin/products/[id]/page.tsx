@@ -9,22 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { ArrowLeft, Pencil, Package, Star, ExternalLink } from "lucide-react";
-
-function getTotalStock(variants: { stock: number }[] | undefined) {
-  return variants?.reduce((sum, v) => sum + v.stock, 0) ?? 0;
-}
-
-function formatPrice(price: number) {
-  return `NPR ${price.toLocaleString()}`;
-}
-
-function formatDate(date: string) {
-  return new Date(date).toLocaleDateString("en-US", {
-    month: "long",
-    day: "numeric",
-    year: "numeric",
-  });
-}
+import { formatPrice, formatDate } from "@/lib/utils";
 
 function ViewSkeleton() {
   return (
@@ -82,8 +67,6 @@ export default function ViewProductPage({
   }
 
   const product = data.product;
-  const totalStock = getTotalStock(product.variants);
-  const thumbnail = product.images?.find((img) => img.is_thumbnail);
   const sortedImages = [...(product.images ?? [])].sort(
     (a, b) => a.sort_order - b.sort_order
   );
@@ -394,10 +377,10 @@ export default function ViewProductPage({
                 </span>
                 <span
                   className={`text-sm font-bold ${
-                    totalStock <= 5 ? "text-amber-600" : "text-foreground"
+                    product.low_stock ? "text-amber-600" : "text-foreground"
                   }`}
                 >
-                  {totalStock} units
+                  {product.total_stock} units
                 </span>
               </div>
               <div className="flex items-center justify-between">

@@ -2,60 +2,34 @@
 
 import Link from "next/link";
 import { useUser } from "@/features/auth/auth-hooks";
+import { useGetCustomerDashboardQuery } from "@/features/customer/customer-api";
 import CustomerLoading from "./loading";
 
-const stats = [
-  {
-    label: "Total Orders",
-    value: "2",
-    iconBg: "bg-rose-50",
-    iconColor: "text-rose-700",
-    icon: (
-      <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-        <path d="M16 3h5v5" />
-        <path d="M8 3H3v5" />
-        <path d="M12 22v-8.3a4 4 0 0 0-1.172-2.872L3 3" />
-        <path d="m15 9 6-6" />
-      </svg>
-    ),
-  },
-  {
-    label: "Active",
-    value: "1",
-    iconBg: "bg-blue-50",
-    iconColor: "text-blue-700",
-    icon: (
-      <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-        <circle cx="12" cy="12" r="10" />
-        <polyline points="12 6 12 12 16 14" />
-      </svg>
-    ),
-  },
-  {
-    label: "Delivered",
-    value: "1",
-    iconBg: "bg-emerald-50",
-    iconColor: "text-emerald-700",
-    icon: (
-      <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-        <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" />
-        <polyline points="22 4 12 14.01 9 11.01" />
-      </svg>
-    ),
-  },
-  {
-    label: "Total Spent",
-    value: "NPR 1,550",
-    iconBg: "bg-amber-50",
-    iconColor: "text-amber-700",
-    icon: (
-      <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-        <line x1="12" x2="12" y1="2" y2="22" />
-        <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" />
-      </svg>
-    ),
-  },
-];
+function StatCard({
+  label,
+  value,
+  iconBg,
+  iconColor,
+  icon,
+}: {
+  label: string;
+  value: string;
+  iconBg: string;
+  iconColor: string;
+  icon: React.ReactNode;
+}) {
+  return (
+    <div className="flex items-center gap-4 rounded-2xl border border-slate-100 bg-white p-5">
+      <div className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-xl ${iconBg} ${iconColor}`}>
+        {icon}
+      </div>
+      <div>
+        <p className="text-2xl font-bold text-slate-900">{value}</p>
+        <p className="text-xs text-slate-500">{label}</p>
+      </div>
+    </div>
+  );
+}
 
 const quickActions = [
   {
@@ -101,29 +75,32 @@ const quickActions = [
   },
 ];
 
-const recentOrders = [
-  {
-    id: "BKA-00003",
-    date: "Aug 25, 2026",
-    amount: "NPR 950",
-    status: "Pending",
-    statusBg: "bg-amber-50",
-    statusColor: "text-amber-700",
-  },
-  {
-    id: "BKA-00002",
-    date: "Aug 25, 2026",
-    amount: "NPR 600",
-    status: "Delivered",
-    statusBg: "bg-emerald-50",
-    statusColor: "text-emerald-700",
-  },
-];
+function getStatusStyle(status: string) {
+  switch (status) {
+    case "Pending":
+      return "bg-amber-50 text-amber-700";
+    case "Confirmed":
+    case "Processing":
+      return "bg-blue-50 text-blue-700";
+    case "Shipped":
+      return "bg-purple-50 text-purple-700";
+    case "Delivered":
+      return "bg-emerald-50 text-emerald-700";
+    case "Cancelled":
+      return "bg-red-50 text-red-700";
+    default:
+      return "bg-slate-50 text-slate-700";
+  }
+}
 
 export default function CustomerPage() {
   const user = useUser();
+  const { data, isLoading } = useGetCustomerDashboardQuery();
 
-  if (!user) return <CustomerLoading />;
+  if (!user || isLoading) return <CustomerLoading />;
+
+  const stats = data?.stats;
+  const recentOrders = data?.recent_orders ?? [];
 
   return (
     <>
@@ -147,20 +124,56 @@ export default function CustomerPage() {
 
       {/* Quick Stats */}
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        {stats.map((stat) => (
-          <div
-            key={stat.label}
-            className="flex items-center gap-4 rounded-2xl border border-slate-100 bg-white p-5"
-          >
-            <div className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-xl ${stat.iconBg} ${stat.iconColor}`}>
-              {stat.icon}
-            </div>
-            <div>
-              <p className="text-2xl font-bold text-slate-900">{stat.value}</p>
-              <p className="text-xs text-slate-500">{stat.label}</p>
-            </div>
-          </div>
-        ))}
+        <StatCard
+          label="Total Orders"
+          value={String(stats?.total_orders ?? 0)}
+          iconBg="bg-rose-50"
+          iconColor="text-rose-700"
+          icon={
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M16 3h5v5" />
+              <path d="M8 3H3v5" />
+              <path d="M12 22v-8.3a4 4 0 0 0-1.172-2.872L3 3" />
+              <path d="m15 9 6-6" />
+            </svg>
+          }
+        />
+        <StatCard
+          label="Active"
+          value={String(stats?.active_orders ?? 0)}
+          iconBg="bg-blue-50"
+          iconColor="text-blue-700"
+          icon={
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <circle cx="12" cy="12" r="10" />
+              <polyline points="12 6 12 12 16 14" />
+            </svg>
+          }
+        />
+        <StatCard
+          label="Delivered"
+          value={String(stats?.delivered_orders ?? 0)}
+          iconBg="bg-emerald-50"
+          iconColor="text-emerald-700"
+          icon={
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" />
+              <polyline points="22 4 12 14.01 9 11.01" />
+            </svg>
+          }
+        />
+        <StatCard
+          label="Total Spent"
+          value={stats?.total_spent ?? "NPR 0"}
+          iconBg="bg-amber-50"
+          iconColor="text-amber-700"
+          icon={
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <line x1="12" x2="12" y1="2" y2="22" />
+              <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" />
+            </svg>
+          }
+        />
       </div>
 
       {/* Quick Action Cards */}
@@ -194,22 +207,31 @@ export default function CustomerPage() {
           </Link>
         </div>
         <div className="divide-y divide-slate-100">
-          {recentOrders.map((order) => (
-            <div key={order.id} className="flex items-center justify-between px-6 py-4">
-              <div>
-                <p className="text-sm font-bold text-maroon">
-                  {order.id}
-                </p>
-                <p className="text-xs text-slate-500">{order.date}</p>
-              </div>
-              <div className="flex items-center gap-3">
-                <p className="text-sm font-bold text-slate-900">{order.amount}</p>
-                <span className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-[10px] font-medium ${order.statusBg} ${order.statusColor}`}>
-                  {order.status}
-                </span>
-              </div>
+          {recentOrders.length === 0 ? (
+            <div className="px-6 py-8 text-center text-sm text-slate-500">
+              No orders yet.{" "}
+              <Link href="/products" className="text-maroon hover:underline">
+                Start shopping
+              </Link>
             </div>
-          ))}
+          ) : (
+            recentOrders.map((order) => (
+              <div key={order.id} className="flex items-center justify-between px-6 py-4">
+                <div>
+                  <p className="text-sm font-bold text-maroon">
+                    {order.id}
+                  </p>
+                  <p className="text-xs text-slate-500">{order.date}</p>
+                </div>
+                <div className="flex items-center gap-3">
+                  <p className="text-sm font-bold text-slate-900">{order.amount}</p>
+                  <span className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-[10px] font-medium ${getStatusStyle(order.status)}`}>
+                    {order.status}
+                  </span>
+                </div>
+              </div>
+            ))
+          )}
         </div>
       </div>
     </>

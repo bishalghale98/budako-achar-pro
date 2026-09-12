@@ -34,9 +34,7 @@ export async function generateMetadata({
 
   const canonicalUrl = `${SITE_URL}/products/${product.slug}`;
 
-  const thumbnail =
-    product.images?.find((image) => image.is_thumbnail)?.image_url ??
-    product.images?.[0]?.image_url;
+  const thumbnail = product.thumbnail_url ?? product.images?.[0]?.image_url;
 
   return {
     title: product.title,
@@ -93,16 +91,9 @@ export default async function ProductPage({ params }: Props) {
 
   const canonicalUrl = `${SITE_URL}/products/${product.slug}`;
 
-  const activeVariants =
-    product.variants?.filter(
-      (variant) => variant.status === "active"
-    ) ?? [];
+  const variants = product.variants ?? [];
 
-  const thumbnail =
-    images.find((image) => image.is_thumbnail)?.image_url ??
-    images[0]?.image_url;
-
-  const prices = activeVariants
+  const prices = variants
     .map((variant) => Number(variant.price))
     .filter((price) => Number.isFinite(price));
 
@@ -111,11 +102,6 @@ export default async function ProductPage({ params }: Props) {
 
   const highestPrice =
     prices.length > 0 ? Math.max(...prices) : undefined;
-
-  const totalStock = activeVariants.reduce(
-    (total, variant) => total + Number(variant.stock || 0),
-    0
-  );
 
   const productSchema = {
     "@context": "https://schema.org",
@@ -141,15 +127,15 @@ export default async function ProductPage({ params }: Props) {
         }
         : undefined,
 
-    ...(activeVariants.length > 0 && {
+    ...(variants.length > 0 && {
       offers: {
         "@type": "AggregateOffer",
         priceCurrency: "NPR",
         lowPrice: lowestPrice,
         highPrice: highestPrice,
-        offerCount: activeVariants.length,
+        offerCount: variants.length,
         availability:
-          totalStock > 0
+          product.is_available
             ? "https://schema.org/InStock"
             : "https://schema.org/OutOfStock",
         url: canonicalUrl,

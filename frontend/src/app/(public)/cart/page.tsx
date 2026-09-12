@@ -111,7 +111,7 @@ export default function CartPage() {
             />
           ))}
         </div>
-        <OrderSummary subtotal={cart.subtotal} />
+        <OrderSummary subtotal={cart.subtotal} deliveryFee={cart.delivery_fee} total={cart.total} />
       </div>
     </main>
   );

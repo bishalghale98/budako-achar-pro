@@ -8,7 +8,6 @@ import { usePlaceOrderMutation } from "@/features/order";
 import { checkoutPage } from "@/data/checkout";
 import { CustomerForm } from "@/components/checkout";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Button } from "@/components/ui/button";
 
 export default function CheckoutPage() {
   const router = useRouter();
@@ -18,9 +17,8 @@ export default function CheckoutPage() {
 
   const cart = data?.cart;
   const items = cart?.items ?? [];
-  const subtotal = cart?.subtotal ?? 0;
-  const deliveryFee = checkoutPage.deliveryFee;
-  const total = subtotal + deliveryFee;
+  const deliveryFee = cart?.delivery_fee ?? 0;
+  const total = cart?.total ?? 0;
 
   const handleSubmit = async (formData: {
     customer_name: string;
