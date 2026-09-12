@@ -10,6 +10,8 @@ use App\Models\Product;
 use App\Models\ProductImage;
 use App\Services\ProductService;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 
 class AdminProductImageController extends Controller
 {
@@ -30,11 +32,19 @@ class AdminProductImageController extends Controller
     public function store(StoreProductImageRequest $request, Product $product): JsonResponse
     {
         $maxOrder = $product->images()->max('sort_order') ?? 0;
-
         $isThumbnail = $request->boolean('is_thumbnail', false);
 
+        if ($request->hasFile('image')) {
+            $file = $request->file('image');
+            $filename = time() . '_' . Str::random(10) . '.' . $file->getClientOriginalExtension();
+            $path = $file->storeAs('products/' . $product->id, $filename, 'public');
+            $imageUrl = Storage::disk('public')->url($path);
+        } else {
+            $imageUrl = $request->input('image_url');
+        }
+
         $image = $product->images()->create([
-            'image_url' => $request->image_url,
+            'image_url' => $imageUrl,
             'is_thumbnail' => $isThumbnail,
             'sort_order' => $request->integer('sort_order', $maxOrder + 1),
         ]);
@@ -84,6 +94,12 @@ class AdminProductImageController extends Controller
         }
 
         $wasThumbnail = $image->is_thumbnail;
+
+        // Delete stored file if it's a local product upload
+        if (str_starts_with($image->image_url, 'products/')) {
+            Storage::disk('public')->delete($image->image_url);
+        }
+
         $image->delete();
 
         if ($wasThumbnail) {

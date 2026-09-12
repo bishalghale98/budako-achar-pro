@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import {
   useGetAdminProductsQuery,
   useDeleteAdminProductMutation,
@@ -29,6 +30,7 @@ import {
 } from "lucide-react";
 
 export default function AdminProductContent() {
+  const router = useRouter();
   const [page, setPage] = useState(1);
   const [search, setSearch] = useState("");
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
@@ -88,7 +90,10 @@ export default function AdminProductContent() {
             Manage your artisanal batches and inventory.
           </p>
         </div>
-        <Button className="bg-maroon text-white hover:bg-maroon-hover gap-2">
+        <Button
+          onClick={() => router.push("/admin/products/new")}
+          className="bg-maroon text-white hover:bg-maroon-hover gap-2"
+        >
           <Plus className="h-4 w-4" />
           Add Product
         </Button>
@@ -181,7 +186,10 @@ export default function AdminProductContent() {
                     <p className="text-sm text-slate-500 mb-4">
                       Create your first product to get started.
                     </p>
-                    <Button className="bg-maroon text-white hover:bg-maroon-hover gap-2">
+                    <Button
+                      onClick={() => router.push("/admin/products/new")}
+                      className="bg-maroon text-white hover:bg-maroon-hover gap-2"
+                    >
                       <Plus className="h-4 w-4" />
                       Add Product
                     </Button>

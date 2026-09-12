@@ -249,17 +249,12 @@ export const adminApi = createApi({
 
     createAdminImage: builder.mutation<
       { success: boolean; image: ProductImage },
-      {
-        productId: string;
-        image_url: string;
-        is_thumbnail?: boolean;
-        sort_order?: number;
-      }
+      { productId: string; formData: FormData }
     >({
-      query: ({ productId, ...body }) => ({
+      query: ({ productId, formData }) => ({
         url: `/api/admin/products/${productId}/images`,
         method: "POST",
-        body,
+        body: formData,
         headers: { Accept: "application/json" },
       }),
       invalidatesTags: ["AdminImages"],
