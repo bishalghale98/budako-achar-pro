@@ -184,7 +184,12 @@ export function ProductTable({ products, isLoading, onDelete }: Props) {
 
                   <TableCell>
                     <div className="flex items-center justify-end gap-2">
-                      <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className="h-8 w-8 p-0"
+                        onClick={() => router.push(`/admin/products/${product.id}`)}
+                      >
                         <Eye className="h-4 w-4 text-slate-500" />
                       </Button>
                       <Button

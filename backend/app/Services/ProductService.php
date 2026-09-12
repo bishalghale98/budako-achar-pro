@@ -2,6 +2,8 @@
 
 namespace App\Services;
 
+use App\Models\CartItem;
+use App\Models\OrderItem;
 use App\Models\Product;
 use App\Models\ProductImage;
 use Illuminate\Support\Facades\DB;
@@ -42,6 +44,11 @@ class ProductService
     public function delete(Product $product): bool
     {
         return DB::transaction(function () use ($product) {
+            $variantIds = $product->variants()->pluck('id');
+
+            CartItem::whereIn('product_variant_id', $variantIds)->delete();
+            OrderItem::whereIn('product_variant_id', $variantIds)->delete();
+
             $product->images()->delete();
             $product->variants()->delete();
             $product->reviews()->delete();
