@@ -4,6 +4,7 @@ import type {
   ProductResponse,
   ProductReviewsResponse,
   CategoriesResponse,
+  Category,
 } from "@/features/products/product-types";
 
 export async function getProducts(params?: {
@@ -40,4 +41,26 @@ export async function getProductReviews(
 
 export async function getCategories(): Promise<CategoriesResponse> {
   return serverFetch<CategoriesResponse>("/api/categories");
+}
+
+export async function getCategoryBySlug(slug: string): Promise<Category | undefined> {
+  const { categories } = await getCategories();
+  return categories.find((cat) => cat.slug === slug);
+}
+
+export async function getProductByCategorySlug(
+  slug: string,
+  params?: { page?: number; per_page?: number; sort?: string }
+): Promise<{ category: Category; products: ProductsResponse } | null> {
+  const category = await getCategoryBySlug(slug);
+  if (!category) return null;
+
+  const products = await getProducts({
+    page: params?.page,
+    per_page: params?.per_page ?? 12,
+    category_id: category.id,
+    sort: params?.sort,
+  });
+
+  return { category, products };
 }
