@@ -13,6 +13,7 @@ import {
 } from "@/features/admin/admin-api";
 import { Button } from "@/components/ui/button";
 import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Package, ArrowLeft } from "lucide-react";
 import { productSchema, type ProductFormValues } from "./admin-product-schema";
 import { useProductImages } from "./use-product-images";
@@ -177,14 +178,16 @@ export default function AdminProductForm() {
               <p className="text-xs text-muted-foreground">Namaste,</p>
               <p className="text-sm font-bold text-foreground">{user.name}</p>
             </div>
-            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-maroon/10 text-xs font-bold text-maroon">
-              {user.name
-                .split(" ")
-                .map((n) => n[0])
-                .join("")
-                .toUpperCase()
-                .slice(0, 2)}
-            </div>
+            <Avatar>
+              <AvatarFallback className="bg-maroon/10 text-xs font-bold text-maroon">
+                {user.name
+                  .split(" ")
+                  .map((n) => n[0])
+                  .join("")
+                  .toUpperCase()
+                  .slice(0, 2)}
+              </AvatarFallback>
+            </Avatar>
           </div>
         )}
       </div>

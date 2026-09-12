@@ -4,6 +4,7 @@ import { useRouter } from "next/navigation";
 import { useUser, useIsLoading } from "@/features/auth/auth-hooks";
 import { useLogoutMutation } from "@/features/auth/auth-api";
 import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { PageHeader } from "@/components/shared";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -106,16 +107,16 @@ export function DashboardContent() {
           </div>
           <div className="flex items-center justify-between px-6 py-4">
             <span className="text-sm text-muted-foreground">Email Verified</span>
-            <span className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-[11px] font-bold ${isVerified ? "bg-emerald-50 text-emerald-700" : "bg-amber-50 text-amber-700"}`}>
+            <Badge variant={isVerified ? "default" : "secondary"} className={isVerified ? "bg-emerald-50 text-emerald-700 border-0" : "bg-amber-50 text-amber-700 border-0"}>
               {isVerified ? "Verified" : "Not Verified"}
-            </span>
+            </Badge>
           </div>
           {user.role && (
             <div className="flex items-center justify-between px-6 py-4">
               <span className="text-sm text-muted-foreground">Role</span>
-              <span className="inline-flex items-center rounded-full bg-accent/20 px-2.5 py-0.5 text-[11px] font-bold text-accent-foreground capitalize">
+              <Badge variant="secondary" className="bg-accent/20 text-accent-foreground border-0 capitalize">
                 {user.role}
-              </span>
+              </Badge>
             </div>
           )}
         </div>

@@ -2,6 +2,7 @@
 
 import { useUser } from "@/features/auth/auth-hooks";
 import { MobileSidebarTrigger } from "./dashboard-sidebar";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 
 export function DashboardHeader() {
   const user = useUser();
@@ -18,14 +19,16 @@ export function DashboardHeader() {
             <p className="text-sm font-bold text-foreground">{user.name}</p>
             <p className="text-xs text-muted-foreground">{user.email}</p>
           </div>
-          <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-maroon/10 text-xs font-bold text-maroon">
-            {user.name
-              .split(" ")
-              .map((n) => n[0])
-              .join("")
-              .toUpperCase()
-              .slice(0, 2)}
-          </div>
+          <Avatar>
+            <AvatarFallback className="bg-maroon/10 text-xs font-bold text-maroon">
+              {user.name
+                .split(" ")
+                .map((n) => n[0])
+                .join("")
+                .toUpperCase()
+                .slice(0, 2)}
+            </AvatarFallback>
+          </Avatar>
         </div>
       )}
     </header>

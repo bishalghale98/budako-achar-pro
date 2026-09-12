@@ -1,5 +1,6 @@
 "use client";
 
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
 
 interface PaymentMethodOption {
@@ -26,7 +27,7 @@ export function PaymentMethodRadio({
       <h3 className="font-bold text-darkText mb-3 text-sm uppercase tracking-wide">
         Payment Method
       </h3>
-      <div className="space-y-2 text-sm">
+      <RadioGroup value={selected} onValueChange={onChange} className="space-y-2">
         {methods.map((method) => (
           <Label
             key={method.id}
@@ -36,14 +37,7 @@ export function PaymentMethodRadio({
                 : "border-border hover:bg-muted"
             }`}
           >
-            <input
-              type="radio"
-              name="payment_method"
-              value={method.id}
-              checked={selected === method.id}
-              onChange={() => onChange(method.id)}
-              className="h-4 w-4 shrink-0 border-gray-300 text-maroon focus:ring-maroon"
-            />
+            <RadioGroupItem value={method.id} />
             <div>
               <span className="font-medium text-darkText">{method.label}</span>
               {method.description && (
@@ -54,7 +48,7 @@ export function PaymentMethodRadio({
             </div>
           </Label>
         ))}
-      </div>
+      </RadioGroup>
       {error && (
         <p className="text-xs text-destructive mt-1">{error}</p>
       )}

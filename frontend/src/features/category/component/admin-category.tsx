@@ -13,7 +13,16 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Badge } from "@/components/ui/badge";
 import { Alert, AlertDescription } from "@/components/ui/alert";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
 import {
   Dialog,
   DialogContent,
@@ -128,36 +137,28 @@ export default function CategoryContent() {
 
       {/* Table */}
       <div className="overflow-hidden rounded-2xl border border-border bg-card">
-        <table className="w-full">
-          <thead>
-            <tr className="border-b border-border bg-muted/50">
-              <th className="text-left px-6 py-3 text-xs font-semibold text-muted-foreground uppercase tracking-wider">
-                Name
-              </th>
-              <th className="text-left px-6 py-3 text-xs font-semibold text-muted-foreground uppercase tracking-wider">
-                Slug
-              </th>
-              <th className="text-center px-6 py-3 text-xs font-semibold text-muted-foreground uppercase tracking-wider">
-                Products
-              </th>
-              <th className="text-right px-6 py-3 text-xs font-semibold text-muted-foreground uppercase tracking-wider">
-                Actions
-              </th>
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-border">
+        <Table>
+          <TableHeader>
+            <TableRow className="bg-muted/50">
+              <TableHead className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Name</TableHead>
+              <TableHead className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Slug</TableHead>
+              <TableHead className="text-center text-xs font-semibold text-muted-foreground uppercase tracking-wider">Products</TableHead>
+              <TableHead className="text-right text-xs font-semibold text-muted-foreground uppercase tracking-wider">Actions</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
             {isLoading ? (
               Array.from({ length: 5 }).map((_, i) => (
-                <tr key={i}>
-                  <td className="px-6 py-4"><Skeleton className="h-4 w-40" /></td>
-                  <td className="px-6 py-4"><Skeleton className="h-4 w-32" /></td>
-                  <td className="px-6 py-4"><Skeleton className="h-4 w-8 mx-auto" /></td>
-                  <td className="px-6 py-4"><Skeleton className="h-8 w-20 ml-auto" /></td>
-                </tr>
+                <TableRow key={i}>
+                  <TableCell><Skeleton className="h-4 w-40" /></TableCell>
+                  <TableCell><Skeleton className="h-4 w-32" /></TableCell>
+                  <TableCell><Skeleton className="h-4 w-8 mx-auto" /></TableCell>
+                  <TableCell><Skeleton className="h-8 w-20 ml-auto" /></TableCell>
+                </TableRow>
               ))
             ) : categories.length === 0 ? (
-              <tr>
-                <td colSpan={4} className="px-6 py-16 text-center">
+              <TableRow>
+                <TableCell colSpan={4} className="px-6 py-16 text-center">
                   <FolderOpen className="h-12 w-12 text-muted-foreground/30 mx-auto mb-4" />
                   <h3 className="text-lg font-semibold text-foreground mb-1">No categories yet</h3>
                   <p className="text-sm text-muted-foreground mb-4">Create your first category to get started.</p>
@@ -165,23 +166,23 @@ export default function CategoryContent() {
                     <Plus className="h-4 w-4" />
                     New Category
                   </Button>
-                </td>
-              </tr>
+                </TableCell>
+              </TableRow>
             ) : (
               categories.map((category) => (
-                <tr key={category.id} className="hover:bg-muted/50 transition-colors">
-                  <td className="px-6 py-4">
+                <TableRow key={category.id}>
+                  <TableCell>
                     <span className="font-medium text-foreground">{category.name}</span>
-                  </td>
-                  <td className="px-6 py-4">
+                  </TableCell>
+                  <TableCell>
                     <span className="text-sm text-muted-foreground">{category.slug}</span>
-                  </td>
-                  <td className="px-6 py-4 text-center">
-                    <span className="inline-flex items-center rounded-full bg-maroon/10 px-2.5 py-0.5 text-xs font-bold text-maroon">
+                  </TableCell>
+                  <TableCell className="text-center">
+                    <Badge variant="secondary" className="bg-maroon/10 text-maroon border-0 font-bold">
                       {category.products_count ?? 0}
-                    </span>
-                  </td>
-                  <td className="px-6 py-4">
+                    </Badge>
+                  </TableCell>
+                  <TableCell>
                     <div className="flex items-center justify-end gap-2">
                       <Button
                         variant="outline"
@@ -202,12 +203,12 @@ export default function CategoryContent() {
                         Delete
                       </Button>
                     </div>
-                  </td>
-                </tr>
+                  </TableCell>
+                </TableRow>
               ))
             )}
-          </tbody>
-        </table>
+          </TableBody>
+        </Table>
       </div>
 
       {/* Pagination */}

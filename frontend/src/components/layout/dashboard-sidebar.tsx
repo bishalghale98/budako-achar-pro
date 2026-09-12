@@ -12,6 +12,8 @@ import {
   SheetTrigger,
 } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { useState } from "react";
 import { useUser } from "@/features/auth/auth-hooks";
 import { useLogoutMutation } from "@/features/auth/auth-api";
@@ -101,9 +103,11 @@ function SidebarUser() {
   return (
     <div className="border-t border-border p-4">
       <div className="flex items-center gap-3">
-        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-maroon/10 text-xs font-bold text-maroon">
-          {initials}
-        </div>
+        <Avatar size="lg">
+          <AvatarFallback className="bg-maroon/10 text-xs font-bold text-maroon">
+            {initials}
+          </AvatarFallback>
+        </Avatar>
         <div className="min-w-0 flex-1">
           <p className="truncate text-sm font-bold text-foreground">{user.name}</p>
           <p className="truncate text-xs text-muted-foreground">{user.email}</p>
@@ -111,9 +115,9 @@ function SidebarUser() {
       </div>
       <div className="mt-3 flex items-center gap-2">
         {user.role && (
-          <span className="inline-flex items-center rounded-full bg-accent/20 px-2.5 py-0.5 text-[11px] font-bold text-accent-foreground capitalize">
+          <Badge variant="secondary" className="bg-accent/20 text-accent-foreground border-0 capitalize">
             {user.role}
-          </span>
+          </Badge>
         )}
         <div className="ml-auto">
           <Button
