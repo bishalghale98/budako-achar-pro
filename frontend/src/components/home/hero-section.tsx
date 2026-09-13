@@ -1,23 +1,36 @@
 import Link from "next/link";
 import Image from "next/image";
-import { Star } from "lucide-react";
-import { heroProduct } from "@/data/home";
+import { heroSectionData } from "@/data/home";
+import Icon from "../shared/icons";
+import { formatPrice } from "@/lib/utils";
+import { getProducts } from "@/lib/server/product";
 
-export function HeroSection() {
+export async function HeroSection() {
+  const BadgeIcon = heroSectionData.badgeIcon;
+  const { data } = await getProducts({ featured: true, per_page: 1 });
+  const product = data?.[0] ?? null;
+
+  const thumbnail = product?.thumbnail_url ?? product?.images?.[0]?.image_url;
+  const defaultVariant = product?.variants?.[0];
+  const price = defaultVariant?.price ?? 0;
+  const weight = defaultVariant
+    ? `${defaultVariant.weight}${defaultVariant.unit}`
+    : "500g";
+
   return (
     <section className="relative bg-linear-to-br from-maroon/5 via-white to-gold/10 py-16 lg:py-24 overflow-hidden">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
         <div className="space-y-6 text-center lg:text-left">
           <div className="inline-flex items-center gap-2 bg-gold/20 text-maroon px-3 py-1 rounded-full text-xs font-semibold">
-            <Star className="w-4 h-4 text-gold fill-gold" />
-            <span>4.2 / 5 Rated by Food Enthusiasts (23 Reviews)</span>
+            <Icon icon={BadgeIcon} className="w-4 h-4 text-gold fill-gold" />
+            <span>{heroSectionData.badge}</span>
           </div>
           <h1 className="font-serif text-4xl sm:text-5xl lg:text-6xl font-bold text-darkText leading-tight">
-            Authentic Taste of <span className="text-maroon">Nepali Achar</span>
+            {heroSectionData.title}{" "}
+            <span className="text-maroon">{heroSectionData.highlight}</span>
           </h1>
           <p className="text-lg text-gray-600 max-w-xl mx-auto lg:mx-0">
-            Traditional flavors, bold spices, and homemade goodness in every
-            bite, carefully prepared at Sangeet Chowk, Itahari.
+            {heroSectionData.description}
           </p>
           <div className="flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-4 pt-2">
             <Link
@@ -37,30 +50,40 @@ export function HeroSection() {
         <div className="relative flex justify-center">
           <div className="absolute -inset-1 bg-linear-to-r from-gold to-maroon rounded-2xl blur-lg opacity-25" />
           <div className="relative bg-white rounded-2xl shadow-xl border border-gray-100 max-w-md w-full overflow-hidden">
-            <div className="h-80 bg-gray-100 overflow-hidden relative">
-              <Image
-                src={heroProduct.image}
-                alt={heroProduct.alt}
-                fill
-                loading="eager"
-                className="object-cover"
-                sizes="(max-width: 768px) 100vw, 50vw"
-              />
-              <span className="absolute bottom-3 left-3 bg-white/90 backdrop-blur px-3 py-1 rounded text-xs font-semibold text-maroon shadow">
-                {heroProduct.weight}
-              </span>
-            </div>
-            <div className="p-4 space-y-2">
-              <h3 className="font-serif font-bold text-lg sm:text-xl">
-                {heroProduct.name}
-              </h3>
-              <div className="flex items-center justify-between">
-                <p className="text-xs text-gray-500">{heroProduct.tagline}</p>
-                <span className="text-maroon font-bold text-lg sm:text-xl">
-                  {heroProduct.price}
-                </span>
+            {product && thumbnail ? (
+              <>
+                <div className="h-80 bg-gray-100 overflow-hidden relative">
+                  <Image
+                    src={thumbnail}
+                    alt={product.title}
+                    fill
+                    loading="eager"
+                    className="object-cover"
+                    sizes="(max-width: 768px) 100vw, 50vw"
+                  />
+                  <span className="absolute bottom-3 left-3 bg-white/90 backdrop-blur px-3 py-1 rounded text-xs font-semibold text-maroon shadow">
+                    {weight}
+                  </span>
+                </div>
+                <div className="p-4 space-y-2">
+                  <h3 className="font-serif font-bold text-lg sm:text-xl">
+                    {product.title}
+                  </h3>
+                  <div className="flex items-center justify-between">
+                    <p className="text-xs text-gray-500">
+                      {product.short_description ?? "Authentic Nepali achar"}
+                    </p>
+                    <span className="text-maroon font-bold text-lg sm:text-xl">
+                      {formatPrice(price)}
+                    </span>
+                  </div>
+                </div>
+              </>
+            ) : (
+              <div className="h-80 flex items-center justify-center text-gray-400 text-sm">
+                Loading product...
               </div>
-            </div>
+            )}
           </div>
         </div>
       </div>

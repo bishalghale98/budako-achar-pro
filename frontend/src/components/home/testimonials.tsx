@@ -1,4 +1,11 @@
 import { testimonials } from "@/data/home";
+import {
+  Carousel,
+  CarouselContent,
+  CarouselItem,
+  CarouselNext,
+  CarouselPrevious,
+} from "@/components/ui/carousel";
 import { TestimonialCard } from "./testimonial-card";
 
 export function Testimonials() {
@@ -21,11 +28,17 @@ export function Testimonials() {
           </div>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-          {testimonials.map((t) => (
-            <TestimonialCard key={t.name} {...t} />
-          ))}
-        </div>
+        <Carousel className="w-full">
+          <CarouselContent className="-ml-4">
+            {testimonials.map((t, index) => (
+              <CarouselItem key={`${t.name}-${index}`} className="pl-4 md:basis-1/2 lg:basis-1/3">
+                <TestimonialCard {...t} />
+              </CarouselItem>
+            ))}
+          </CarouselContent>
+          <CarouselPrevious className="left-0" />
+          <CarouselNext className="right-0" />
+        </Carousel>
       </div>
     </section>
   );

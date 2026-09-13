@@ -1,4 +1,4 @@
-import { features } from "@/data/home";
+import { whyChooseUsSteps } from "@/data/home";
 
 export function WhyChooseUs() {
   return (
@@ -12,7 +12,7 @@ export function WhyChooseUs() {
         </h2>
       </div>
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
-        {features.map((feature) => (
+        {whyChooseUsSteps.map((feature) => (
           <div
             key={feature.number}
             className="bg-white p-6 rounded-xl border border-gray-200 shadow-sm"
