@@ -6,10 +6,13 @@ export const tagTypes = [
   "Reviews",
   "Cart",
   "Addresses",
+  "CustomerOrders",
   "AdminProducts",
   "AdminVariants",
   "AdminImages",
   "AdminReviews",
   "AdminUsers",
+  "AdminOrders",
+  "AdminPayments",
 ] as const;
 export type TagTypes = (typeof tagTypes)[number];

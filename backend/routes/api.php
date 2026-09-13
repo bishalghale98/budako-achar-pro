@@ -14,6 +14,7 @@ use App\Http\Controllers\Api\User\ProfileController;
 use App\Http\Controllers\Api\CartController;
 use App\Http\Controllers\Api\CartItemController;
 use App\Http\Controllers\Api\Customer\CustomerDashboardController;
+use App\Http\Controllers\Api\Customer\CustomerOrderController;
 use App\Http\Controllers\Api\OrderController;
 use App\Http\Controllers\Api\ProductController;
 use App\Http\Controllers\Api\ProductReviewController;
@@ -23,6 +24,8 @@ use App\Http\Controllers\Api\Admin\AdminProductVariantController;
 use App\Http\Controllers\Api\Admin\AdminProductImageController;
 use App\Http\Controllers\Api\Admin\AdminProductReviewController;
 use App\Http\Controllers\Api\Admin\AdminCategoryController;
+use App\Http\Controllers\Api\Admin\AdminOrderController;
+use App\Http\Controllers\Api\Admin\AdminPaymentController;
 use App\Http\Controllers\Api\AddressController;
 use App\Models\User;
 use Illuminate\Session\Middleware\StartSession;
@@ -70,6 +73,11 @@ Route::middleware('auth:sanctum')->group(function () {
 
     // Customer dashboard
     Route::get('/customer/dashboard', [CustomerDashboardController::class, 'show']);
+
+    // Customer orders
+    Route::get('/customer/orders', [CustomerOrderController::class, 'index']);
+    Route::get('/customer/orders/{id}', [CustomerOrderController::class, 'show']);
+    Route::post('/customer/orders/{id}/cancel', [CustomerOrderController::class, 'cancel']);
 
     // Product reviews (authenticated users)
     Route::post('/products/{product}/reviews', [ProductReviewController::class, 'store']);
@@ -123,4 +131,16 @@ Route::middleware(['auth:sanctum', 'role:' . Role::Admin->value])->prefix('admin
 
     // Categories
     Route::apiResource('categories', AdminCategoryController::class);
+
+    // Orders
+    Route::get('/orders', [AdminOrderController::class, 'index']);
+    Route::get('/orders/{id}', [AdminOrderController::class, 'show']);
+    Route::put('/orders/{id}/status', [AdminOrderController::class, 'updateStatus']);
+
+    // Payments
+    Route::get('/payments', [AdminPaymentController::class, 'index']);
+    Route::get('/payments/{id}', [AdminPaymentController::class, 'show']);
+    Route::post('/payments/{id}/verify', [AdminPaymentController::class, 'verify']);
+    Route::post('/payments/{id}/reject', [AdminPaymentController::class, 'reject']);
+    Route::get('/payments/{id}/proof', [AdminPaymentController::class, 'proof']);
 });

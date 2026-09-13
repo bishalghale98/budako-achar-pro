@@ -28,7 +28,7 @@ const sidebarNav = [
   },
   {
     title: "My Profile",
-    href: "/settings/profile",
+    href: "/customer/profile",
     icon: <User className="h-4.5 w-4.5" />,
   },
   {

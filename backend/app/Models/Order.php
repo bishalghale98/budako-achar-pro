@@ -16,6 +16,7 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
     'customer_name', 'customer_phone', 'customer_email',
     'address_line', 'area', 'city', 'province', 'delivery_notes',
     'status', 'subtotal', 'delivery_fee', 'total',
+    'cancelled_at', 'cancelled_by', 'cancellation_reason',
 ])]
 class Order extends Model
 {
@@ -28,12 +29,18 @@ class Order extends Model
             'subtotal' => 'decimal:2',
             'delivery_fee' => 'decimal:2',
             'total' => 'decimal:2',
+            'cancelled_at' => 'datetime',
         ];
     }
 
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
+    }
+
+    public function cancelledBy(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'cancelled_by');
     }
 
     public function cart(): BelongsTo

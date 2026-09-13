@@ -7,6 +7,12 @@ import type {
   ProductReview,
   Category,
 } from "../products/product-types";
+import type {
+  Order,
+  OrderPayment,
+  OrdersResponse,
+  PaymentsResponse,
+} from "../order/order-types";
 
 interface AdminProductsResponse {
   success: boolean;
@@ -74,7 +80,7 @@ interface AdminCategoryResponse {
 export const adminApi = createApi({
   reducerPath: "adminApi",
   baseQuery: baseQueryWithCsrf,
-  tagTypes: ["AdminProducts", "AdminVariants", "AdminImages", "AdminReviews", "AdminUsers", "AdminCategories"],
+  tagTypes: ["AdminProducts", "AdminVariants", "AdminImages", "AdminReviews", "AdminUsers", "AdminCategories", "AdminOrders", "AdminPayments"],
   endpoints: (builder) => ({
     // ─── Users ──────────────────────────────────────
     getAdminUsers: builder.query<AdminUsersResponse, void>({
@@ -399,6 +405,110 @@ export const adminApi = createApi({
       }),
       invalidatesTags: ["AdminCategories"],
     }),
+
+    // ─── Orders ─────────────────────────────────────
+    getAdminOrders: builder.query<
+      OrdersResponse,
+      { page?: number; per_page?: number; status?: string; search?: string }
+    >({
+      query: (params) => ({
+        url: "/api/admin/orders",
+        params,
+        headers: { Accept: "application/json" },
+      }),
+      providesTags: ["AdminOrders"],
+    }),
+
+    getAdminOrder: builder.query<{ success: boolean; order: Order }, string>({
+      query: (id) => ({
+        url: `/api/admin/orders/${id}`,
+        headers: { Accept: "application/json" },
+      }),
+      providesTags: (_result, _error, id) => [{ type: "AdminOrders", id }],
+    }),
+
+    updateOrderStatus: builder.mutation<
+      { success: boolean; message: string; order: Order },
+      { id: string; status: string }
+    >({
+      query: ({ id, ...body }) => ({
+        url: `/api/admin/orders/${id}/status`,
+        method: "PUT",
+        body,
+        headers: { Accept: "application/json" },
+      }),
+      invalidatesTags: (_result, _error, { id }) => [
+        "AdminOrders",
+        { type: "AdminOrders", id },
+      ],
+    }),
+
+    // ─── Payments ───────────────────────────────────
+    getAdminPayments: builder.query<
+      PaymentsResponse,
+      { page?: number; per_page?: number; status?: string; method?: string }
+    >({
+      query: (params) => ({
+        url: "/api/admin/payments",
+        params,
+        headers: { Accept: "application/json" },
+      }),
+      providesTags: ["AdminPayments"],
+    }),
+
+    getAdminPayment: builder.query<
+      { success: boolean; payment: OrderPayment },
+      string
+    >({
+      query: (id) => ({
+        url: `/api/admin/payments/${id}`,
+        headers: { Accept: "application/json" },
+      }),
+      providesTags: (_result, _error, id) => [{ type: "AdminPayments", id }],
+    }),
+
+    verifyPayment: builder.mutation<
+      { success: boolean; message: string; payment: OrderPayment },
+      string
+    >({
+      query: (id) => ({
+        url: `/api/admin/payments/${id}/verify`,
+        method: "POST",
+        headers: { Accept: "application/json" },
+      }),
+      invalidatesTags: (_result, _error, id) => [
+        "AdminPayments",
+        { type: "AdminPayments", id },
+        "AdminOrders",
+      ],
+    }),
+
+    rejectPayment: builder.mutation<
+      { success: boolean; message: string; payment: OrderPayment },
+      { id: string; reason: string }
+    >({
+      query: ({ id, ...body }) => ({
+        url: `/api/admin/payments/${id}/reject`,
+        method: "POST",
+        body,
+        headers: { Accept: "application/json" },
+      }),
+      invalidatesTags: (_result, _error, { id }) => [
+        "AdminPayments",
+        { type: "AdminPayments", id },
+        "AdminOrders",
+      ],
+    }),
+
+    getPaymentProof: builder.query<
+      { success: boolean; url: string },
+      string
+    >({
+      query: (id) => ({
+        url: `/api/admin/payments/${id}/proof`,
+        headers: { Accept: "application/json" },
+      }),
+    }),
   }),
 });
 
@@ -426,4 +536,12 @@ export const {
   useCreateAdminCategoryMutation,
   useUpdateAdminCategoryMutation,
   useDeleteAdminCategoryMutation,
+  useGetAdminOrdersQuery,
+  useGetAdminOrderQuery,
+  useUpdateOrderStatusMutation,
+  useGetAdminPaymentsQuery,
+  useGetAdminPaymentQuery,
+  useVerifyPaymentMutation,
+  useRejectPaymentMutation,
+  useGetPaymentProofQuery,
 } = adminApi;

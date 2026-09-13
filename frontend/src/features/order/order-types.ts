@@ -14,6 +14,13 @@ export interface OrderPayment {
   payment_method: string;
   status: string;
   amount: number;
+  proof_image: string | null;
+  verified_by: string | null;
+  verified_at: string | null;
+  rejection_reason: string | null;
+  created_at: string;
+  updated_at: string;
+  order?: Order;
 }
 
 export interface Order {
@@ -32,16 +39,50 @@ export interface Order {
   subtotal: number;
   delivery_fee: number;
   total: number;
+  cancelled_at: string | null;
+  cancelled_by: string | null;
+  cancellation_reason: string | null;
   items: OrderItem[];
   payment: OrderPayment;
   created_at: string;
   updated_at: string;
 }
 
+export interface OrdersResponse {
+  success: boolean;
+  orders: Order[];
+  pagination: {
+    current_page: number;
+    last_page: number;
+    per_page: number;
+    total: number;
+  };
+}
+
 export interface OrderResponse {
   success: boolean;
-  message: string;
   order: Order;
+}
+
+export interface PaymentsResponse {
+  success: boolean;
+  payments: OrderPayment[];
+  pagination: {
+    current_page: number;
+    last_page: number;
+    per_page: number;
+    total: number;
+  };
+}
+
+export interface PaymentResponse {
+  success: boolean;
+  payment: OrderPayment;
+}
+
+export interface MessageResponse {
+  success: boolean;
+  message: string;
 }
 
 export interface PlaceOrderRequest {

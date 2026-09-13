@@ -25,6 +25,15 @@ use Illuminate\Support\Str;
 
 class OrderService
 {
+    private const TRANSITIONS = [
+        'pending' => [OrderStatus::Confirmed, OrderStatus::Cancelled],
+        'confirmed' => [OrderStatus::Processing, OrderStatus::Cancelled],
+        'processing' => [OrderStatus::Shipped, OrderStatus::Cancelled],
+        'shipped' => [OrderStatus::Delivered],
+        'delivered' => [],
+        'cancelled' => [],
+    ];
+
     public function placeOrder(Cart $cart, array $data, ?UploadedFile $proofFile = null): Order
     {
         $plainPassword = null;
@@ -72,10 +81,10 @@ class OrderService
                 }
 
                 // 6. Resolve address from saved address or manual input
-                $addressLine = $data['address_line'];
+                $addressLine = $data['address_line'] ?? null;
                 $area = $data['area'] ?? null;
-                $city = $data['city'];
-                $province = $data['province'];
+                $city = $data['city'] ?? null;
+                $province = $data['province'] ?? null;
                 $deliveryNotes = $data['delivery_notes'] ?? null;
                 $customerPhone = $data['customer_phone'];
 
@@ -184,6 +193,89 @@ class OrderService
         }
 
         return $order;
+    }
+
+    public function updateStatus(Order $order, string $status): Order
+    {
+        $newStatus = OrderStatus::from($status);
+        $allowed = self::TRANSITIONS[$order->status->value] ?? [];
+
+        if (! in_array($newStatus, $allowed, true)) {
+            throw new OrderException(
+                "Cannot transition from \"{$order->status->value}\" to \"{$newStatus->value}\"."
+            );
+        }
+
+        $order->update(['status' => $newStatus]);
+
+        return $order;
+    }
+
+    public function cancelOrder(Order $order, User $user, string $reason): Order
+    {
+        return DB::transaction(function () use ($order, $user, $reason) {
+            $order = Order::where('id', $order->id)
+                ->where('status', '!=', OrderStatus::Cancelled)
+                ->lockForUpdate()
+                ->firstOrFail();
+
+            $allowed = self::TRANSITIONS[$order->status->value] ?? [];
+            if (! in_array(OrderStatus::Cancelled, $allowed, true)) {
+                throw new OrderException(
+                    "Order in \"{$order->status->value}\" status cannot be cancelled."
+                );
+            }
+
+            // Restore stock (exact inverse of placeOrder decrement)
+            $order->items()->with('productVariant')->each(function ($item) {
+                $item->productVariant->increment('stock', $item->quantity);
+            });
+
+            $order->update([
+                'status' => OrderStatus::Cancelled,
+                'cancelled_at' => now(),
+                'cancelled_by' => $user->id,
+                'cancellation_reason' => $reason,
+            ]);
+
+            return $order;
+        });
+    }
+
+    public function verifyPayment(Payment $payment, User $admin): Payment
+    {
+        if ($payment->status !== PaymentStatus::Pending) {
+            throw new OrderException('Payment is not pending verification.');
+        }
+
+        $payment->update([
+            'status' => PaymentStatus::Paid,
+            'verified_by' => $admin->id,
+            'verified_at' => now(),
+        ]);
+
+        // Auto-confirm order if still pending
+        if ($payment->order->status === OrderStatus::Pending) {
+            $this->updateStatus($payment->order, OrderStatus::Confirmed->value);
+        }
+
+        return $payment;
+    }
+
+    public function rejectPayment(Payment $payment, User $admin, string $reason): Payment
+    {
+        if ($payment->status !== PaymentStatus::Pending) {
+            throw new OrderException('Payment is not pending verification.');
+        }
+
+        $payment->update([
+            'status' => PaymentStatus::Rejected,
+            'verified_by' => $admin->id,
+            'verified_at' => now(),
+            'rejection_reason' => $reason,
+        ]);
+
+        return $payment;
     }
 
     private function validateCart(Cart $cart): void

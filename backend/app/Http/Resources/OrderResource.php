@@ -29,6 +29,10 @@ class OrderResource extends JsonResource
             'delivery_fee' => (float) $this->delivery_fee,
             'total' => (float) $this->total,
 
+            'cancelled_at' => $this->cancelled_at?->toISOString(),
+            'cancelled_by' => $this->cancelled_by,
+            'cancellation_reason' => $this->cancellation_reason,
+
             'items' => OrderItemResource::collection($this->whenLoaded('items')),
             'payment' => new PaymentResource($this->whenLoaded('payment')),
 

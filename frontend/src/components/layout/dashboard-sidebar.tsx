@@ -18,13 +18,23 @@ import { useState } from "react";
 import { useUser } from "@/features/auth/auth-hooks";
 import { useLogoutMutation } from "@/features/auth/auth-api";
 import { useRouter } from "next/navigation";
-import { LayoutDashboard, User, LogOut, Menu, FolderTree, Package } from "lucide-react";
+import { LayoutDashboard, User, LogOut, Menu, FolderTree, Package, ClipboardList, CreditCard } from "lucide-react";
 
 const sidebarNav = [
   {
     title: "Dashboard",
     href: "/admin/dashboard",
     icon: <LayoutDashboard className="h-4.5 w-4.5" />,
+  },
+  {
+    title: "Orders",
+    href: "/admin/orders",
+    icon: <ClipboardList className="h-4.5 w-4.5" />,
+  },
+  {
+    title: "Payments",
+    href: "/admin/payments",
+    icon: <CreditCard className="h-4.5 w-4.5" />,
   },
   {
     title: "Products",
