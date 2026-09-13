@@ -4,10 +4,13 @@ import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { Card, CardContent } from "@/components/ui/card";
 import { Check } from "lucide-react";
+import { useGetSiteSettingsQuery } from "@/features/settings/settings-api";
 
 export function OrderSuccessContent() {
   const searchParams = useSearchParams();
   const orderNumber = searchParams.get("order");
+  const { data: settingsData } = useGetSiteSettingsQuery();
+  const brandName = settingsData?.site_settings?.brand_name || "Buda Ko Achar";
 
   if (!orderNumber) {
     return (
@@ -50,7 +53,7 @@ export function OrderSuccessContent() {
             </h1>
             <p className="text-muted-foreground text-sm mt-1">
               Thank you for shopping with{" "}
-              <span className="font-semibold text-maroon">Buda Ko Achar</span>.
+              <span className="font-semibold text-maroon">{brandName}</span>.
             </p>
           </div>
           <div className="bg-muted p-4 rounded-xl text-sm space-y-1">

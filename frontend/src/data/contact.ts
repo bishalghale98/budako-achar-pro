@@ -1,7 +1,7 @@
 export interface ContactInfo {
-  location: string;
-  phone: string;
-  whatsapp: string;
+  location?: string | null;
+  phone?: string | null;
+  whatsapp?: string | null;
 }
 
 export interface ContactFormData {

@@ -18,7 +18,7 @@ import { useState } from "react";
 import { useUser } from "@/features/auth/auth-hooks";
 import { useLogoutMutation } from "@/features/auth/auth-api";
 import { useRouter } from "next/navigation";
-import { LayoutDashboard, User, LogOut, Menu, FolderTree, Package, ClipboardList, CreditCard } from "lucide-react";
+import { LayoutDashboard, User, LogOut, Menu, FolderTree, Package, ClipboardList, CreditCard, Settings } from "lucide-react";
 
 const sidebarNav = [
   {
@@ -45,6 +45,11 @@ const sidebarNav = [
     title: "Category",
     href: "/admin/category",
     icon: <FolderTree className="h-4.5 w-4.5" />,
+  },
+  {
+    title: "Settings",
+    href: "/admin/settings",
+    icon: <Settings className="h-4.5 w-4.5" />,
   },
   {
     title: "Profile",

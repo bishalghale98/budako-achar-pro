@@ -1,3 +1,5 @@
+"use client";
+
 import Link from "next/link";
 import { MessageCircle } from "lucide-react";
 import {
@@ -5,6 +7,7 @@ import {
   TooltipTrigger,
   TooltipContent,
 } from "@/components/ui/tooltip";
+import { useGetSiteSettingsQuery } from "@/features/settings/settings-api";
 
 const footerLinks = {
   shop: [
@@ -22,7 +25,17 @@ const footerLinks = {
   ],
 };
 
+const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
+
 export function PublicFooter() {
+  const { data: settingsData } = useGetSiteSettingsQuery();
+  const settings = settingsData?.site_settings;
+
+  const brandName = settings?.brand_name || "Buda Ko Achar";
+  const footerDescription = settings?.footer_description || "Handcrafted, traditional Nepali achar made with love. Authentic recipes passed down through generations, bringing the true taste of Nepal to your table.";
+  const copyrightText = settings?.copyright_text || brandName;
+  const whatsappNumber = settings?.whatsapp_number;
+
   return (
     <>
       <footer className="border-t border-gray-800 bg-dark-text py-16 text-gray-400">
@@ -32,13 +45,11 @@ export function PublicFooter() {
             <div className="md:col-span-2">
               <Link href="/" className="inline-block">
                 <span className="font-serif text-xl font-bold text-white">
-                  Buda Ko Achar
+                  {brandName}
                 </span>
               </Link>
               <p className="mt-4 max-w-sm text-sm leading-relaxed text-gray-400">
-                Handcrafted, traditional Nepali achar made with love. Authentic
-                recipes passed down through generations, bringing the true taste
-                of Nepal to your table.
+                {footerDescription}
               </p>
             </div>
 
@@ -89,7 +100,7 @@ export function PublicFooter() {
 
           <div className="mt-12 border-t border-gray-800 pt-8 text-center text-sm">
             <p>
-              &copy; {new Date().getFullYear()} Buda Ko Achar. All rights
+              &copy; {new Date().getFullYear()} {copyrightText}. All rights
               reserved.
             </p>
             <p className="mt-2 text-xs text-gray-500">
@@ -108,22 +119,24 @@ export function PublicFooter() {
       </footer>
 
       {/* WhatsApp FAB */}
-      <Tooltip>
-        <TooltipTrigger
-          render={
-            <a
-              href="https://wa.me/9779800000000"
-              target="_blank"
-              rel="noopener noreferrer"
-              aria-label="Chat on WhatsApp"
-            />
-          }
-          className="fixed bottom-6 right-6 z-50 flex size-12 items-center justify-center rounded-full bg-[#25D366] text-white shadow-lg transition hover:bg-[#20ba59]"
-        >
-          <MessageCircle className="size-5" />
-        </TooltipTrigger>
-        <TooltipContent side="top">Chat on WhatsApp</TooltipContent>
-      </Tooltip>
+      {whatsappNumber && (
+        <Tooltip>
+          <TooltipTrigger
+            render={
+              <a
+                href={`https://wa.me/977${whatsappNumber}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label="Chat on WhatsApp"
+              />
+            }
+            className="fixed bottom-6 right-6 z-50 flex size-12 items-center justify-center rounded-full bg-[#25D366] text-white shadow-lg transition hover:bg-[#20ba59]"
+          >
+            <MessageCircle className="size-5" />
+          </TooltipTrigger>
+          <TooltipContent side="top">Chat on WhatsApp</TooltipContent>
+        </Tooltip>
+      )}
     </>
   );
 }

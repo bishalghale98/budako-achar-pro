@@ -16,6 +16,7 @@ import { checkoutSchema, type CheckoutFormValues } from "./checkout-schema";
 import { AddressSelector } from "@/components/address/address-selector";
 import { useGetAddressesQuery } from "@/features/address/address-api";
 import { useUser } from "@/features/auth/auth-hooks";
+import { useGetPaymentSettingsQuery } from "@/features/settings/settings-api";
 
 interface CustomerFormProps {
   defaultCity: string;
@@ -52,6 +53,8 @@ export function CustomerForm({
 }: CustomerFormProps) {
   const user = useUser();
   const { data: addressData, isLoading: addressesLoading } = useGetAddressesQuery();
+  const { data: paymentSettingsData } = useGetPaymentSettingsQuery();
+  const paymentSettings = paymentSettingsData?.payment_settings;
   const addresses = useMemo(() => addressData?.addresses ?? [], [addressData?.addresses]);
 
   const [selectedAddressId, setSelectedAddressId] = useState<string | null>(null);
@@ -355,28 +358,34 @@ export function CustomerForm({
         {paymentMethod === "digital" && (
           <Card>
             <CardContent className="flex flex-col sm:flex-row items-center gap-6">
-              <div className="shrink-0">
-                <Image
-                  src="https://images.unsplash.com/photo-1595079676339-1534801ad6cf?q=80&w=1170&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
-                  alt="QR Code"
-                  className="rounded-xl object-cover"
-                  width={192}
-                  height={192}
-                />
-              </div>
+              {paymentSettings?.digital_payment_qr_image && (
+                <div className="shrink-0">
+                  <Image
+                    src={paymentSettings.digital_payment_qr_image.startsWith("http") ? paymentSettings.digital_payment_qr_image : `${process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000"}/storage/${paymentSettings.digital_payment_qr_image}`}
+                    alt="QR Code"
+                    className="rounded-xl object-cover"
+                    width={192}
+                    height={192}
+                  />
+                </div>
+              )}
               <div className="space-y-2 text-sm text-center sm:text-left">
                 <h4 className="font-bold text-darkText uppercase tracking-wide">
                   eSewa / Khalti Payment
                 </h4>
                 <div className="space-y-1 text-muted-foreground">
-                  <p>
-                    <span className="font-medium text-darkText">Account Name:</span>{" "}
-                    Budako Achar Udyog
-                  </p>
-                  <p>
-                    <span className="font-medium text-darkText">Wallet Number:</span>{" "}
-                    9800000000
-                  </p>
+                  {paymentSettings?.digital_payment_account_name && (
+                    <p>
+                      <span className="font-medium text-darkText">Account Name:</span>{" "}
+                      {paymentSettings.digital_payment_account_name}
+                    </p>
+                  )}
+                  {paymentSettings?.digital_payment_wallet_number && (
+                    <p>
+                      <span className="font-medium text-darkText">Wallet Number:</span>{" "}
+                      {paymentSettings.digital_payment_wallet_number}
+                    </p>
+                  )}
                 </div>
                 <p className="text-xs text-muted-foreground">
                   Scan the QR code or send payment to the number above. Then upload
@@ -390,36 +399,46 @@ export function CustomerForm({
         {paymentMethod === "bank" && (
           <Card>
             <CardContent className="flex flex-col sm:flex-row items-center gap-6">
-              <div className="shrink-0">
-                <Image
-                  src="https://images.unsplash.com/photo-1595079676339-1534801ad6cf?q=80&w=1170&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
-                  alt="QR Code"
-                  className="rounded-xl object-cover"
-                  width={192}
-                  height={192}
-                />
-              </div>
+              {paymentSettings?.bank_qr_image && (
+                <div className="shrink-0">
+                  <Image
+                    src={paymentSettings.bank_qr_image.startsWith("http") ? paymentSettings.bank_qr_image : `${process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000"}/storage/${paymentSettings.bank_qr_image}`}
+                    alt="QR Code"
+                    className="rounded-xl object-cover"
+                    width={192}
+                    height={192}
+                  />
+                </div>
+              )}
               <div className="space-y-2 text-sm text-center sm:text-left">
                 <h4 className="font-bold text-darkText uppercase tracking-wide">
                   Bank Transfer
                 </h4>
                 <div className="space-y-1 text-muted-foreground">
-                  <p>
-                    <span className="font-medium text-darkText">Bank:</span>{" "}
-                    Global IME Bank
-                  </p>
-                  <p>
-                    <span className="font-medium text-darkText">Account Name:</span>{" "}
-                    Budako Achar Udyog
-                  </p>
-                  <p>
-                    <span className="font-medium text-darkText">Account Number:</span>{" "}
-                    01234567890123
-                  </p>
-                  <p>
-                    <span className="font-medium text-darkText">Branch:</span>{" "}
-                    Biratnagar
-                  </p>
+                  {paymentSettings?.bank_name && (
+                    <p>
+                      <span className="font-medium text-darkText">Bank:</span>{" "}
+                      {paymentSettings.bank_name}
+                    </p>
+                  )}
+                  {paymentSettings?.bank_account_name && (
+                    <p>
+                      <span className="font-medium text-darkText">Account Name:</span>{" "}
+                      {paymentSettings.bank_account_name}
+                    </p>
+                  )}
+                  {paymentSettings?.bank_account_number && (
+                    <p>
+                      <span className="font-medium text-darkText">Account Number:</span>{" "}
+                      {paymentSettings.bank_account_number}
+                    </p>
+                  )}
+                  {paymentSettings?.bank_branch && (
+                    <p>
+                      <span className="font-medium text-darkText">Branch:</span>{" "}
+                      {paymentSettings.bank_branch}
+                    </p>
+                  )}
                 </div>
                 <p className="text-xs text-muted-foreground">
                   Transfer the exact order amount to the account above. Then upload

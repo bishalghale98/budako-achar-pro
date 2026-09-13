@@ -14,5 +14,8 @@ export const tagTypes = [
   "AdminUsers",
   "AdminOrders",
   "AdminPayments",
+  "SiteSettings",
+  "PaymentSettings",
+  "OrderSettings",
 ] as const;
 export type TagTypes = (typeof tagTypes)[number];

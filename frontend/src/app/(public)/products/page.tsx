@@ -2,9 +2,11 @@ import { AppBreadcrumb } from "@/components/shared";
 import { PageHeader } from "@/components/shared";
 import { ProductList } from "@/components/products/product-list";
 import { Metadata } from "next";
+import { getSiteSettingsForMetadata } from "@/lib/server/site-settings";
 
 export async function generateMetadata(): Promise<Metadata> {
-  const SITE_NAME = "Budako Achar";
+  const settings = await getSiteSettingsForMetadata();
+  const siteName = settings?.brand_name || "Buda Ko Achar";
   const title = `Our Achar Collection | Traditional Nepali Achar`;
   const description = `Discover our collection of traditional Nepali achar made with authentic spices. Handcrafted and delivered fresh.`;
   const url = `${process.env.NEXT_PUBLIC_SITE_URL || "https://budaachar.com"}/products`;
@@ -20,7 +22,7 @@ export async function generateMetadata(): Promise<Metadata> {
       title,
       description,
       url,
-      siteName: SITE_NAME,
+      siteName,
       type: "website",
       locale: "en_US",
     },

@@ -1,6 +1,7 @@
 import { Suspense } from "react";
 import { OrderSuccessContent } from "./order-success-content";
 import { Skeleton } from "@/components/ui/skeleton";
+import { getSiteSettings } from "@/lib/server/site-settings";
 
 function OrderSuccessSkeleton() {
   return (
@@ -17,14 +18,17 @@ function OrderSuccessSkeleton() {
   );
 }
 
-export default function OrderSuccessPage() {
+export default async function OrderSuccessPage() {
+  const settings = await getSiteSettings();
+  const brandName = settings?.brand_name || "Buda Ko Achar";
+
   return (
     <div className="font-sans bg-lightBg text-darkText antialiased flex flex-col min-h-screen">
       <Suspense fallback={<OrderSuccessSkeleton />}>
         <OrderSuccessContent />
       </Suspense>
       <footer className="text-center py-6 text-xs text-gray-500 border-t border-gray-200">
-        &copy; {new Date().getFullYear()} Buda Ko Achar. All rights reserved.
+        &copy; {new Date().getFullYear()} {brandName}. All rights reserved.
       </footer>
     </div>
   );

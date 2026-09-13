@@ -1,7 +1,7 @@
 export { cn } from "cn";
 
-export function formatPrice(price: number): string {
-  return `NPR ${price.toLocaleString()}`;
+export function formatPrice(price: number, currencyCode: string = "NPR"): string {
+  return `${currencyCode} ${price.toLocaleString()}`;
 }
 
 export function formatDate(date: string, style: "short" | "long" = "short"): string {

@@ -5,13 +5,15 @@ import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useGetCartQuery } from "@/features/cart";
 import { usePlaceOrderMutation } from "@/features/order";
-import { checkoutPage } from "@/data/checkout";
+import { useGetSiteSettingsQuery } from "@/features/settings/settings-api";
 import { CustomerForm } from "@/components/checkout";
 import { Skeleton } from "@/components/ui/skeleton";
 
 export default function CheckoutPage() {
   const router = useRouter();
   const { data, isLoading, isError } = useGetCartQuery();
+  const { data: settingsData } = useGetSiteSettingsQuery();
+  const settings = settingsData?.site_settings;
   const [placeOrder, { isLoading: isSubmitting, error }] =
     usePlaceOrderMutation();
 
@@ -19,6 +21,8 @@ export default function CheckoutPage() {
   const items = cart?.items ?? [];
   const deliveryFee = cart?.delivery_fee ?? 0;
   const total = cart?.total ?? 0;
+  const defaultCity = settings?.default_city || "Itahari";
+  const defaultProvince = settings?.default_province || "Koshi Province";
 
   const handleSubmit = async (formData: {
     customer_name: string;
@@ -65,14 +69,14 @@ export default function CheckoutPage() {
   return (
     <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
       <h1 className="font-serif text-3xl font-bold text-darkText mb-8">
-        {checkoutPage.heading}
+        Checkout
       </h1>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
         <div className="lg:col-span-2">
           <CustomerForm
-            defaultCity={checkoutPage.defaultCity}
-            defaultProvince={checkoutPage.defaultProvince}
+            defaultCity={defaultCity}
+            defaultProvince={defaultProvince}
             onSubmit={handleSubmit}
             isSubmitting={isSubmitting}
             serverError={serverError}

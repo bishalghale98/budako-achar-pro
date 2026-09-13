@@ -2,6 +2,7 @@
 
 namespace App\Http\Resources;
 
+use App\Models\OrderSetting;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
@@ -11,7 +12,7 @@ class CartResource extends JsonResource
     {
         $items = CartItemResource::collection($this->whenLoaded('items'));
         $subtotal = (float) $this->items->sum(fn ($item) => $item->unit_price * $item->quantity);
-        $deliveryFee = (float) config('order.delivery_fee', 100);
+        $deliveryFee = OrderSetting::getDeliveryFee();
 
         return [
             'id' => $this->id,

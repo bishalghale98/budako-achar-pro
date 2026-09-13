@@ -3,6 +3,7 @@ import { Inter, Playfair_Display } from "next/font/google";
 import "./globals.css";
 import Providers from "@/store/provider";
 import { TooltipProvider } from "@/components/ui/tooltip";
+import { getSiteSettingsForMetadata } from "@/lib/server/site-settings";
 
 const inter = Inter({
   variable: "--font-inter",
@@ -14,14 +15,22 @@ const playfair = Playfair_Display({
   subsets: ["latin"],
 });
 
-export const metadata: Metadata = {
-  title: "Buda Ko Achar — Authentic Nepali Pickles",
-  description:
-    "Handcrafted, traditional Nepali achar made with love. Explore our range of authentic pickles.",
-  icons: {
-    icon: "/logos/facivon logo.png",
-  },
-};
+const FALLBACK_TITLE = "Buda Ko Achar — Authentic Nepali Pickles";
+const FALLBACK_DESCRIPTION =
+  "Handcrafted, traditional Nepali achar made with love. Explore our range of authentic pickles.";
+const FALLBACK_FAVICON = "/logos/facivon logo.png";
+
+export async function generateMetadata(): Promise<Metadata> {
+  const settings = await getSiteSettingsForMetadata();
+
+  return {
+    title: settings?.meta_title || FALLBACK_TITLE,
+    description: settings?.meta_description || FALLBACK_DESCRIPTION,
+    icons: {
+      icon: settings?.favicon || FALLBACK_FAVICON,
+    },
+  };
+}
 
 export default function RootLayout({
   children,

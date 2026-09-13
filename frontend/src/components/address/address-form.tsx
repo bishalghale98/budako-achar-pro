@@ -15,6 +15,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
+import { useGetSiteSettingsQuery } from "@/features/settings/settings-api";
 import type { Address, AddressFormValues } from "@/features/address/address-types";
 
 const addressSchema = z.object({
@@ -48,6 +49,10 @@ export function AddressForm({
   isSubmitting,
 }: AddressFormProps) {
   const isEditing = !!address;
+  const { data: settingsData } = useGetSiteSettingsQuery();
+  const settings = settingsData?.site_settings;
+  const defaultCity = settings?.default_city || "Itahari";
+  const defaultProvince = settings?.default_province || "Koshi Province";
 
   const {
     register,
@@ -62,8 +67,8 @@ export function AddressForm({
       label: "",
       address_line: "",
       area: "",
-      city: "Itahari",
-      province: "Koshi Province",
+      city: defaultCity,
+      province: defaultProvince,
       phone: "",
       delivery_notes: "",
       is_default: false,
@@ -88,15 +93,15 @@ export function AddressForm({
           label: "",
           address_line: "",
           area: "",
-          city: "Itahari",
-          province: "Koshi Province",
+          city: defaultCity,
+          province: defaultProvince,
           phone: "",
           delivery_notes: "",
           is_default: false,
         });
       }
     }
-  }, [open, address, reset]);
+  }, [open, address, reset, defaultCity, defaultProvince]);
 
   const handleFormSubmit = async (data: AddressSchemaValues) => {
     await onSubmit({

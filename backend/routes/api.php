@@ -26,7 +26,12 @@ use App\Http\Controllers\Api\Admin\AdminProductReviewController;
 use App\Http\Controllers\Api\Admin\AdminCategoryController;
 use App\Http\Controllers\Api\Admin\AdminOrderController;
 use App\Http\Controllers\Api\Admin\AdminPaymentController;
+use App\Http\Controllers\Api\Admin\AdminSiteSettingsController;
+use App\Http\Controllers\Api\Admin\AdminPaymentSettingsController;
+use App\Http\Controllers\Api\Admin\AdminOrderSettingsController;
 use App\Http\Controllers\Api\AddressController;
+use App\Http\Controllers\Api\SiteSettingsController;
+use App\Http\Controllers\Api\PaymentSettingsController;
 use App\Models\User;
 use Illuminate\Session\Middleware\StartSession;
 use Illuminate\Support\Facades\Route;
@@ -84,6 +89,10 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::patch('/products/{product}/reviews/{review}', [ProductReviewController::class, 'update']);
     Route::delete('/products/{product}/reviews/{review}', [ProductReviewController::class, 'destroy']);
 });
+
+// Public site settings
+Route::get('/site-settings', [SiteSettingsController::class, 'show']);
+Route::get('/payment-settings', [PaymentSettingsController::class, 'show']);
 
 // Public product routes
 Route::get('/products', [ProductController::class, 'index']);
@@ -143,4 +152,12 @@ Route::middleware(['auth:sanctum', 'role:' . Role::Admin->value])->prefix('admin
     Route::post('/payments/{id}/verify', [AdminPaymentController::class, 'verify']);
     Route::post('/payments/{id}/reject', [AdminPaymentController::class, 'reject']);
     Route::get('/payments/{id}/proof', [AdminPaymentController::class, 'proof']);
+
+    // Settings
+    Route::get('/site-settings', [AdminSiteSettingsController::class, 'show']);
+    Route::put('/site-settings', [AdminSiteSettingsController::class, 'update']);
+    Route::get('/payment-settings', [AdminPaymentSettingsController::class, 'show']);
+    Route::put('/payment-settings', [AdminPaymentSettingsController::class, 'update']);
+    Route::get('/order-settings', [AdminOrderSettingsController::class, 'show']);
+    Route::put('/order-settings', [AdminOrderSettingsController::class, 'update']);
 });

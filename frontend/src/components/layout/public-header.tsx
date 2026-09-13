@@ -22,6 +22,7 @@ import {
 } from "@/components/ui/popover";
 import { useAuth } from "@/features/auth/auth-hooks";
 import { useGetCartQuery } from "@/features/cart";
+import { useGetSiteSettingsQuery } from "@/features/settings/settings-api";
 
 const navLinks = [
   { href: "/", label: "Home" },
@@ -38,6 +39,8 @@ export function PublicHeader() {
 
   const { user } = useAuth();
   const { data: cartData } = useGetCartQuery();
+  const { data: settingsData } = useGetSiteSettingsQuery();
+  const settings = settingsData?.site_settings;
   const cart = cartData?.cart;
   const cartCount = cart?.total_quantity ?? 0;
 
@@ -61,14 +64,20 @@ export function PublicHeader() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
         {/* Logo */}
         <Link href="/" className="flex items-center group">
-          <Image
-            src="/logos/primary logo.png"
-            alt="Buda Ko Achar"
-            width={180}
-            height={48}
-            className="h-10 w-auto"
-            priority
-          />
+          {settings?.brand_display_mode === "image" && settings?.brand_logo ? (
+            <Image
+              src={settings.brand_logo.startsWith("http") ? settings.brand_logo : `${process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000"}/storage/${settings.brand_logo}`}
+              alt={settings?.brand_name || "Buda Ko Achar"}
+              width={180}
+              height={48}
+              className="h-10 w-auto"
+              priority
+            />
+          ) : (
+            <span className="font-serif text-xl font-bold text-maroon">
+              {settings?.brand_name || "Buda Ko Achar"}
+            </span>
+          )}
         </Link>
 
         {/* Desktop Nav */}

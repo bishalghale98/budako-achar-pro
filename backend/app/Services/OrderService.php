@@ -13,6 +13,7 @@ use App\Models\Cart;
 use App\Models\Counter;
 use App\Models\Order;
 use App\Models\OrderItem;
+use App\Models\OrderSetting;
 use App\Models\Payment;
 use App\Models\ProductVariant;
 use App\Models\User;
@@ -64,7 +65,7 @@ class OrderService
                     return (float) $variant->price * $item->quantity;
                 });
 
-                $deliveryFee = (float) config('order.delivery_fee', 100);
+                $deliveryFee = OrderSetting::getDeliveryFee();
                 $total = $subtotal + $deliveryFee;
 
                 // 5. Find or create user
