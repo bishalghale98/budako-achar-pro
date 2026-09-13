@@ -4,13 +4,205 @@ namespace App\Http\Controllers\Api\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\SiteSetting;
+use App\Models\User;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 
 class AdminDashboardController extends Controller
 {
+    public function overview(): JsonResponse
+    {
+        $timezone = 'Asia/Kathmandu';
+        $now = Carbon::now($timezone);
+        $todayDate = $now->format('M d, Y');
+
+        $data = Cache::remember('admin_dashboard_overview', 300, function () use ($now, $timezone) {
+            $settings = SiteSetting::instance();
+
+            $todayStart = (clone $now)->startOfDay()->timezone('UTC');
+            $todayEnd = (clone $now)->endOfDay()->timezone('UTC');
+            $yesterdayStart = (clone $now)->subDay()->startOfDay()->timezone('UTC');
+            $yesterdayEnd = (clone $now)->subDay()->endOfDay()->timezone('UTC');
+            $monthStart = (clone $now)->startOfMonth()->startOfDay()->timezone('UTC');
+            $lastMonthStart = (clone $now)->subMonth()->startOfMonth()->startOfDay()->timezone('UTC');
+            $lastMonthEnd = (clone $now)->subMonth()->endOfMonth()->endOfDay()->timezone('UTC');
+
+            // KPIs: today's delivered sales
+            $todayDelivered = DB::table('orders')
+                ->where('status', 'delivered')
+                ->where('created_at', '>=', $todayStart)
+                ->where('created_at', '<=', $todayEnd)
+                ->selectRaw('COUNT(*) as count, COALESCE(SUM(total), 0) as sales')
+                ->first();
+
+            // KPIs: yesterday's delivered sales (for % change)
+            $yesterdayDelivered = DB::table('orders')
+                ->where('status', 'delivered')
+                ->where('created_at', '>=', $yesterdayStart)
+                ->where('created_at', '<', $todayStart)
+                ->selectRaw('COUNT(*) as count, COALESCE(SUM(total), 0) as sales')
+                ->first();
+
+            // KPIs: today's orders (all statuses)
+            $todayOrders = DB::table('orders')
+                ->where('created_at', '>=', $todayStart)
+                ->where('created_at', '<=', $todayEnd)
+                ->count();
+
+            // KPIs: yesterday's orders (for % change)
+            $yesterdayOrders = DB::table('orders')
+                ->where('created_at', '>=', $yesterdayStart)
+                ->where('created_at', '<', $todayStart)
+                ->count();
+
+            // KPIs: month delivered sales
+            $monthDelivered = DB::table('orders')
+                ->where('status', 'delivered')
+                ->where('created_at', '>=', $monthStart)
+                ->selectRaw('COALESCE(SUM(total), 0) as sales')
+                ->first();
+
+            // KPIs: last month delivered sales (for % change)
+            $lastMonthDelivered = DB::table('orders')
+                ->where('status', 'delivered')
+                ->where('created_at', '>=', $lastMonthStart)
+                ->where('created_at', '<=', $lastMonthEnd)
+                ->selectRaw('COALESCE(SUM(total), 0) as sales')
+                ->first();
+
+            // KPIs: customers
+            $totalCustomers = User::where('role', 'customer')->count();
+            $newCustomersMonth = User::where('role', 'customer')
+                ->where('created_at', '>=', $monthStart)
+                ->count();
+            $newCustomersLastMonth = User::where('role', 'customer')
+                ->where('created_at', '>=', $lastMonthStart)
+                ->where('created_at', '<=', $lastMonthEnd)
+                ->count();
+
+            // Order status counts (all 6, zero-filled)
+            $statusCounts = DB::table('orders')
+                ->select('status', DB::raw('COUNT(*) as count'))
+                ->groupBy('status')
+                ->pluck('count', 'status')
+                ->toArray();
+
+            $orderStatus = [];
+            foreach (['pending', 'confirmed', 'processing', 'shipped', 'delivered', 'cancelled'] as $s) {
+                $orderStatus[$s] = (int) ($statusCounts[$s] ?? 0);
+            }
+
+            // Recent orders (5 latest)
+            $recentOrders = DB::table('orders')
+                ->orderByDesc('created_at')
+                ->limit(5)
+                ->get(['id', 'order_number', 'customer_name', 'total', 'status', 'created_at'])
+                ->toArray();
+
+            // Top products (delivered orders only, by recorded subtotal)
+            $topProducts = DB::table('order_items')
+                ->join('orders', 'order_items.order_id', '=', 'orders.id')
+                ->where('orders.status', 'delivered')
+                ->select(
+                    'order_items.product_name',
+                    'order_items.variant_name',
+                    DB::raw('SUM(order_items.quantity) as units_sold'),
+                    DB::raw('SUM(order_items.subtotal) as revenue')
+                )
+                ->groupBy('order_items.product_name', 'order_items.variant_name')
+                ->orderByDesc('revenue')
+                ->limit(5)
+                ->get()
+                ->toArray();
+
+            // Low stock (active variants with stock <= 5)
+            $lowStock = DB::table('product_variants')
+                ->where('status', 'active')
+                ->where('stock', '<=', 5)
+                ->orderBy('stock')
+                ->get(['product_id', 'name as variant_name', 'stock', 'sku'])
+                ->toArray();
+
+            // Resolve product names for low stock
+            if (count($lowStock) > 0) {
+                $productIds = array_unique(array_column($lowStock, 'product_id'));
+                $productNames = DB::table('products')
+                    ->whereIn('id', $productIds)
+                    ->pluck('title', 'id')
+                    ->toArray();
+
+                $lowStock = array_map(function ($item) use ($productNames) {
+                    return [
+                        'product_name' => $productNames[$item->product_id] ?? 'Unknown',
+                        'variant_name' => $item->variant_name,
+                        'stock' => (int) $item->stock,
+                        'sku' => $item->sku,
+                    ];
+                }, $lowStock);
+            }
+
+            // Compute % changes
+            $todaySalesChange = $this->pctChange(
+                (float) $yesterdayDelivered->sales,
+                (float) $todayDelivered->sales
+            );
+            $todayOrdersChange = $this->pctChange($yesterdayOrders, $todayOrders);
+            $monthSalesChange = $this->pctChange(
+                (float) $lastMonthDelivered->sales,
+                (float) $monthDelivered->sales
+            );
+            $customerGrowthPct = $this->pctChange($newCustomersLastMonth, $newCustomersMonth);
+
+            // AOV: today's delivered AOV vs yesterday's delivered AOV
+            $todayAov = $todayDelivered->count > 0
+                ? round((float) $todayDelivered->sales / $todayDelivered->count, 2)
+                : 0;
+            $yesterdayAov = $yesterdayDelivered->count > 0
+                ? round((float) $yesterdayDelivered->sales / $yesterdayDelivered->count, 2)
+                : 0;
+            $aovChange = $this->pctChange($yesterdayAov, $todayAov);
+
+            return [
+                'currency_code' => $settings->currency_code,
+                'currency_symbol' => $settings->currency_symbol,
+                'kpis' => [
+                    'today_sales' => (float) $todayDelivered->sales,
+                    'today_sales_change' => $todaySalesChange,
+                    'today_orders' => $todayOrders,
+                    'today_orders_change' => $todayOrdersChange,
+                    'month_sales' => (float) $monthDelivered->sales,
+                    'month_sales_change' => $monthSalesChange,
+                    'total_customers' => $totalCustomers,
+                    'new_customers_this_month' => $newCustomersMonth,
+                    'customer_growth_pct' => $customerGrowthPct,
+                    'average_order_value' => $todayAov,
+                    'aov_change' => $aovChange,
+                ],
+                'order_status' => $orderStatus,
+                'recent_orders' => $recentOrders,
+                'top_products' => $topProducts,
+                'low_stock' => $lowStock,
+            ];
+        });
+
+        return response()->json(array_merge([
+            'success' => true,
+            'today_date' => $todayDate,
+        ], $data));
+    }
+
+    private function pctChange(float $previous, float $current): float
+    {
+        if ($previous > 0) {
+            return round(($current - $previous) / $previous * 100, 1);
+        }
+
+        return $current > 0 ? 100.0 : 0.0;
+    }
+
     public function sales(Request $request): JsonResponse
     {
         $period = $request->validate([

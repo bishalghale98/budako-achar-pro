@@ -4,7 +4,11 @@ namespace Tests\Feature;
 
 use App\Enums\CartStatus;
 use App\Models\Cart;
+use App\Models\Category;
 use App\Models\Order;
+use App\Models\OrderItem;
+use App\Models\Product;
+use App\Models\ProductVariant;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Session;
@@ -67,6 +71,36 @@ class AdminDashboardTest extends TestCase
             'total' => $total,
         ]);
     }
+
+    private function createOrderItem(Order $order, string $productName, string $variantName, int $quantity, string $subtotal): void
+    {
+        $category = Category::factory()->create();
+        $product = Product::factory()->create([
+            'category_id' => $category->id,
+            'title' => $productName,
+            'status' => 'active',
+        ]);
+        $variant = ProductVariant::factory()->create([
+            'product_id' => $product->id,
+            'name' => $variantName,
+            'price' => $subtotal,
+            'stock' => 50,
+            'status' => 'active',
+        ]);
+
+        OrderItem::create([
+            'order_id' => $order->id,
+            'product_id' => $product->id,
+            'product_variant_id' => $variant->id,
+            'product_name' => $productName,
+            'variant_name' => $variantName,
+            'quantity' => $quantity,
+            'unit_price' => $subtotal,
+            'subtotal' => $subtotal,
+        ]);
+    }
+
+    // ── Sales Analytics Tests ──────────────────────────
 
     public function test_non_admin_gets_403(): void
     {
@@ -215,5 +249,155 @@ class AdminDashboardTest extends TestCase
 
         $data = $response->json('summary');
         $this->assertEquals(1500.0, $data['average_order_value']);
+    }
+
+    // ── Dashboard Overview Tests ───────────────────────
+
+    public function test_overview_non_admin_gets_403(): void
+    {
+        $customer = User::factory()->create(['role' => 'customer']);
+
+        $response = $this->actingAs($customer, 'sanctum')
+            ->getJson('/api/admin/dashboard/overview');
+
+        $response->assertStatus(403);
+    }
+
+    public function test_overview_returns_all_sections(): void
+    {
+        $response = $this->actingAs($this->admin, 'sanctum')
+            ->getJson('/api/admin/dashboard/overview');
+
+        $response->assertOk();
+        $response->assertJsonStructure([
+            'success',
+            'today_date',
+            'currency_code',
+            'currency_symbol',
+            'kpis' => [
+                'today_sales', 'today_sales_change',
+                'today_orders', 'today_orders_change',
+                'month_sales', 'month_sales_change',
+                'total_customers', 'new_customers_this_month', 'customer_growth_pct',
+                'average_order_value', 'aov_change',
+            ],
+            'order_status' => ['pending', 'confirmed', 'processing', 'shipped', 'delivered', 'cancelled'],
+            'recent_orders',
+            'top_products',
+            'low_stock',
+        ]);
+    }
+
+    public function test_overview_order_status_zero_fills_missing(): void
+    {
+        // Create no orders — all statuses should be 0
+        $response = $this->actingAs($this->admin, 'sanctum')
+            ->getJson('/api/admin/dashboard/overview');
+
+        $response->assertOk();
+
+        $status = $response->json('order_status');
+        $this->assertEquals(0, $status['pending']);
+        $this->assertEquals(0, $status['confirmed']);
+        $this->assertEquals(0, $status['processing']);
+        $this->assertEquals(0, $status['shipped']);
+        $this->assertEquals(0, $status['delivered']);
+        $this->assertEquals(0, $status['cancelled']);
+    }
+
+    public function test_overview_order_status_counts_all_six(): void
+    {
+        $this->createOrderWithStatus('pending');
+        $this->createOrderWithStatus('pending');
+        $this->createOrderWithStatus('confirmed');
+        $this->createOrderWithStatus('processing');
+        $this->createOrderWithStatus('shipped');
+        $this->createOrderWithStatus('delivered');
+        $this->createOrderWithStatus('delivered');
+        $this->createOrderWithStatus('delivered');
+        $this->createOrderWithStatus('cancelled');
+
+        $response = $this->actingAs($this->admin, 'sanctum')
+            ->getJson('/api/admin/dashboard/overview');
+
+        $response->assertOk();
+
+        $status = $response->json('order_status');
+        $this->assertEquals(2, $status['pending']);
+        $this->assertEquals(1, $status['confirmed']);
+        $this->assertEquals(1, $status['processing']);
+        $this->assertEquals(1, $status['shipped']);
+        $this->assertEquals(3, $status['delivered']);
+        $this->assertEquals(1, $status['cancelled']);
+    }
+
+    public function test_overview_recent_orders_includes_id(): void
+    {
+        $order = $this->createDeliveredOrder('1500.00');
+
+        $response = $this->actingAs($this->admin, 'sanctum')
+            ->getJson('/api/admin/dashboard/overview');
+
+        $response->assertOk();
+
+        $recent = $response->json('recent_orders');
+        $this->assertNotEmpty($recent);
+        $this->assertArrayHasKey('id', $recent[0]);
+        $this->assertArrayHasKey('order_number', $recent[0]);
+        $this->assertArrayHasKey('status', $recent[0]);
+    }
+
+    public function test_overview_top_products_from_delivered_only(): void
+    {
+        // Delivered order with items
+        $delivered = $this->createDeliveredOrder('5000.00');
+        $this->createOrderItem($delivered, 'Mango Achar 500g', '500g Jar', 10, '5000.00');
+
+        // Pending order with items (should not appear)
+        $pending = $this->createOrderWithStatus('pending', '3000.00');
+        $this->createOrderItem($pending, 'Mixed Achar 250g', '250g Jar', 5, '3000.00');
+
+        $response = $this->actingAs($this->admin, 'sanctum')
+            ->getJson('/api/admin/dashboard/overview');
+
+        $response->assertOk();
+
+        $topProducts = $response->json('top_products');
+        $this->assertCount(1, $topProducts);
+        $this->assertEquals('Mango Achar 500g', $topProducts[0]['product_name']);
+        $this->assertEquals(10, $topProducts[0]['units_sold']);
+        $this->assertEquals(5000.0, (float) $topProducts[0]['revenue']);
+    }
+
+    public function test_overview_empty_database_returns_zeros(): void
+    {
+        $response = $this->actingAs($this->admin, 'sanctum')
+            ->getJson('/api/admin/dashboard/overview');
+
+        $response->assertOk();
+
+        $kpis = $response->json('kpis');
+        $this->assertEquals(0, $kpis['today_sales']);
+        $this->assertEquals(0, $kpis['today_orders']);
+        $this->assertEquals(0, $kpis['month_sales']);
+        $this->assertEquals(0, $kpis['total_customers']);
+        $this->assertEquals(0, $kpis['average_order_value']);
+
+        $this->assertEmpty($response->json('recent_orders'));
+        $this->assertEmpty($response->json('top_products'));
+        $this->assertEmpty($response->json('low_stock'));
+    }
+
+    public function test_overview_includes_currency_and_date(): void
+    {
+        $response = $this->actingAs($this->admin, 'sanctum')
+            ->getJson('/api/admin/dashboard/overview');
+
+        $response->assertOk();
+        $response->assertJsonFragment([
+            'currency_code' => 'NPR',
+            'currency_symbol' => 'NPR',
+        ]);
+        $this->assertNotEmpty($response->json('today_date'));
     }
 }

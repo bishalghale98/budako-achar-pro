@@ -13,7 +13,7 @@ import type {
   OrdersResponse,
   PaymentsResponse,
 } from "../order/order-types";
-import type { SalesAnalyticsResponse } from "../dashboard/types";
+import type { SalesAnalyticsResponse, DashboardOverviewResponse } from "../dashboard/types";
 
 interface AdminProductsResponse {
   success: boolean;
@@ -523,6 +523,15 @@ export const adminApi = createApi({
       }),
       providesTags: ["AdminAnalytics"],
     }),
+
+    // ─── Dashboard Overview ──────────────────────────
+    getAdminDashboardOverview: builder.query<DashboardOverviewResponse, void>({
+      query: () => ({
+        url: "/api/admin/dashboard/overview",
+        headers: { Accept: "application/json" },
+      }),
+      providesTags: ["AdminAnalytics"],
+    }),
   }),
 });
 
@@ -559,4 +568,5 @@ export const {
   useRejectPaymentMutation,
   useGetPaymentProofQuery,
   useGetAdminSalesAnalyticsQuery,
+  useGetAdminDashboardOverviewQuery,
 } = adminApi;

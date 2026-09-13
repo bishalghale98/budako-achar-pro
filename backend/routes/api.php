@@ -156,6 +156,7 @@ Route::middleware(['auth:sanctum', 'role:' . Role::Admin->value])->prefix('admin
 
     // Dashboard
     Route::get('/dashboard/analytics/sales', [AdminDashboardController::class, 'sales']);
+    Route::get('/dashboard/overview', [AdminDashboardController::class, 'overview']);
 
     // Settings
     Route::get('/site-settings', [AdminSiteSettingsController::class, 'show']);
