@@ -25,6 +25,7 @@ export interface Order {
   customer_phone: string;
   customer_email: string;
   address_line: string;
+  area: string | null;
   city: string;
   province: string;
   delivery_notes: string | null;
@@ -47,9 +48,11 @@ export interface PlaceOrderRequest {
   customer_name: string;
   customer_phone: string;
   customer_email: string;
-  address_line: string;
-  city: string;
-  province: string;
+  address_id?: string;
+  address_line?: string;
+  area?: string;
+  city?: string;
+  province?: string;
   delivery_notes?: string;
   payment_method: string;
   payment_proof?: File;

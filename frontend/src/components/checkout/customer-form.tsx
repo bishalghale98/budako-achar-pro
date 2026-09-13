@@ -1,5 +1,6 @@
 "use client";
 
+import { useState, useCallback, useEffect, useMemo } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import Image from "next/image";
@@ -12,6 +13,9 @@ import { Card, CardContent } from "@/components/ui/card";
 import { PaymentMethodRadio } from "./payment-method";
 import { PaymentProofUpload } from "./payment-proof-upload";
 import { checkoutSchema, type CheckoutFormValues } from "./checkout-schema";
+import { AddressSelector } from "@/components/address/address-selector";
+import { useGetAddressesQuery } from "@/features/address/address-api";
+import { useUser } from "@/features/auth/auth-hooks";
 
 interface CustomerFormProps {
   defaultCity: string;
@@ -46,6 +50,21 @@ export function CustomerForm({
   isSubmitting,
   serverError,
 }: CustomerFormProps) {
+  const user = useUser();
+  const { data: addressData, isLoading: addressesLoading } = useGetAddressesQuery();
+  const addresses = useMemo(() => addressData?.addresses ?? [], [addressData?.addresses]);
+
+  const [selectedAddressId, setSelectedAddressId] = useState<string | null>(null);
+  const [useDifferent, setUseDifferent] = useState(false);
+  const [manualAddress, setManualAddress] = useState<Record<string, string>>({
+    address_line: "",
+    area: "",
+    city: defaultCity,
+    province: defaultProvince,
+    delivery_notes: "",
+  });
+  const [manualAddressErrors, setManualAddressErrors] = useState<Record<string, string>>({});
+
   const {
     register,
     handleSubmit,
@@ -60,7 +79,9 @@ export function CustomerForm({
       customer_name: "",
       customer_phone: "",
       customer_email: "",
+      address_id: undefined,
       address_line: "",
+      area: "",
       city: defaultCity,
       province: defaultProvince,
       delivery_notes: "",
@@ -69,11 +90,92 @@ export function CustomerForm({
     },
   });
 
+  // Auto-fill from logged-in user
+  useEffect(() => {
+    if (user) {
+      setValue("customer_name", user.name, { shouldValidate: true });
+      setValue("customer_email", user.email, { shouldValidate: true });
+    }
+  }, [user, setValue]);
+
+  // Initialize default address selection once addresses load
+  useEffect(() => {
+    if (addressesLoading || !user) return;
+    if (addresses.length === 0) {
+      setUseDifferent(true);
+      setSelectedAddressId(null);
+      setValue("address_id", undefined, { shouldValidate: true });
+    } else if (!selectedAddressId) {
+      const defaultAddr = addresses.find((a) => a.is_default) ?? addresses[0];
+      setSelectedAddressId(defaultAddr.id);
+      setValue("address_id", defaultAddr.id, { shouldValidate: true });
+    }
+  }, [addresses, addressesLoading, user, selectedAddressId, setValue]);
+
   const paymentMethod = watch("payment_method");
 
+  const handleAddressSelect = useCallback((id: string) => {
+    setSelectedAddressId(id);
+    setUseDifferent(false);
+    setValue("address_id", id, { shouldValidate: true });
+  }, [setValue]);
+
+  const handleUseDifferent = useCallback(() => {
+    setUseDifferent(true);
+    setSelectedAddressId(null);
+    setValue("address_id", undefined, { shouldValidate: true });
+    setManualAddress((prev) => ({
+      ...prev,
+      city: defaultCity,
+      province: defaultProvince,
+    }));
+  }, [setValue, defaultCity, defaultProvince]);
+
+  const handleUseSaved = useCallback(() => {
+    setUseDifferent(false);
+    const defaultAddr = addresses.find((a) => a.is_default) ?? addresses[0];
+    setSelectedAddressId(defaultAddr.id);
+    setValue("address_id", defaultAddr.id, { shouldValidate: true });
+  }, [addresses, setValue]);
+
+  const handleManualAddressChange = useCallback((field: string, value: string) => {
+    setManualAddress((prev) => ({ ...prev, [field]: value }));
+    setValue(field as keyof CheckoutFormValues, value, { shouldValidate: true });
+    setManualAddressErrors((prev) => {
+      const next = { ...prev };
+      delete next[field];
+      return next;
+    });
+  }, [setValue]);
+
   const handleFormSubmit = async (data: CheckoutFormValues) => {
+    const newErrors: Record<string, string> = {};
+
+    if (!selectedAddressId) {
+      if (!manualAddress.address_line) newErrors.address_line = "Street address is required";
+      if (!manualAddress.city) newErrors.city = "City is required";
+      if (!manualAddress.province) newErrors.province = "Province is required";
+
+      if (Object.keys(newErrors).length > 0) {
+        setManualAddressErrors(newErrors);
+        return;
+      }
+    }
+
+    setManualAddressErrors({});
+
+    const submitData = {
+      ...data,
+      address_id: selectedAddressId ?? undefined,
+      address_line: selectedAddressId ? undefined : manualAddress.address_line,
+      area: selectedAddressId ? undefined : manualAddress.area,
+      city: selectedAddressId ? undefined : manualAddress.city,
+      province: selectedAddressId ? undefined : manualAddress.province,
+      delivery_notes: selectedAddressId ? undefined : manualAddress.delivery_notes,
+    };
+
     try {
-      await onSubmit(data);
+      await onSubmit(submitData);
     } catch (err: unknown) {
       const apiError = err as {
         data?: { message?: string; errors?: Record<string, string[]> };
@@ -160,68 +262,86 @@ export function CustomerForm({
           )}
         </div>
 
-        <div className="space-y-1.5">
-          <Label htmlFor="address_line" className="text-xs font-bold uppercase text-muted-foreground">
-            Street Address
-          </Label>
-          <Input
-            id="address_line"
-            placeholder="e.g. Sangeet Chowk"
-            className={inputClass(!!errors.address_line)}
-            {...register("address_line")}
+        {user ? (
+          <AddressSelector
+            addresses={addresses}
+            isLoading={addressesLoading}
+            selectedId={selectedAddressId}
+            onSelect={handleAddressSelect}
+            onUseDifferent={handleUseDifferent}
+            onUseSaved={handleUseSaved}
+            useDifferent={useDifferent}
+            onManualAddressChange={handleManualAddressChange}
+            defaultCity={defaultCity}
+            defaultProvince={defaultProvince}
+            manualAddressErrors={manualAddressErrors}
           />
-          {errors.address_line && (
-            <p className="text-xs text-destructive">
-              {errors.address_line.message}
-            </p>
-          )}
-        </div>
+        ) : (
+          <div className="space-y-4">
+            <div className="space-y-1.5">
+              <Label htmlFor="address_line" className="text-xs font-bold uppercase text-muted-foreground">
+                Street Address
+              </Label>
+              <Input
+                id="address_line"
+                placeholder="e.g. Sangeet Chowk"
+                className={inputClass(!!errors.address_line)}
+                {...register("address_line")}
+              />
+              {errors.address_line && (
+                <p className="text-xs text-destructive">
+                  {errors.address_line.message}
+                </p>
+              )}
+            </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <div className="space-y-1.5">
-            <Label htmlFor="city" className="text-xs font-bold uppercase text-muted-foreground">
-              City
-            </Label>
-            <Input
-              id="city"
-              className={inputClass(!!errors.city)}
-              {...register("city")}
-            />
-            {errors.city && (
-              <p className="text-xs text-destructive">
-                {errors.city.message}
-              </p>
-            )}
-          </div>
-          <div className="space-y-1.5">
-            <Label htmlFor="province" className="text-xs font-bold uppercase text-muted-foreground">
-              Province
-            </Label>
-            <Input
-              id="province"
-              className={inputClass(!!errors.province)}
-              {...register("province")}
-            />
-            {errors.province && (
-              <p className="text-xs text-destructive">
-                {errors.province.message}
-              </p>
-            )}
-          </div>
-        </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div className="space-y-1.5">
+                <Label htmlFor="city" className="text-xs font-bold uppercase text-muted-foreground">
+                  City
+                </Label>
+                <Input
+                  id="city"
+                  className={inputClass(!!errors.city)}
+                  {...register("city")}
+                />
+                {errors.city && (
+                  <p className="text-xs text-destructive">
+                    {errors.city.message}
+                  </p>
+                )}
+              </div>
+              <div className="space-y-1.5">
+                <Label htmlFor="province" className="text-xs font-bold uppercase text-muted-foreground">
+                  Province
+                </Label>
+                <Input
+                  id="province"
+                  className={inputClass(!!errors.province)}
+                  {...register("province")}
+                />
+                {errors.province && (
+                  <p className="text-xs text-destructive">
+                    {errors.province.message}
+                  </p>
+                )}
+              </div>
+            </div>
 
-        <div className="space-y-1.5">
-          <Label htmlFor="delivery_notes" className="text-xs font-bold uppercase text-muted-foreground">
-            Delivery Notes (Optional)
-          </Label>
-          <Textarea
-            id="delivery_notes"
-            rows={2}
-            placeholder="Special instructions for delivery"
-            className={errors.delivery_notes ? "border-destructive" : ""}
-            {...register("delivery_notes")}
-          />
-        </div>
+            <div className="space-y-1.5">
+              <Label htmlFor="delivery_notes" className="text-xs font-bold uppercase text-muted-foreground">
+                Delivery Notes (Optional)
+              </Label>
+              <Textarea
+                id="delivery_notes"
+                rows={2}
+                placeholder="Special instructions for delivery"
+                className={errors.delivery_notes ? "border-destructive" : ""}
+                {...register("delivery_notes")}
+              />
+            </div>
+          </div>
+        )}
 
         <div className="pt-4 border-t border-border">
           <PaymentMethodRadio

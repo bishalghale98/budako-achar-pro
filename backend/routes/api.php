@@ -23,6 +23,7 @@ use App\Http\Controllers\Api\Admin\AdminProductVariantController;
 use App\Http\Controllers\Api\Admin\AdminProductImageController;
 use App\Http\Controllers\Api\Admin\AdminProductReviewController;
 use App\Http\Controllers\Api\Admin\AdminCategoryController;
+use App\Http\Controllers\Api\AddressController;
 use App\Models\User;
 use Illuminate\Session\Middleware\StartSession;
 use Illuminate\Support\Facades\Route;
@@ -59,6 +60,13 @@ Route::middleware('auth:sanctum')->group(function () {
     // Profile
     Route::get('/user/profile', [ProfileController::class, 'show']);
     Route::patch('/user/profile', [ProfileController::class, 'update']);
+
+    // Addresses
+    Route::get('/addresses', [AddressController::class, 'index']);
+    Route::post('/addresses', [AddressController::class, 'store']);
+    Route::put('/addresses/{id}', [AddressController::class, 'update']);
+    Route::delete('/addresses/{id}', [AddressController::class, 'destroy']);
+    Route::put('/addresses/{id}/default', [AddressController::class, 'setDefault']);
 
     // Customer dashboard
     Route::get('/customer/dashboard', [CustomerDashboardController::class, 'show']);

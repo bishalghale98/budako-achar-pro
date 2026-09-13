@@ -24,9 +24,11 @@ export default function CheckoutPage() {
     customer_name: string;
     customer_phone: string;
     customer_email: string;
-    address_line: string;
-    city: string;
-    province: string;
+    address_id?: string;
+    address_line?: string;
+    area?: string;
+    city?: string;
+    province?: string;
     delivery_notes?: string;
     payment_method: string;
     payment_proof?: File | null;
@@ -35,13 +37,20 @@ export default function CheckoutPage() {
     body.append("customer_name", formData.customer_name);
     body.append("customer_phone", formData.customer_phone);
     body.append("customer_email", formData.customer_email);
-    body.append("address_line", formData.address_line);
-    body.append("city", formData.city);
-    body.append("province", formData.province);
-    if (formData.delivery_notes) {
-      body.append("delivery_notes", formData.delivery_notes);
-    }
     body.append("payment_method", formData.payment_method);
+
+    if (formData.address_id) {
+      body.append("address_id", formData.address_id);
+    } else {
+      body.append("address_line", formData.address_line ?? "");
+      if (formData.area) body.append("area", formData.area);
+      body.append("city", formData.city ?? "");
+      body.append("province", formData.province ?? "");
+      if (formData.delivery_notes) {
+        body.append("delivery_notes", formData.delivery_notes);
+      }
+    }
+
     if (formData.payment_proof) {
       body.append("payment_proof", formData.payment_proof);
     }

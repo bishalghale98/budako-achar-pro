@@ -20,6 +20,7 @@ class OrderResource extends JsonResource
             'customer_email' => $this->customer_email,
 
             'address_line' => $this->address_line,
+            'area' => $this->area,
             'city' => $this->city,
             'province' => $this->province,
             'delivery_notes' => $this->delivery_notes,

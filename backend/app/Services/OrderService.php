@@ -16,6 +16,7 @@ use App\Models\OrderItem;
 use App\Models\Payment;
 use App\Models\ProductVariant;
 use App\Models\User;
+use App\Models\Address;
 use App\Notifications\NewCustomerWelcomeNotification;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\DB;
@@ -70,29 +71,51 @@ class OrderService
                     $newlyCreated = true;
                 }
 
-                // 6. Generate order number
+                // 6. Resolve address from saved address or manual input
+                $addressLine = $data['address_line'];
+                $area = $data['area'] ?? null;
+                $city = $data['city'];
+                $province = $data['province'];
+                $deliveryNotes = $data['delivery_notes'] ?? null;
+                $customerPhone = $data['customer_phone'];
+
+                if (! empty($data['address_id'])) {
+                    $address = Address::where('id', $data['address_id'])
+                        ->where('user_id', $user->id)
+                        ->firstOrFail();
+
+                    $addressLine = $address->address_line;
+                    $area = $address->area;
+                    $city = $address->city;
+                    $province = $address->province;
+                    $deliveryNotes = $address->delivery_notes;
+                    $customerPhone = $address->phone;
+                }
+
+                // 7. Generate order number
                 $counter = Counter::where('name', 'order_number')->lockForUpdate()->first();
                 $orderNumber = $counter->next('BKA-', 4);
 
-                // 7. Create order
+                // 8. Create order
                 $order = Order::create([
                     'order_number' => $orderNumber,
                     'user_id' => $user->id,
                     'cart_id' => $cart->id,
                     'customer_name' => $data['customer_name'],
-                    'customer_phone' => $data['customer_phone'],
+                    'customer_phone' => $customerPhone,
                     'customer_email' => $data['customer_email'],
-                    'address_line' => $data['address_line'],
-                    'city' => $data['city'],
-                    'province' => $data['province'],
-                    'delivery_notes' => $data['delivery_notes'] ?? null,
+                    'address_line' => $addressLine,
+                    'area' => $area,
+                    'city' => $city,
+                    'province' => $province,
+                    'delivery_notes' => $deliveryNotes,
                     'status' => $this->resolveOrderStatus($data['payment_method']),
                     'subtotal' => $subtotal,
                     'delivery_fee' => $deliveryFee,
                     'total' => $total,
                 ]);
 
-                // 8. Create order items (snapshot)
+                // 9. Create order items (snapshot)
                 foreach ($cartItems as $item) {
                     $variant = $variants->get($item->product_variant_id);
                     $itemSubtotal = (float) $variant->price * $item->quantity;
