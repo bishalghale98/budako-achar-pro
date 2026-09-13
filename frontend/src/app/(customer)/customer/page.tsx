@@ -63,7 +63,7 @@ const quickActions = [
   {
     title: "My Profile",
     description: "Update your details",
-    href: "/settings/profile",
+    href: "/customer/profile",
     iconBg: "bg-blue-50",
     iconColor: "text-blue-700",
     icon: (
@@ -103,7 +103,7 @@ export default function CustomerPage() {
   const recentOrders = data?.recent_orders ?? [];
 
   return (
-    <>
+    <div className="space-y-6">
       {/* Welcome Banner */}
       <div className="flex items-center gap-4 rounded-2xl border border-cream bg-cream/50 p-6">
         <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-maroon/10 text-maroon">
@@ -234,6 +234,6 @@ export default function CustomerPage() {
           )}
         </div>
       </div>
-    </>
+    </div>
   );
 }

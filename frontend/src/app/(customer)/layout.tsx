@@ -31,11 +31,7 @@ const sidebarNav = [
     href: "/customer/profile",
     icon: <User className="h-4.5 w-4.5" />,
   },
-  {
-    title: "Wishlist",
-    href: "/customer/wishlist",
-    icon: <Heart className="h-4.5 w-4.5" />,
-  },
+
 ];
 
 function DashboardLayoutContent({ children }: { children: React.ReactNode }) {
@@ -131,7 +127,7 @@ function DashboardLayoutContent({ children }: { children: React.ReactNode }) {
       </div>
 
       {/* Main Content Area */}
-      <div className="space-y-6 lg:col-span-3">
+      <div className="flex flex-1 flex-col lg:col-span-3">
         {children}
       </div>
     </div>
