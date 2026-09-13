@@ -13,6 +13,7 @@ import type {
   OrdersResponse,
   PaymentsResponse,
 } from "../order/order-types";
+import type { SalesAnalyticsResponse } from "../dashboard/types";
 
 interface AdminProductsResponse {
   success: boolean;
@@ -80,7 +81,7 @@ interface AdminCategoryResponse {
 export const adminApi = createApi({
   reducerPath: "adminApi",
   baseQuery: baseQueryWithCsrf,
-  tagTypes: ["AdminProducts", "AdminVariants", "AdminImages", "AdminReviews", "AdminUsers", "AdminCategories", "AdminOrders", "AdminPayments"],
+  tagTypes: ["AdminProducts", "AdminVariants", "AdminImages", "AdminReviews", "AdminUsers", "AdminCategories", "AdminOrders", "AdminPayments", "AdminAnalytics"],
   endpoints: (builder) => ({
     // ─── Users ──────────────────────────────────────
     getAdminUsers: builder.query<AdminUsersResponse, void>({
@@ -509,6 +510,19 @@ export const adminApi = createApi({
         headers: { Accept: "application/json" },
       }),
     }),
+
+    // ─── Dashboard Analytics ────────────────────────
+    getAdminSalesAnalytics: builder.query<
+      SalesAnalyticsResponse,
+      { period: "daily" | "weekly" | "monthly" }
+    >({
+      query: (params) => ({
+        url: "/api/admin/dashboard/analytics/sales",
+        params,
+        headers: { Accept: "application/json" },
+      }),
+      providesTags: ["AdminAnalytics"],
+    }),
   }),
 });
 
@@ -544,4 +558,5 @@ export const {
   useVerifyPaymentMutation,
   useRejectPaymentMutation,
   useGetPaymentProofQuery,
+  useGetAdminSalesAnalyticsQuery,
 } = adminApi;

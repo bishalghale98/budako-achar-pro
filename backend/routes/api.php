@@ -20,6 +20,7 @@ use App\Http\Controllers\Api\ProductController;
 use App\Http\Controllers\Api\ProductReviewController;
 use App\Http\Controllers\Api\CategoryController;
 use App\Http\Controllers\Api\Admin\AdminProductController;
+use App\Http\Controllers\Api\Admin\AdminDashboardController;
 use App\Http\Controllers\Api\Admin\AdminProductVariantController;
 use App\Http\Controllers\Api\Admin\AdminProductImageController;
 use App\Http\Controllers\Api\Admin\AdminProductReviewController;
@@ -152,6 +153,9 @@ Route::middleware(['auth:sanctum', 'role:' . Role::Admin->value])->prefix('admin
     Route::post('/payments/{id}/verify', [AdminPaymentController::class, 'verify']);
     Route::post('/payments/{id}/reject', [AdminPaymentController::class, 'reject']);
     Route::get('/payments/{id}/proof', [AdminPaymentController::class, 'proof']);
+
+    // Dashboard
+    Route::get('/dashboard/analytics/sales', [AdminDashboardController::class, 'sales']);
 
     // Settings
     Route::get('/site-settings', [AdminSiteSettingsController::class, 'show']);

@@ -5,20 +5,21 @@ import { useUser, useIsLoading } from "@/features/auth/auth-hooks";
 import { useLogoutMutation } from "@/features/auth/auth-api";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Separator } from "@/components/ui/separator";
-import { PageHeader } from "@/components/shared";
 import { Skeleton } from "@/components/ui/skeleton";
-import { LogOut, Mail, CheckCircle, XCircle } from "lucide-react";
+import { LogOut } from "lucide-react";
+import { SalesSummaryCards } from "./sales-summary-cards";
+import { SalesAnalyticsChart } from "./sales-analytics-chart";
 
 export function DashboardSkeleton() {
   return (
     <div className="space-y-6">
       <Skeleton className="h-9 w-48" />
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-        <Skeleton className="h-32 rounded-2xl" />
-        <Skeleton className="h-32 rounded-2xl" />
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
+        <Skeleton className="h-24 rounded-2xl" />
+        <Skeleton className="h-24 rounded-2xl" />
+        <Skeleton className="h-24 rounded-2xl" />
       </div>
-      <Skeleton className="h-48 rounded-2xl" />
+      <Skeleton className="h-[400px] rounded-2xl" />
     </div>
   );
 }
@@ -66,35 +67,13 @@ export function DashboardContent() {
         </div>
       </div>
 
-      {/* Quick Stats */}
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-        {/* Email Status Card */}
-        <div className="flex items-center gap-4 rounded-2xl border border-border bg-card p-5">
-          <div className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-xl ${isVerified ? "bg-emerald-50 text-emerald-700" : "bg-amber-50 text-amber-700"}`}>
-            {isVerified ? <CheckCircle className="h-5 w-5" /> : <XCircle className="h-5 w-5" />}
-          </div>
-          <div>
-            <p className="text-2xl font-bold text-foreground">{isVerified ? "Yes" : "No"}</p>
-            <p className="text-xs text-muted-foreground">Email Verified</p>
-          </div>
-        </div>
+      {/* Sales Analytics (manages its own period state + data fetching) */}
+      <SalesAnalyticsChart showSummary />
 
-        {/* Role Card */}
-        <div className="flex items-center gap-4 rounded-2xl border border-border bg-card p-5">
-          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-accent/20 text-accent-foreground">
-            <Mail className="h-5 w-5" />
-          </div>
-          <div>
-            <p className="text-2xl font-bold text-foreground capitalize">{user.role || "User"}</p>
-            <p className="text-xs text-muted-foreground">Account Role</p>
-          </div>
-        </div>
-      </div>
-
-      {/* Profile Info */}
+      {/* Account Information */}
       <div className="overflow-hidden rounded-2xl border border-border bg-card">
         <div className="flex items-center justify-between border-b border-border px-6 py-5">
-          <h2 className="font-semibold text-foreground">Profile Information</h2>
+          <h2 className="font-semibold text-foreground">Account Information</h2>
         </div>
         <div className="divide-y divide-border">
           <div className="flex items-center justify-between px-6 py-4">

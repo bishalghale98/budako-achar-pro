@@ -14,6 +14,7 @@ export const tagTypes = [
   "AdminUsers",
   "AdminOrders",
   "AdminPayments",
+  "AdminAnalytics",
   "SiteSettings",
   "PaymentSettings",
   "OrderSettings",
