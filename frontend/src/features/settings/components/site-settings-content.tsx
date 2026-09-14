@@ -263,8 +263,16 @@ export function SiteSettingsContent() {
             <Textarea id="address" {...register("address")} rows={2} />
           </div>
           <div className="space-y-2">
-            <Label htmlFor="google_maps_url">Google Maps URL</Label>
-            <Input id="google_maps_url" type="url" {...register("google_maps_url")} />
+            <Label htmlFor="google_maps_url">Google Maps Embed Code</Label>
+            <Textarea
+              id="google_maps_url"
+              placeholder='<iframe src="https://www.google.com/maps/embed?pb=..." ...></iframe>'
+              rows={3}
+              {...register("google_maps_url")}
+            />
+            <p className="text-xs text-muted-foreground">
+              Paste the complete Google Maps iframe code from Google Maps → Share → Embed a map.
+            </p>
           </div>
         </CardContent>
       </Card>

@@ -41,7 +41,7 @@ export default async function ContactPage() {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
         <div className="space-y-8">
           <StoreInfoCard info={contactInfo} />
-          <MapPlaceholder text={contactPage.mapPlaceholder} />
+          <MapPlaceholder text={contactPage.mapPlaceholder} embedUrl={settings?.google_maps_url} />
         </div>
         <ContactForm />
       </div>

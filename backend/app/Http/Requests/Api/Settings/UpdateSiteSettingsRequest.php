@@ -11,6 +11,17 @@ class UpdateSiteSettingsRequest extends FormRequest
         return true;
     }
 
+    public function prepareForValidation(): void
+    {
+        $raw = $this->input('google_maps_url');
+
+        if (is_string($raw) && str_contains($raw, '<iframe')) {
+            if (preg_match('/src=["\']([^"\']+)["\']/', $raw, $matches)) {
+                $this->merge(['google_maps_url' => $matches[1]]);
+            }
+        }
+    }
+
     public function rules(): array
     {
         $siteSettingId = $this->route('siteSetting')?->id;
@@ -36,7 +47,10 @@ class UpdateSiteSettingsRequest extends FormRequest
             'whatsapp_number' => ['nullable', 'string', 'max:30'],
             'email' => ['nullable', 'email', 'max:255'],
             'address' => ['nullable', 'string', 'max:500'],
-            'google_maps_url' => ['nullable', 'url', 'max:500'],
+            'google_maps_url' => [
+                'nullable', 'string', 'max:500',
+                'regex:/^https:\/\/www\.google\.com\/maps\/embed/',
+            ],
 
             // Social
             'facebook_url' => ['nullable', 'url', 'max:500'],
