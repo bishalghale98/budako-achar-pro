@@ -8,6 +8,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useLoginMutation } from "@/features/auth/auth-api";
 import { getRoleHome } from "@/features/auth/components/role-guard";
 import { safeRedirect } from "@/features/auth/auth-utils";
+import { Loader2 } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
@@ -129,8 +130,10 @@ export function LoginForm() {
         <Button
           type="submit"
           disabled={isLoading}
-          className="w-full py-3.5 bg-maroon text-white font-medium rounded-lg hover:bg-maroon-hover transition shadow-sm text-sm disabled:opacity-60"
+          size="lg"
+          className="w-full bg-maroon text-white hover:bg-maroon-hover"
         >
+          {isLoading && <Loader2 className="animate-spin" />}
           {isLoading ? "Signing in..." : "Sign In"}
         </Button>
       </form>

@@ -6,6 +6,7 @@ import Link from "next/link";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useRegisterMutation } from "@/features/auth/auth-api";
+import { Loader2 } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
@@ -141,8 +142,10 @@ export function RegisterForm() {
         <Button
           type="submit"
           disabled={isLoading}
-          className="w-full py-3.5 bg-maroon text-white font-medium rounded-lg hover:bg-maroon-hover transition shadow-sm text-sm disabled:opacity-60"
+          size="lg"
+          className="w-full bg-maroon text-white hover:bg-maroon-hover"
         >
+          {isLoading && <Loader2 className="animate-spin" />}
           {isLoading ? "Creating account..." : "Create Account"}
         </Button>
       </form>
