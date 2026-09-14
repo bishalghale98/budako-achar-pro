@@ -31,6 +31,7 @@ use App\Http\Controllers\Api\Admin\AdminSiteSettingsController;
 use App\Http\Controllers\Api\Admin\AdminPaymentSettingsController;
 use App\Http\Controllers\Api\Admin\AdminOrderSettingsController;
 use App\Http\Controllers\Api\Admin\AdminPageController;
+use App\Http\Controllers\Api\Admin\AdminPageImageController;
 use App\Http\Controllers\Api\PageController;
 use App\Http\Controllers\Api\AddressController;
 use App\Http\Controllers\Api\SiteSettingsController;
@@ -149,6 +150,8 @@ Route::middleware(['auth:sanctum', 'role:' . Role::Admin->value])->prefix('admin
 
     // Pages
     Route::apiResource('pages', AdminPageController::class);
+    Route::post('pages/{page}/images', [AdminPageImageController::class, 'store']);
+    Route::delete('pages/{page}/images/{image}', [AdminPageImageController::class, 'destroy']);
 
     // Orders
     Route::get('/orders', [AdminOrderController::class, 'index']);

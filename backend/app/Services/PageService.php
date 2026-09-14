@@ -38,6 +38,8 @@ class PageService
 
     public function delete(Page $page): bool
     {
+        $page->deleteImages();
+
         return $page->delete();
     }
 }

@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests\Api\Page;
 
+use App\Rules\ValidTiptapDocument;
 use Illuminate\Foundation\Http\FormRequest;
 
 class StorePageRequest extends FormRequest
@@ -17,7 +18,7 @@ class StorePageRequest extends FormRequest
             'title' => ['required', 'string', 'max:255'],
             'slug' => ['required', 'string', 'max:255', 'unique:pages,slug'],
             'short_description' => ['nullable', 'string', 'max:500'],
-            'content' => ['nullable', 'array'],
+            'content' => ['nullable', new ValidTiptapDocument],
             'status' => ['sometimes', 'string', 'in:draft,published'],
             'seo_title' => ['nullable', 'string', 'max:255'],
             'seo_description' => ['nullable', 'string', 'max:500'],

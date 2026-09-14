@@ -90,7 +90,8 @@ export default function AdminPageForm({ initialData }: AdminPageFormProps) {
   }, [titleValue, setValue, isEditing]);
 
   const handleContentChange = (json: TiptapDoc) => {
-    setValue("content", json, { shouldValidate: false });
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    setValue("content", json as any, { shouldValidate: false });
   };
 
   const onSubmit = async (data: PageFormValues) => {

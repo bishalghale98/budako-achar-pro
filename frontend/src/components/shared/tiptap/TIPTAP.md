@@ -2,7 +2,7 @@
 
 Reusable Tiptap infrastructure for the Laravel + Next.js stack.
 
-**Tiptap JSON is the single source of truth.** Everything revolves around that: editor outputs JSON, database stores JSON, API returns JSON, renderer consumes JSON.
+**Tiptap JSON is the single source of truth.** Editor outputs JSON, database stores JSON, API returns JSON, server renderer converts to safe HTML.
 
 ---
 
@@ -38,16 +38,13 @@ function ProductPage({ description }: { description: TiptapDoc | null }) {
 }
 ```
 
-### Empty Document Default
+### Server-Side Rendering
 
 ```tsx
-import { emptyDoc } from "@/components/shared/tiptap";
+import { renderTiptapToHtml } from "@/lib/server/tiptap-render";
 
-const form = useForm({
-  defaultValues: {
-    description: emptyDoc,
-  },
-});
+// In a Server Component or API route
+const html = renderTiptapToHtml(page.content);
 ```
 
 ---
@@ -66,7 +63,7 @@ const form = useForm({
                 editor.getJSON()
                       │
                       ▼
-                Zod Validation
+              Zod Schema (frontend)
                       │
                       ▼
                  RTK Query
@@ -76,7 +73,7 @@ const form = useForm({
                       ▼
               Laravel API
                       │
-              Request Validation
+              ValidTiptapDocument rule
                       │
                       ▼
                 Eloquent Model
@@ -88,343 +85,147 @@ const form = useForm({
 Public side:
 
 ```
-Laravel API
+Laravel Controller
      │
      ▼
-Tiptap JSON
+renderTiptapToHtml()  ← server-side JSON→HTML walker
      │
      ▼
-TiptapContent
+Safe HTML (escaped, allowlisted)
      │
      ▼
-Rendered HTML
+dangerouslySetInnerHTML
 ```
 
 ---
 
-## Frontend
-
-### Components
+## Components
 
 | Component | Purpose |
 |-----------|---------|
-| `TiptapEditor` | Interactive rich text editor |
-| `TiptapToolbar` | Formatting toolbar (headings, bold, italic, etc.) |
-| `TiptapContent` | Read-only renderer for public pages |
+| `TiptapEditor` | Interactive rich text editor with fullscreen, focus ring, loading state |
+| `TiptapToolbar` | Organized toolbar: heading dropdown, format groups, link popover, image dialog, word count, fullscreen |
+| `TiptapContent` | Client-side read-only renderer (uses `generateHTML`) |
+| `TiptapLinkPopover` | Popover-based link editor with URL normalization and safety checks |
+| `TiptapImageDialog` | Upload-only image dialog with drag-and-drop, validation, preview |
 | `emptyDoc` | Empty Tiptap document for form defaults |
 | `getDefaultExtensions()` | Returns configured extension array |
 
 ### Imports
 
 ```tsx
-// From shared module
 import {
   TiptapEditor,
   TiptapContent,
+  TiptapLinkPopover,
+  TiptapImageDialog,
   emptyDoc,
   getDefaultExtensions,
   type TiptapDoc,
 } from "@/components/shared/tiptap";
 ```
 
-### Editor Props
+---
+
+## Editor Props
 
 ```tsx
 interface TiptapEditorProps {
-  content?: TiptapDoc | null;     // Initial Tiptap JSON
-  onChange?: (json: TiptapDoc) => void;  // Called on every change
-  placeholder?: string;           // Placeholder text
-  editable?: boolean;             // Read-only mode (default: true)
-  className?: string;             // Container class
-  toolbarClassName?: string;      // Toolbar class
+  content?: TiptapDoc | null;
+  onChange?: (json: TiptapDoc) => void;
+  onImageUpload?: (file: File) => Promise<string>;
+  placeholder?: string;
+  editable?: boolean;
+  className?: string;
+  toolbarClassName?: string;
 }
 ```
 
-### TiptapDoc Type
-
-```tsx
-type TiptapDoc = JSONContent & { type: "doc" };
-```
-
-Always a valid Tiptap document. Use this type for form state, props, and API responses.
+`onImageUpload` is called when the user uploads an image through the toolbar. It should return the public URL. If not provided, a local `blob:` URL is used as fallback.
 
 ---
 
-## Zod Validation (Frontend)
+## Extensions
 
-Add a Tiptap document validator to your Zod schema:
-
-```ts
-import { z } from "zod";
-
-const tiptapDocSchema = z.object({
-  type: z.literal("doc"),
-  content: z.array(z.any()).min(1),
-}).nullable().optional();
-
-const productSchema = z.object({
-  title: z.string().min(1),
-  description: tiptapDocSchema,
-});
-```
-
-### React Hook Form Integration
-
-```tsx
-"use client";
-
-import { useForm } from "react-hook-form";
-import { standardSchemaResolver } from "@hookform/resolvers/standard-schema";
-import { TiptapEditor, emptyDoc, type TiptapDoc } from "@/components/shared/tiptap";
-
-type FormValues = {
-  title: string;
-  description: TiptapDoc | null;
-};
-
-function ProductForm() {
-  const { control, handleSubmit } = useForm<FormValues>({
-    resolver: standardSchemaResolver(schema),
-    defaultValues: {
-      title: "",
-      description: emptyDoc,
-    },
-  });
-
-  return (
-    <form onSubmit={handleSubmit(onSubmit)}>
-      <Controller
-        name="description"
-        control={control}
-        render={({ field }) => (
-          <TiptapEditor
-            content={field.value}
-            onChange={field.onChange}
-            placeholder="Write product description..."
-          />
-        )}
-      />
-    </form>
-  );
-}
-```
+| Extension | Config |
+|-----------|--------|
+| **StarterKit** | Headings h1-h6, `link: false` (explicit only) |
+| **Underline** | underline mark |
+| **Link** | `autolink: false`, `openOnClick: false` |
+| **TextAlign** | Headings + paragraphs |
+| **Placeholder** | Configurable |
+| **Image** | `allowBase64: false`, upload-only |
+| **CharacterCount** | Word count in toolbar |
 
 ---
 
-## Backend (Laravel)
+## Validation (Three Layers)
 
-### Migration
+### 1. Frontend Zod Schema
 
-Add a `json` column to store Tiptap content:
+Explicit recursive validation. Located in `features/pages/page-schema.ts`.
 
-```php
-Schema::table('products', function (Blueprint $table) {
-    $table->json('description')->nullable()->change();
-});
-```
+### 2. Laravel Rule
 
-For new tables, use `json` directly:
+`app/Rules/ValidTiptapDocument.php` — structural, allowlist-based recursive validation.
 
 ```php
-$table->json('description')->nullable();
+'description' => ['nullable', new ValidTiptapDocument],
 ```
 
-### Model Casting
+Enforces parent→child node structure. Image URLs must start with `/storage/`.
 
-Cast the column to an array so Eloquent handles JSON serialization:
+### 3. Server Renderer
 
-```php
-use App\Models\Product;
+`lib/server/tiptap-render.ts` — the final security boundary.
 
-protected function casts(): array
-{
-    return [
-        'description' => 'array',
-    ];
-}
-```
-
-### Form Request Validation
-
-Validate that the incoming value is a valid Tiptap document:
-
-```php
-use Illuminate\Foundation\Http\FormRequest;
-
-class StoreProductRequest extends FormRequest
-{
-    public function rules(): array
-    {
-        return [
-            'description' => ['nullable', 'array'],
-            'description.type' => ['required_with:description', 'string', 'in:doc'],
-            'description.content' => ['required_with:description', 'array'],
-        ];
-    }
-}
-```
-
-### Reusable Validation Rule
-
-Create `app/Rules/ValidTiptapDocument.php`:
-
-```php
-<?php
-
-namespace App\Rules;
-
-use Closure;
-use Illuminate\Contracts\Validation\ValidationRule;
-
-class ValidTiptapDocument implements ValidationRule
-{
-    public function validate(string $attribute, mixed $value, Closure $fail): void
-    {
-        if (!is_array($value)) {
-            $fail("The {$attribute} must be a valid document.");
-            return;
-        }
-
-        if (($value['type'] ?? null) !== 'doc') {
-            $fail("The {$attribute} must be a valid document.");
-            return;
-        }
-
-        if (empty($value['content']) || !is_array($value['content'])) {
-            $fail("The {$attribute} must contain content.");
-            return;
-        }
-    }
-}
-```
-
-Use it in Form Requests:
-
-```php
-use App\Rules\ValidTiptapDocument;
-
-public function rules(): array
-{
-    return [
-        'description' => ['nullable', new ValidTiptapDocument],
-    ];
-}
-```
-
-### API Resource
-
-Return the JSON directly — no transformation needed:
-
-```php
-public function toArray(Request $request): array
-{
-    return [
-        'id' => $this->id,
-        'title' => $this->title,
-        'description' => $this->description,  // Already an array from cast
-    ];
-}
-```
-
-### Controller
-
-No special handling needed. The validated data passes through:
-
-```php
-public function store(StoreProductRequest $request): JsonResponse
-{
-    $product = Product::create($request->validated());
-    // description is already a PHP array from the request
-    // Eloquent casts it to JSON when saving
-}
-```
+- `escapeHtml()` on all text content
+- Only allowlisted nodes rendered
+- Unknown nodes skipped safely
+- Unsafe links render as text only
+- Invalid images not rendered
+- Bad heading levels default to `<h2>`
 
 ---
 
-## Tiptap JSON Format
+## Image System
 
-### Empty Document
+Upload-only. No remote URLs, no base64 in documents.
 
-```json
-{
-  "type": "doc",
-  "content": [
-    { "type": "paragraph" }
-  ]
-}
+```
+User clicks Image button
+  → TiptapImageDialog opens
+  → User drags/selects file (JPEG/PNG/WebP, max 5MB)
+  → Alt text required
+  → onImageUpload(file) called → returns URL
+  → Tiptap node created: { type: "image", attrs: { src, alt } }
 ```
 
-### Document with Content
+### Backend Image Storage (Pages)
 
-```json
-{
-  "type": "doc",
-  "content": [
-    {
-      "type": "heading",
-      "attrs": { "level": 2 },
-      "content": [{ "type": "text", "text": "Product Details" }]
-    },
-    {
-      "type": "paragraph",
-      "content": [
-        { "type": "text", "text": "This is a " },
-        { "type": "text", "marks": [{ "type": "bold" }], "text": "bold" },
-        { "type": "text", "text": " word." }
-      ]
-    },
-    {
-      "type": "bulletList",
-      "content": [
-        {
-          "type": "listItem",
-          "content": [
-            { "type": "paragraph", "content": [{ "type": "text", "text": "Item one" }] }
-          ]
-        },
-        {
-          "type": "listItem",
-          "content": [
-            { "type": "paragraph", "content": [{ "type": "text", "text": "Item two" }] }
-          ]
-        }
-      ]
-    }
-  ]
-}
 ```
+storage/app/public/pages/{pageId}/{timestamp}_{random}.{ext}
+```
+
+Images are stored on the `public` disk. Page deletion cleans up all images.
 
 ---
 
-## Editor Extensions
+## Toolbar Layout
 
-Default extensions (configured in `tiptap-extensions.ts`):
-
-| Extension | Features |
-|-----------|----------|
-| **StarterKit** | Paragraphs, headings (h1-h3), bold, italic, strike, code, lists, blockquote, hard break, history |
-| **Link** | Clickable links (opens in same tab, configurable) |
-| **TextAlign** | Left, center, right alignment for headings and paragraphs |
-| **Placeholder** | Configurable placeholder text |
-
-### Customizing Extensions
-
-Edit `components/shared/tiptap/tiptap-extensions.ts`:
-
-```tsx
-import { getDefaultExtensions } from "@/components/shared/tiptap";
-
-// Add custom extensions
-export function getDefaultExtensions(opts?: { placeholder?: string }): Extensions {
-  return [
-    StarterKit,
-    // Add more extensions here
-    Placeholder.configure({
-      placeholder: opts?.placeholder ?? "Start writing...",
-    }),
-  ];
-}
 ```
+[Paragraph/H1-H6▾] | [B I U Sₖ Code] | [Left Center Right] | [• 1. ""] | [🔗 — 🖼] | [↩ ↪] | [Clear]  ···  [3 words] [⛶]
+```
+
+- **Block Type**: Heading dropdown (H1-H6) or Paragraph
+- **Text Format**: Bold, Italic, Underline, Strikethrough, Inline Code
+- **Alignment**: Left, Center, Right
+- **Lists**: Bullet, Numbered, Blockquote
+- **Insert**: Link (opens popover), Horizontal Rule, Image (opens dialog)
+- **History**: Undo, Redo
+- **Clear Formatting**: Removes all marks and block types
+- **Word Count**: Live character count
+- **Fullscreen**: Toggle with ESC to exit
 
 ---
 
@@ -432,139 +233,33 @@ export function getDefaultExtensions(opts?: { placeholder?: string }): Extension
 
 ### Editor
 
-Editor styles are applied via Tailwind classes in `tiptap-editor.tsx` using ProseMirror selectors:
+ProseMirror selectors via Tailwind in `tiptap-editor.tsx`:
 
 ```tsx
-[&_.ProseMirror_p]:mb-2
-[&_.ProseMirror_h1]:text-2xl
-[&_.ProseMirror_strong]:font-bold
+[&_.ProseMirror_h4]:text-base [&_.ProseMirror_h4]:font-bold
+[&_.ProseMirror_img]:max-w-full [&_.ProseMirror_img]:h-auto
 // etc.
 ```
 
 ### Content Renderer
 
-`TiptapContent` applies Tailwind classes for rendered output:
+Tailwind classes in `tiptap-content.tsx`:
 
 ```tsx
-[&_h1]:text-2xl [&_h1]:font-bold
-[&_p]:mb-3 [&_p]:leading-relaxed
-[&_a]:text-primary [&_a]:underline
+[&_h4]:text-base [&_h4]:font-bold
+[&_img]:max-w-full [&_img]:h-auto
 // etc.
 ```
 
-### Design Tokens Used
+### Design Tokens
 
 | Token | Usage |
 |-------|-------|
+| `maroon` / `maroon-hover` | Primary brand color, focus ring |
 | `text-primary` | Links, active toolbar buttons |
-| `text-muted-foreground` | Placeholder text, blockquotes |
-| `border-border` | Editor border, toolbar separator |
-| `bg-background` | Editor background |
-| `bg-accent` | Active toolbar button background |
-
-All tokens come from the existing design system defined in `globals.css`.
-
----
-
-## Complete Example: Product Form
-
-### Frontend
-
-```tsx
-"use client";
-
-import { Controller, useForm } from "react-hook-form";
-import { standardSchemaResolver } from "@hookform/resolvers/standard-schema";
-import { TiptapEditor, emptyDoc, type TiptapDoc } from "@/components/shared/tiptap";
-import { useUpdateProductMutation } from "@/features/products/product-api";
-
-type FormValues = {
-  title: string;
-  description: TiptapDoc | null;
-};
-
-export function ProductForm({ product }: { product: Product }) {
-  const [updateProduct] = useUpdateProductMutation();
-
-  const form = useForm<FormValues>({
-    resolver: standardSchemaResolver(schema),
-    defaultValues: {
-      title: product.title,
-      description: product.description ?? emptyDoc,
-    },
-  });
-
-  const onSubmit = async (data: FormValues) => {
-    await updateProduct({
-      id: product.id,
-      ...data,
-    });
-  };
-
-  return (
-    <form onSubmit={form.handleSubmit(onSubmit)}>
-      <input {...form.register("title")} />
-
-      <Controller
-        name="description"
-        control={form.control}
-        render={({ field }) => (
-          <TiptapEditor
-            content={field.value}
-            onChange={field.onChange}
-            placeholder="Write product description..."
-          />
-        )}
-      />
-
-      <button type="submit">Save</button>
-    </form>
-  );
-}
-```
-
-### Backend Migration
-
-```php
-$table->json('description')->nullable();
-```
-
-### Backend Model
-
-```php
-protected function casts(): array
-{
-    return [
-        'description' => 'array',
-    ];
-}
-```
-
-### Backend Request
-
-```php
-'description' => ['nullable', 'array'],
-'description.type' => ['required_with:description', 'string', 'in:doc'],
-'description.content' => ['required_with:description', 'array'],
-```
-
-### Backend Resource
-
-```php
-'description' => $this->description,
-```
-
----
-
-## Do NOT
-
-- Store HTML in the database
-- Use `dangerouslySetInnerHTML` with raw user input
-- Convert JSON → HTML → JSON during editing
-- Install unnecessary Tiptap extensions
-- Create separate API endpoints for Tiptap
-- Put business logic in the editor component
-- Hard-code colors — use design tokens
+| `text-muted-foreground` | Placeholder, blockquotes |
+| `border-border` | Editor border, separators |
+| `bg-accent` | Active toolbar button |
 
 ---
 
@@ -572,9 +267,27 @@ protected function casts(): array
 
 ```
 components/shared/tiptap/
-├── tiptap-extensions.ts    # Extension config + types + emptyDoc
-├── tiptap-editor.tsx       # Interactive editor (client component)
-├── tiptap-toolbar.tsx      # Formatting toolbar
-├── tiptap-content.tsx      # Read-only renderer
-└── index.ts                # Barrel exports
+├── tiptap-extensions.ts     # Extension config + types + emptyDoc
+├── tiptap-editor.tsx        # Interactive editor (fullscreen, focus ring)
+├── tiptap-toolbar.tsx       # Organized toolbar with groups
+├── tiptap-content.tsx       # Client-side read-only renderer
+├── tiptap-link-popover.tsx  # Link insert/edit popover
+├── tiptap-image-dialog.tsx  # Upload-only image dialog
+├── index.ts                 # Barrel exports
+└── TIPTAP.md                # This file
+
+lib/server/
+└── tiptap-render.ts         # Server-side JSON→HTML walker
 ```
+
+---
+
+## Do NOT
+
+- Store HTML in the database
+- Use `generateHTML()` on the server (needs `window.document`)
+- Allow base64 images in Tiptap documents
+- Allow remote image URLs (upload-only)
+- Use `autolink` (users must explicitly insert links)
+- Skip the `ValidTiptapDocument` rule on form requests
+- Trust the frontend Zod schema alone — the server renderer is the final boundary
