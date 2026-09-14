@@ -8,6 +8,7 @@ import {
   TooltipContent,
 } from "@/components/ui/tooltip";
 import { useGetSiteSettingsQuery } from "@/features/settings/settings-api";
+import { useGetPublicPagesQuery } from "@/features/pages/pages-api";
 
 const footerLinks = {
   shop: [
@@ -19,17 +20,15 @@ const footerLinks = {
     { href: "/about", label: "About Us" },
     { href: "/contact", label: "Contact" },
   ],
-  legal: [
-    { href: "/terms", label: "Terms of Service" },
-    { href: "/privacy", label: "Privacy Policy" },
-  ],
 };
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
 
 export function PublicFooter() {
   const { data: settingsData } = useGetSiteSettingsQuery();
+  const { data: pagesData } = useGetPublicPagesQuery();
   const settings = settingsData?.site_settings;
+  const pages = pagesData?.pages ?? [];
 
   const brandName = settings?.brand_name || "Buda Ko Achar";
   const footerDescription = settings?.footer_description || "Handcrafted, traditional Nepali achar made with love. Authentic recipes passed down through generations, bringing the true taste of Nepal to your table.";
@@ -40,7 +39,7 @@ export function PublicFooter() {
     <>
       <footer className="border-t border-gray-800 bg-dark-text py-16 text-gray-400">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 gap-10 md:grid-cols-4">
+          <div className="grid grid-cols-1 gap-10 md:grid-cols-5">
             {/* Brand */}
             <div className="md:col-span-2">
               <Link href="/" className="inline-block">
@@ -84,18 +83,27 @@ export function PublicFooter() {
                     </Link>
                   </li>
                 ))}
-                {footerLinks.legal.map((link) => (
-                  <li key={link.href}>
-                    <Link
-                      href={link.href}
-                      className="text-sm transition hover:text-white"
-                    >
-                      {link.label}
-                    </Link>
-                  </li>
-                ))}
               </ul>
             </div>
+
+            {/* Pages (dynamic) */}
+            {pages.length > 0 && (
+              <div>
+                <h3 className="mb-4 text-sm font-bold text-white">Pages</h3>
+                <ul className="space-y-3">
+                  {pages.map((page) => (
+                    <li key={page.slug}>
+                      <Link
+                        href={`/pages/${page.slug}`}
+                        className="text-sm transition hover:text-white"
+                      >
+                        {page.title}
+                      </Link>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
           </div>
 
           <div className="mt-12 border-t border-gray-800 pt-8 text-center text-sm">

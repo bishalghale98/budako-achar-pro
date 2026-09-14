@@ -106,6 +106,7 @@ Route::get('/categories', [CategoryController::class, 'index']);
 Route::get('/categories/{slug}', [CategoryController::class, 'showBySlug']);
 
 // Public page routes
+Route::get('/pages', [PageController::class, 'index']);
 Route::get('/pages/{slug}', [PageController::class, 'show']);
 
 // Guest cart (public, no auth required)

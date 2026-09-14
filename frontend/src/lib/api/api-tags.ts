@@ -19,5 +19,6 @@ export const tagTypes = [
   "SiteSettings",
   "PaymentSettings",
   "OrderSettings",
+  "PublicPages",
 ] as const;
 export type TagTypes = (typeof tagTypes)[number];
