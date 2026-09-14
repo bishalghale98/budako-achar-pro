@@ -13,7 +13,9 @@ export const emptyDoc: TiptapDoc = {
 
 export function getDefaultExtensions(opts?: { placeholder?: string }): Extensions {
   return [
-    StarterKit,
+    StarterKit.configure({
+      link: false,
+    }),
     Link.configure({
       openOnClick: false,
       HTMLAttributes: {

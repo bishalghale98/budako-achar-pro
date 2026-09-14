@@ -14,6 +14,12 @@ import type {
   PaymentsResponse,
 } from "../order/order-types";
 import type { SalesAnalyticsResponse, DashboardOverviewResponse } from "../dashboard/types";
+import type {
+  Page,
+  AdminPagesResponse,
+  AdminPageResponse,
+  PageFormData,
+} from "../pages/page-types";
 
 interface AdminProductsResponse {
   success: boolean;
@@ -81,7 +87,7 @@ interface AdminCategoryResponse {
 export const adminApi = createApi({
   reducerPath: "adminApi",
   baseQuery: baseQueryWithCsrf,
-  tagTypes: ["AdminProducts", "AdminVariants", "AdminImages", "AdminReviews", "AdminUsers", "AdminCategories", "AdminOrders", "AdminPayments", "AdminAnalytics"],
+  tagTypes: ["AdminProducts", "AdminVariants", "AdminImages", "AdminReviews", "AdminUsers", "AdminCategories", "AdminPages", "AdminOrders", "AdminPayments", "AdminAnalytics"],
   endpoints: (builder) => ({
     // ─── Users ──────────────────────────────────────
     getAdminUsers: builder.query<AdminUsersResponse, void>({
@@ -407,6 +413,64 @@ export const adminApi = createApi({
       invalidatesTags: ["AdminCategories"],
     }),
 
+    // ─── Pages ──────────────────────────────────────
+    getAdminPages: builder.query<
+      AdminPagesResponse,
+      { page?: number; per_page?: number; search?: string; status?: string }
+    >({
+      query: (params) => ({
+        url: "/api/admin/pages",
+        params,
+        headers: { Accept: "application/json" },
+      }),
+      providesTags: ["AdminPages"],
+    }),
+
+    getAdminPage: builder.query<AdminPageResponse, string>({
+      query: (id) => ({
+        url: `/api/admin/pages/${id}`,
+        headers: { Accept: "application/json" },
+      }),
+      providesTags: (_result, _error, id) => [
+        { type: "AdminPages", id },
+      ],
+    }),
+
+    createAdminPage: builder.mutation<AdminPageResponse, PageFormData>({
+      query: (body) => ({
+        url: "/api/admin/pages",
+        method: "POST",
+        body,
+        headers: { Accept: "application/json" },
+      }),
+      invalidatesTags: ["AdminPages"],
+    }),
+
+    updateAdminPage: builder.mutation<
+      AdminPageResponse,
+      { id: string } & Partial<PageFormData>
+    >({
+      query: ({ id, ...body }) => ({
+        url: `/api/admin/pages/${id}`,
+        method: "PUT",
+        body,
+        headers: { Accept: "application/json" },
+      }),
+      invalidatesTags: (_result, _error, { id }) => [
+        "AdminPages",
+        { type: "AdminPages", id },
+      ],
+    }),
+
+    deleteAdminPage: builder.mutation<MessageResponse, string>({
+      query: (id) => ({
+        url: `/api/admin/pages/${id}`,
+        method: "DELETE",
+        headers: { Accept: "application/json" },
+      }),
+      invalidatesTags: ["AdminPages"],
+    }),
+
     // ─── Orders ─────────────────────────────────────
     getAdminOrders: builder.query<
       OrdersResponse,
@@ -559,6 +623,11 @@ export const {
   useCreateAdminCategoryMutation,
   useUpdateAdminCategoryMutation,
   useDeleteAdminCategoryMutation,
+  useGetAdminPagesQuery,
+  useGetAdminPageQuery,
+  useCreateAdminPageMutation,
+  useUpdateAdminPageMutation,
+  useDeleteAdminPageMutation,
   useGetAdminOrdersQuery,
   useGetAdminOrderQuery,
   useUpdateOrderStatusMutation,

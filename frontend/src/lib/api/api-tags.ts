@@ -12,6 +12,7 @@ export const tagTypes = [
   "AdminImages",
   "AdminReviews",
   "AdminUsers",
+  "AdminPages",
   "AdminOrders",
   "AdminPayments",
   "AdminAnalytics",

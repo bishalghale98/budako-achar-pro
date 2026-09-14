@@ -30,6 +30,8 @@ use App\Http\Controllers\Api\Admin\AdminPaymentController;
 use App\Http\Controllers\Api\Admin\AdminSiteSettingsController;
 use App\Http\Controllers\Api\Admin\AdminPaymentSettingsController;
 use App\Http\Controllers\Api\Admin\AdminOrderSettingsController;
+use App\Http\Controllers\Api\Admin\AdminPageController;
+use App\Http\Controllers\Api\PageController;
 use App\Http\Controllers\Api\AddressController;
 use App\Http\Controllers\Api\SiteSettingsController;
 use App\Http\Controllers\Api\PaymentSettingsController;
@@ -102,6 +104,9 @@ Route::get('/products/{slug}/reviews', [ProductController::class, 'reviews']);
 Route::get('/categories', [CategoryController::class, 'index']);
 Route::get('/categories/{slug}', [CategoryController::class, 'showBySlug']);
 
+// Public page routes
+Route::get('/pages/{slug}', [PageController::class, 'show']);
+
 // Guest cart (public, no auth required)
 Route::middleware(StartSession::class)->group(function () {
     Route::get('/cart', [CartController::class, 'index']);
@@ -141,6 +146,9 @@ Route::middleware(['auth:sanctum', 'role:' . Role::Admin->value])->prefix('admin
 
     // Categories
     Route::apiResource('categories', AdminCategoryController::class);
+
+    // Pages
+    Route::apiResource('pages', AdminPageController::class);
 
     // Orders
     Route::get('/orders', [AdminOrderController::class, 'index']);
