@@ -105,12 +105,10 @@ export function TiptapImageDialog({
     setError(null);
 
     try {
-      let src: string;
-      if (onImageUpload) {
-        src = await onImageUpload(file);
-      } else {
-        src = URL.createObjectURL(file);
+      if (!onImageUpload) {
+        throw new Error("Image upload is not configured");
       }
+      const src = await onImageUpload(file);
       onInsert(src, alt.trim());
       handleOpenChange(false);
     } catch {

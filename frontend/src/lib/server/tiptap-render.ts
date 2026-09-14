@@ -42,6 +42,12 @@ function isSafeUrl(url: string): boolean {
   return true;
 }
 
+function isPageImageUrl(url: string): boolean {
+  if (url.startsWith("/storage/pages/")) return true;
+  if (/^https?:\/\/[^/]+\/storage\/pages\//.test(url)) return true;
+  return false;
+}
+
 function renderMarks(text: string, marks?: JSONContent["marks"]): string {
   if (!marks) return escapeHtml(text);
 
@@ -121,7 +127,7 @@ function renderNodes(nodes?: JSONContent[]): string {
         }
         case "image": {
           const src = (node.attrs?.src as string) || "";
-          if (!src || !isSafeUrl(src)) return "";
+          if (!src || !isPageImageUrl(src)) return "";
           const alt = escapeHtml((node.attrs?.alt as string) || "");
           const title = node.attrs?.title
             ? ` title="${escapeHtml(String(node.attrs.title))}"`

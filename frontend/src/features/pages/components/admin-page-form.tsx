@@ -1,12 +1,13 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import { standardSchemaResolver } from "@hookform/resolvers/standard-schema";
 import { useRouter } from "next/navigation";
 import {
   useCreateAdminPageMutation,
   useUpdateAdminPageMutation,
+  useCreateAdminPageImageMutation,
 } from "@/features/admin/admin-api";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -46,6 +47,7 @@ export default function AdminPageForm({ initialData }: AdminPageFormProps) {
     useCreateAdminPageMutation();
   const [updatePage, { isLoading: isUpdating }] =
     useUpdateAdminPageMutation();
+  const [uploadPageImage] = useCreateAdminPageImageMutation();
 
   const {
     register,
@@ -93,6 +95,22 @@ export default function AdminPageForm({ initialData }: AdminPageFormProps) {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     setValue("content", json as any, { shouldValidate: false });
   };
+
+  const handleImageUpload = useCallback(
+    async (file: File): Promise<string> => {
+      if (!initialData?.id) {
+        throw new Error("Save the page before adding images.");
+      }
+      const formData = new FormData();
+      formData.append("image", file);
+      const result = await uploadPageImage({
+        pageId: initialData.id,
+        formData,
+      }).unwrap();
+      return result.image_url;
+    },
+    [initialData?.id, uploadPageImage]
+  );
 
   const onSubmit = async (data: PageFormValues) => {
     try {
@@ -339,6 +357,7 @@ export default function AdminPageForm({ initialData }: AdminPageFormProps) {
             <TiptapEditor
               content={contentValue as TiptapDoc | null}
               onChange={handleContentChange}
+              onImageUpload={isEditing ? handleImageUpload : undefined}
               placeholder="Start writing your page content..."
               className="min-h-[300px]"
             />

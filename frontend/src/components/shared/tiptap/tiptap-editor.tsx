@@ -74,11 +74,10 @@ export function TiptapEditor({
 
   const handleImageUpload = useCallback(
     async (file: File): Promise<string> => {
-      if (onImageUpload) {
-        return onImageUpload(file);
+      if (!onImageUpload) {
+        throw new Error("Image upload is not configured");
       }
-      // Fallback: create local preview URL (for non-page contexts)
-      return URL.createObjectURL(file);
+      return onImageUpload(file);
     },
     [onImageUpload]
   );

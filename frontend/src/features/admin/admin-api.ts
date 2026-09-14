@@ -45,6 +45,19 @@ interface AdminImagesResponse {
   images: ProductImage[];
 }
 
+interface AdminPageImageResponse {
+  success: boolean;
+  message: string;
+  image_url: string;
+  image: {
+    id: string;
+    image_url: string;
+    original_name: string | null;
+    mime_type: string | null;
+    size: number | null;
+  };
+}
+
 interface AdminReviewsResponse {
   success: boolean;
   reviews: ProductReview[];
@@ -471,6 +484,20 @@ export const adminApi = createApi({
       invalidatesTags: ["AdminPages"],
     }),
 
+    // ─── Page Images ────────────────────────────────
+    createAdminPageImage: builder.mutation<
+      AdminPageImageResponse,
+      { pageId: string; formData: FormData }
+    >({
+      query: ({ pageId, formData }) => ({
+        url: `/api/admin/pages/${pageId}/images`,
+        method: "POST",
+        body: formData,
+        headers: { Accept: "application/json" },
+      }),
+      invalidatesTags: ["AdminPages"],
+    }),
+
     // ─── Orders ─────────────────────────────────────
     getAdminOrders: builder.query<
       OrdersResponse,
@@ -628,6 +655,7 @@ export const {
   useCreateAdminPageMutation,
   useUpdateAdminPageMutation,
   useDeleteAdminPageMutation,
+  useCreateAdminPageImageMutation,
   useGetAdminOrdersQuery,
   useGetAdminOrderQuery,
   useUpdateOrderStatusMutation,

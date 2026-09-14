@@ -258,7 +258,8 @@ export function TiptapToolbar({
         </ToolbarButton>
         <ToolbarButton
           onClick={() => setImageDialogOpen(true)}
-          tooltip="Insert Image"
+          disabled={!onImageUpload}
+          tooltip={onImageUpload ? "Insert Image" : "Save the page before adding images"}
         >
           <ImageIcon className="size-3.5" />
         </ToolbarButton>
