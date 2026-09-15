@@ -214,9 +214,9 @@ class AdminDashboardController extends Controller
         $settings = SiteSetting::instance();
 
         $points = match ($period) {
-            'daily' => $this->dailySales($now),
-            'weekly' => $this->weeklySales($now),
-            'monthly' => $this->monthlySales($now),
+            'daily' => $this->dailySales($now, $timezone),
+            'weekly' => $this->weeklySales($now, $timezone),
+            'monthly' => $this->monthlySales($now, $timezone),
         };
 
         $totalSales = array_sum(array_column($points, 'sales'));
@@ -236,39 +236,46 @@ class AdminDashboardController extends Controller
         ]);
     }
 
-    private function dailySales(Carbon $now): array
+    private function dailySales(Carbon $now, string $timezone = 'Asia/Kathmandu'): array
     {
         $startDate = (clone $now)->subDays(29)->startOfDay();
         $endDate = (clone $now)->endOfDay();
 
         $rows = DB::table('orders')
             ->where('status', 'delivered')
-            ->where('created_at', '>=', $startDate->startOfDay()->timezone('UTC'))
-            ->where('created_at', '<=', $endDate->timezone('UTC'))
-            ->selectRaw('DATE(created_at) as date_key, COUNT(*) as orders, SUM(total) as sales')
-            ->groupBy('date_key')
+            ->where('created_at', '>=', (clone $startDate)->timezone('UTC'))
+            ->where('created_at', '<=', (clone $endDate)->timezone('UTC'))
+            ->select('created_at', 'total')
             ->get();
 
-        $indexed = collect($rows)->keyBy('date_key');
+        $grouped = [];
+        foreach ($rows as $row) {
+            $dateKey = Carbon::parse($row->created_at, 'UTC')->timezone($timezone)->format('Y-m-d');
+            if (!isset($grouped[$dateKey])) {
+                $grouped[$dateKey] = ['sales' => 0.0, 'orders' => 0];
+            }
+            $grouped[$dateKey]['sales'] += (float) $row->total;
+            $grouped[$dateKey]['orders'] += 1;
+        }
 
         $points = [];
         for ($i = 0; $i < 30; $i++) {
             $date = (clone $now)->subDays(29 - $i);
             $key = $date->format('Y-m-d');
-            $row = $indexed->get($key);
+            $bucket = $grouped[$key] ?? ['sales' => 0.0, 'orders' => 0];
 
             $points[] = [
                 'label' => $date->format('M d'),
                 'date' => $key,
-                'sales' => $row ? (float) $row->sales : 0,
-                'orders' => $row ? (int) $row->orders : 0,
+                'sales' => round((float) $bucket['sales'], 2),
+                'orders' => (int) $bucket['orders'],
             ];
         }
 
         return $points;
     }
 
-    private function weeklySales(Carbon $now): array
+    private function weeklySales(Carbon $now, string $timezone = 'Asia/Kathmandu'): array
     {
         $weeks = [];
         for ($i = 11; $i >= 0; $i--) {
@@ -279,47 +286,47 @@ class AdminDashboardController extends Controller
                 'end' => $weekEnd,
                 'label' => $weekStart->format('M d') . ' - ' . $weekEnd->format('M d'),
                 'date' => $weekStart->format('Y-m-d'),
+                'sales' => 0.0,
+                'orders' => 0,
             ];
         }
 
-        $firstStart = $weeks[0]['start']->timezone('UTC');
-        $lastEnd = end($weeks)['end']->timezone('UTC');
+        $firstStart = (clone $weeks[0]['start'])->timezone('UTC');
+        $lastEnd = (clone end($weeks)['end'])->timezone('UTC');
 
         $rows = DB::table('orders')
             ->where('status', 'delivered')
             ->where('created_at', '>=', $firstStart)
             ->where('created_at', '<=', $lastEnd)
-            ->selectRaw('DATE(created_at) as date_key, COUNT(*) as orders, SUM(total) as sales')
-            ->groupBy('date_key')
+            ->select('created_at', 'total')
             ->get();
+
+        foreach ($rows as $row) {
+            $orderTime = Carbon::parse($row->created_at, 'UTC')->timezone($timezone);
+            foreach ($weeks as &$week) {
+                if ($orderTime->betweenIncluded($week['start'], $week['end'])) {
+                    $week['orders'] += 1;
+                    $week['sales'] += (float) $row->total;
+                    break;
+                }
+            }
+            unset($week);
+        }
 
         $points = [];
         foreach ($weeks as $week) {
-            $weekStartDate = $week['start']->timezone('UTC')->format('Y-m-d');
-            $weekEndDate = $week['end']->timezone('UTC')->format('Y-m-d');
-
-            $weekOrders = 0;
-            $weekSales = 0;
-
-            foreach ($rows as $row) {
-                if ($row->date_key >= $weekStartDate && $row->date_key <= $weekEndDate) {
-                    $weekOrders += (int) $row->orders;
-                    $weekSales += (float) $row->sales;
-                }
-            }
-
             $points[] = [
                 'label' => $week['label'],
                 'date' => $week['date'],
-                'sales' => $weekSales,
-                'orders' => $weekOrders,
+                'sales' => round((float) $week['sales'], 2),
+                'orders' => (int) $week['orders'],
             ];
         }
 
         return $points;
     }
 
-    private function monthlySales(Carbon $now): array
+    private function monthlySales(Carbon $now, string $timezone = 'Asia/Kathmandu'): array
     {
         $months = [];
         for ($i = 11; $i >= 0; $i--) {
@@ -330,40 +337,40 @@ class AdminDashboardController extends Controller
                 'end' => $monthEnd,
                 'label' => $monthStart->format('M Y'),
                 'date' => $monthStart->format('Y-m-d'),
+                'sales' => 0.0,
+                'orders' => 0,
             ];
         }
 
-        $firstStart = $months[0]['start']->timezone('UTC');
-        $lastEnd = end($months)['end']->timezone('UTC');
+        $firstStart = (clone $months[0]['start'])->timezone('UTC');
+        $lastEnd = (clone end($months)['end'])->timezone('UTC');
 
         $rows = DB::table('orders')
             ->where('status', 'delivered')
             ->where('created_at', '>=', $firstStart)
             ->where('created_at', '<=', $lastEnd)
-            ->selectRaw('DATE(created_at) as date_key, COUNT(*) as orders, SUM(total) as sales')
-            ->groupBy('date_key')
+            ->select('created_at', 'total')
             ->get();
+
+        foreach ($rows as $row) {
+            $orderTime = Carbon::parse($row->created_at, 'UTC')->timezone($timezone);
+            foreach ($months as &$month) {
+                if ($orderTime->betweenIncluded($month['start'], $month['end'])) {
+                    $month['orders'] += 1;
+                    $month['sales'] += (float) $row->total;
+                    break;
+                }
+            }
+            unset($month);
+        }
 
         $points = [];
         foreach ($months as $month) {
-            $monthStartDate = $month['start']->timezone('UTC')->format('Y-m-d');
-            $monthEndDate = $month['end']->timezone('UTC')->format('Y-m-d');
-
-            $monthOrders = 0;
-            $monthSales = 0;
-
-            foreach ($rows as $row) {
-                if ($row->date_key >= $monthStartDate && $row->date_key <= $monthEndDate) {
-                    $monthOrders += (int) $row->orders;
-                    $monthSales += (float) $row->sales;
-                }
-            }
-
             $points[] = [
                 'label' => $month['label'],
                 'date' => $month['date'],
-                'sales' => $monthSales,
-                'orders' => $monthOrders,
+                'sales' => round((float) $month['sales'], 2),
+                'orders' => (int) $month['orders'],
             ];
         }
 

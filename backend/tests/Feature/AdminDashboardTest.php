@@ -176,6 +176,35 @@ class AdminDashboardTest extends TestCase
         $this->assertCount(12, $points);
     }
 
+    public function test_weekly_sales_does_not_double_count_boundary_orders(): void
+    {
+        \Illuminate\Support\Carbon::setTestNow('2026-09-15 17:00:00');
+
+        $this->createDeliveredOrder('350.00', '2026-09-13 14:00:00');
+
+        $daily = $this->actingAs($this->admin, 'sanctum')
+            ->getJson('/api/admin/dashboard/analytics/sales?period=daily');
+        $weekly = $this->actingAs($this->admin, 'sanctum')
+            ->getJson('/api/admin/dashboard/analytics/sales?period=weekly');
+        $monthly = $this->actingAs($this->admin, 'sanctum')
+            ->getJson('/api/admin/dashboard/analytics/sales?period=monthly');
+
+        \Illuminate\Support\Carbon::setTestNow();
+
+        $daily->assertOk();
+        $weekly->assertOk();
+        $monthly->assertOk();
+
+        $this->assertEquals(350.0, $daily->json('summary.total_sales'));
+        $this->assertEquals(1, $daily->json('summary.total_orders'));
+
+        $this->assertEquals(350.0, $weekly->json('summary.total_sales'));
+        $this->assertEquals(1, $weekly->json('summary.total_orders'));
+
+        $this->assertEquals(350.0, $monthly->json('summary.total_sales'));
+        $this->assertEquals(1, $monthly->json('summary.total_orders'));
+    }
+
     public function test_monthly_sales_returns_12_months(): void
     {
         $this->createDeliveredOrder('5000.00', '2026-05-15 10:00:00');
