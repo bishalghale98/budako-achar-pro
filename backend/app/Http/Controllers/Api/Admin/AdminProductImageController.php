@@ -52,7 +52,7 @@ class AdminProductImageController extends Controller
         if ($isThumbnail) {
             $this->productService->setThumbnail($product, $image);
         } else {
-            $this->ensureThumbnail($product);
+            $this->productService->ensureThumbnail($product);
         }
 
         return response()->json([
@@ -130,15 +130,5 @@ class AdminProductImageController extends Controller
             'success' => true,
             'message' => 'Thumbnail updated successfully.',
         ]);
-    }
-
-    protected function ensureThumbnail(Product $product): void
-    {
-        if (! $product->images()->where('is_thumbnail', true)->exists()) {
-            $firstImage = $product->images()->orderBy('sort_order')->first();
-            if ($firstImage) {
-                $firstImage->update(['is_thumbnail' => true]);
-            }
-        }
     }
 }

@@ -16,8 +16,8 @@ class ProductReviewResource extends JsonResource
             'comment' => $this->comment,
             'status' => $this->status->value,
             'user' => [
-                'id' => $this->user->id,
-                'name' => $this->user->name,
+                'id' => $this->user?->id,
+                'name' => $this->user?->name,
             ],
             'created_at' => $this->created_at->toISOString(),
             'updated_at' => $this->updated_at->toISOString(),

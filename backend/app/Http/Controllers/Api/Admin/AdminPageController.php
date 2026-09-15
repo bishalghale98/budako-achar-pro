@@ -21,7 +21,7 @@ class AdminPageController extends Controller
     {
         $pages = Page::query()
             ->when($request->status, fn ($q, $status) => $q->where('status', $status))
-            ->when($request->search, fn ($q, $search) => $q->where('title', 'like', "%{$search}%"))
+            ->when($request->search, fn ($q, $search) => $q->where('title', 'like', '%' . $this->escapeLike($search) . '%'))
             ->orderByDesc('created_at')
             ->paginate($request->per_page ?? 20);
 

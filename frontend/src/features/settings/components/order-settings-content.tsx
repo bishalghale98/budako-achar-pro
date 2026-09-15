@@ -61,8 +61,11 @@ export function OrderSettingsContent() {
       }).unwrap();
       setSuccess(true);
       setTimeout(() => setSuccess(false), 3000);
-    } catch (err: any) {
-      setError(err?.data?.message || "Failed to update order settings.");
+    } catch (err: unknown) {
+      const message = (err && typeof err === "object" && "data" in err)
+        ? String((err.data as Record<string, unknown>)?.message ?? "Failed to update order settings.")
+        : "Failed to update order settings.";
+      setError(message);
     }
   };
 

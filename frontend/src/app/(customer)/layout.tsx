@@ -2,11 +2,12 @@
 
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { useUser } from "@/features/auth/auth-hooks";
+import { useEffect } from "react";
+import { useAuth, useUser } from "@/features/auth/auth-hooks";
 import { useLogoutMutation } from "@/features/auth/auth-api";
 import { PublicHeader } from "@/components/layout/public-header";
 import { PublicFooter } from "@/components/layout/public-footer";
-import { LayoutDashboard, ClipboardList, MapPin, User, Heart, LogOut, Shield } from "lucide-react";
+import { LayoutDashboard, ClipboardList, MapPin, User, LogOut, Shield } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import CustomerLoading from "./customer/loading";
 
@@ -37,8 +38,15 @@ const sidebarNav = [
 function DashboardLayoutContent({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const router = useRouter();
+  const { status } = useAuth();
   const user = useUser();
   const [logoutApi] = useLogoutMutation();
+
+  useEffect(() => {
+    if (status === "unauthenticated") {
+      router.replace("/login");
+    }
+  }, [status, router]);
 
   if (!user) return <CustomerLoading />;
 

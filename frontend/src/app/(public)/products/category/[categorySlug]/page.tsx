@@ -8,6 +8,7 @@ import { ProductListSkeleton } from "@/components/products/product-list-skeleton
 import { Pagination } from "@/components/products/pagination";
 import { Suspense } from "react";
 import { getSiteSettingsForMetadata } from "@/lib/server/site-settings";
+import { SITE_URL } from "@/lib/constants";
 
 interface Props {
   params: Promise<{ categorySlug: string }>;
@@ -26,7 +27,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const siteName = settings?.brand_name || "Buda Ko Achar";
   const title = `${category.name} | Nepali Achar Collection`;
   const description = `Browse our collection of authentic ${category.name.toLowerCase()} made with traditional Nepali recipes.`;
-  const url = `${process.env.NEXT_PUBLIC_SITE_URL || "https://budaachar.com"}/products/category/${categorySlug}`;
+  const url = `${SITE_URL}/products/category/${categorySlug}`;
 
   return {
     title,

@@ -1,24 +1,6 @@
 import { z } from "zod";
 
-// --- URL Safety ---
-
-const SAFE_PROTOCOLS = ["http:", "https:", "mailto:", "tel:"];
-
-function isSafeUrl(url: string): boolean {
-  const lower = url.toLowerCase().trim();
-  if (
-    lower.startsWith("javascript:") ||
-    lower.startsWith("data:") ||
-    lower.startsWith("vbscript:") ||
-    lower.startsWith("file:")
-  ) {
-    return false;
-  }
-  if (url.startsWith("/") || url.startsWith("#")) return true;
-  return SAFE_PROTOCOLS.some((p) => lower.startsWith(p));
-}
-
-// --- Marks ---
+// --- Tiptap Document Schema ---
 
 const markSchema = z.object({
   type: z.enum(["bold", "italic", "strike", "underline", "code", "link"]),

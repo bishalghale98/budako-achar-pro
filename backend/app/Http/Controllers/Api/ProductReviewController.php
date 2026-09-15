@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Enums\ReviewStatus;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Api\Product\StoreProductReviewRequest;
 use App\Http\Requests\Api\Product\UpdateProductReviewRequest;
@@ -63,7 +64,7 @@ class ProductReviewController extends Controller
 
         $review->update($request->validated());
 
-        if ($review->status->value === 'approved') {
+        if ($review->status === ReviewStatus::Approved) {
             $this->ratingService->recalculate($product);
         }
 

@@ -4,12 +4,9 @@ namespace App\Policies;
 
 use App\Models\ProductReview;
 use App\Models\User;
-use Illuminate\Auth\Access\HandlesAuthorization;
 
 class ProductReviewPolicy
 {
-    use HandlesAuthorization;
-
     public function viewAny(User $user): bool
     {
         return $user->isAdmin();

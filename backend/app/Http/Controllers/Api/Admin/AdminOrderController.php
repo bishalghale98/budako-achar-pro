@@ -25,7 +25,7 @@ class AdminOrderController extends Controller
         }
 
         if ($request->filled('search')) {
-            $search = $request->input('search');
+            $search = $this->escapeLike($request->input('search'));
             $query->where(function ($q) use ($search) {
                 $q->where('order_number', 'like', "%{$search}%")
                   ->orWhere('customer_name', 'like', "%{$search}%")

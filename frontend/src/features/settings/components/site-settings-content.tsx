@@ -123,8 +123,11 @@ export function SiteSettingsContent() {
       await updateSettings(formData).unwrap();
       setSuccess(true);
       setTimeout(() => setSuccess(false), 3000);
-    } catch (err: any) {
-      setError(err?.data?.message || "Failed to update settings.");
+    } catch (err: unknown) {
+      const message = (err && typeof err === "object" && "data" in err)
+        ? String((err.data as Record<string, unknown>)?.message ?? "Failed to update settings.")
+        : "Failed to update settings.";
+      setError(message);
     }
   };
 

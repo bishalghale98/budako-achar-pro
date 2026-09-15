@@ -38,7 +38,6 @@ export function PaymentSettingsContent() {
     register,
     handleSubmit,
     reset,
-    formState: { errors },
   } = useForm<PaymentSettingsFormValues>({
     defaultValues: {
       digital_payment_account_name: "",
@@ -86,8 +85,11 @@ export function PaymentSettingsContent() {
       await updateSettings(formData).unwrap();
       setSuccess(true);
       setTimeout(() => setSuccess(false), 3000);
-    } catch (err: any) {
-      setError(err?.data?.message || "Failed to update payment settings.");
+    } catch (err: unknown) {
+      const message = (err && typeof err === "object" && "data" in err)
+        ? String((err.data as Record<string, unknown>)?.message ?? "Failed to update payment settings.")
+        : "Failed to update payment settings.";
+      setError(message);
     }
   };
 

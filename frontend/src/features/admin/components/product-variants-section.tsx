@@ -1,6 +1,6 @@
 "use client";
 
-import type { UseFormRegister, FieldErrors, UseFieldArrayReturn, Control, ControllerRenderProps } from "react-hook-form";
+import type { UseFormRegister, FieldErrors, UseFieldArrayReturn, Control } from "react-hook-form";
 import { Controller } from "react-hook-form";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";

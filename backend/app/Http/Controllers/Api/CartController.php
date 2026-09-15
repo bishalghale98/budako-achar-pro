@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers\Api;
 
-use App\Exceptions\CartItemException;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\CartResource;
 use App\Services\CartService;

@@ -3,13 +3,11 @@ import { notFound } from "next/navigation";
 import { getPageBySlug } from "@/lib/server/page";
 import { renderTiptapContent } from "@/lib/server/tiptap-render";
 import { AppBreadcrumb } from "@/components/shared";
+import { SITE_URL } from "@/lib/constants";
 
 interface Props {
   params: Promise<{ slug: string }>;
 }
-
-const SITE_URL =
-  process.env.NEXT_PUBLIC_SITE_URL || "https://yourdomain.com";
 
 async function getPage(slug: string) {
   try {
@@ -50,9 +48,6 @@ export default async function PublicPage({ params }: Props) {
   const page = await getPage(slug);
 
   const { html, className } = renderTiptapContent(page.content);
-
-  const canonicalUrl =
-    page.canonical_url || `${SITE_URL}/pages/${page.slug}`;
 
   return (
     <main className="mx-auto max-w-4xl px-4 py-12 sm:px-6 lg:px-8">

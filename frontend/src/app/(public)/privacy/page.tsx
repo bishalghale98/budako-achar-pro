@@ -4,9 +4,7 @@ import { renderTiptapContent } from "@/lib/server/tiptap-render";
 import { PolicyContent } from "@/components/shared";
 import { privacyData } from "@/data/policies";
 import type { Page } from "@/features/pages/page-types";
-
-const SITE_URL =
-  process.env.NEXT_PUBLIC_SITE_URL || "https://yourdomain.com";
+import { SITE_URL } from "@/lib/constants";
 
 async function fetchCmsPage(): Promise<Page | null> {
   try {

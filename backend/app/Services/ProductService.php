@@ -72,7 +72,7 @@ class ProductService
         }
     }
 
-    protected function ensureThumbnail(Product $product): void
+    public function ensureThumbnail(Product $product): void
     {
         if (! $product->images()->where('is_thumbnail', true)->exists()) {
             $firstImage = $product->images()->orderBy('sort_order')->first();

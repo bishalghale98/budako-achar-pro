@@ -14,7 +14,7 @@ class AdminCategoryController extends Controller
     public function index(Request $request): JsonResponse
     {
         $categories = Category::withCount('products')
-            ->when($request->search, fn ($q, $search) => $q->where('name', 'like', "%{$search}%"))
+            ->when($request->search, fn ($q, $search) => $q->where('name', 'like', '%' . $this->escapeLike($search) . '%'))
             ->orderBy('name')
             ->paginate($request->per_page ?? 20);
 

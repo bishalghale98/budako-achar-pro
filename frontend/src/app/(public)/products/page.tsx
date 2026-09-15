@@ -3,13 +3,14 @@ import { PageHeader } from "@/components/shared";
 import { ProductList } from "@/components/products/product-list";
 import { Metadata } from "next";
 import { getSiteSettingsForMetadata } from "@/lib/server/site-settings";
+import { SITE_URL } from "@/lib/constants";
 
 export async function generateMetadata(): Promise<Metadata> {
   const settings = await getSiteSettingsForMetadata();
   const siteName = settings?.brand_name || "Buda Ko Achar";
   const title = `Our Achar Collection | Traditional Nepali Achar`;
   const description = `Discover our collection of traditional Nepali achar made with authentic spices. Handcrafted and delivered fresh.`;
-  const url = `${process.env.NEXT_PUBLIC_SITE_URL || "https://budaachar.com"}/products`;
+  const url = `${SITE_URL}/products`;
 
   return {
     title,

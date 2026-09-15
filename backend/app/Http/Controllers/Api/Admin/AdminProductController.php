@@ -24,7 +24,7 @@ class AdminProductController extends Controller
             ->when($request->category_id, fn ($q, $categoryId) => $q->where('category_id', $categoryId))
             ->when($request->featured !== null, fn ($q, $featured) => $q->where('featured', $featured))
             ->when($request->status, fn ($q, $status) => $q->where('status', $status))
-            ->when($request->search, fn ($q, $search) => $q->where('title', 'like', "%{$search}%"))
+            ->when($request->search, fn ($q, $search) => $q->where('title', 'like', '%' . $this->escapeLike($search) . '%'))
             ->orderByDesc('created_at')
             ->paginate($request->per_page ?? 20);
 

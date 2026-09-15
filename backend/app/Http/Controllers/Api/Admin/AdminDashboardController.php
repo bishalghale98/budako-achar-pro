@@ -13,9 +13,14 @@ use Illuminate\Support\Facades\DB;
 
 class AdminDashboardController extends Controller
 {
+    private function getTimezone(): string
+    {
+        return SiteSetting::instance()->timezone ?? 'Asia/Kathmandu';
+    }
+
     public function overview(): JsonResponse
     {
-        $timezone = 'Asia/Kathmandu';
+        $timezone = $this->getTimezone();
         $now = Carbon::now($timezone);
         $todayDate = $now->format('M d, Y');
 
@@ -209,7 +214,7 @@ class AdminDashboardController extends Controller
             'period' => 'required|string|in:daily,weekly,monthly',
         ])['period'];
 
-        $timezone = 'Asia/Kathmandu';
+        $timezone = $this->getTimezone();
         $now = Carbon::now($timezone);
         $settings = SiteSetting::instance();
 

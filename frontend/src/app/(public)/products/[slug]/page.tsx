@@ -4,13 +4,11 @@ import { getProductBySlug } from "@/lib/server/product";
 import { ProductGallery } from "@/components/product-details";
 import { AppBreadcrumb } from "@/components/shared";
 import { ProductDetailsClient } from "./product-details-client";
+import { SITE_URL } from "@/lib/constants";
 
 interface Props {
   params: Promise<{ slug: string }>;
 }
-
-const SITE_URL =
-  process.env.NEXT_PUBLIC_SITE_URL || "https://yourdomain.com";
 
 async function getProduct(slug: string) {
   try {

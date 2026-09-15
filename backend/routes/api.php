@@ -113,12 +113,12 @@ Route::get('/pages/{slug}', [PageController::class, 'show']);
 Route::middleware(StartSession::class)->group(function () {
     Route::get('/cart', [CartController::class, 'index']);
     Route::delete('/cart', [CartController::class, 'destroy']);
-    Route::post('/cart/items', [CartItemController::class, 'store']);
-    Route::patch('/cart/items/{cartItem}', [CartItemController::class, 'update']);
+    Route::post('/cart/items', [CartItemController::class, 'store'])->middleware('throttle:cart');
+    Route::patch('/cart/items/{cartItem}', [CartItemController::class, 'update'])->middleware('throttle:cart');
     Route::delete('/cart/items/{cartItem}', [CartItemController::class, 'destroy']);
 
     // Guest checkout
-    Route::post('/orders', [OrderController::class, 'store']);
+    Route::post('/orders', [OrderController::class, 'store'])->middleware('throttle:checkout');
 });
 
 // Admin routes
@@ -126,7 +126,7 @@ Route::middleware(['auth:sanctum', 'role:' . Role::Admin->value])->prefix('admin
     Route::get('/users', function () {
         return response()->json([
             'success' => true,
-            'users' => User::all()->only(['id', 'name', 'email', 'role', 'email_verified_at', 'created_at']),
+            'users' => User::select('id', 'name', 'email', 'role', 'email_verified_at', 'created_at')->get(),
         ]);
     });
 

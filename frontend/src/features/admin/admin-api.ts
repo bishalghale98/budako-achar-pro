@@ -15,7 +15,6 @@ import type {
 } from "../order/order-types";
 import type { SalesAnalyticsResponse, DashboardOverviewResponse } from "../dashboard/types";
 import type {
-  Page,
   AdminPagesResponse,
   AdminPageResponse,
   PageFormData,

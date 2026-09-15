@@ -17,7 +17,7 @@ class ProductController extends Controller
             ->where('products.status', 'active')
             ->when($request->category_id, fn ($q, $categoryId) => $q->where('category_id', $categoryId))
             ->when($request->featured !== null, fn ($q, $featured) => $q->where('featured', $featured))
-            ->when($request->search, fn ($q, $search) => $q->where('title', 'like', "%{$search}%"))
+            ->when($request->search, fn ($q, $search) => $q->where('title', 'like', '%' . $this->escapeLike($search) . '%'))
             ->when(
                 $request->sort,
                 fn ($q, $sort) => match ($sort) {

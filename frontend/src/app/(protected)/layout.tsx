@@ -9,7 +9,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 
 function DashboardGuard({ children }: { children: React.ReactNode }) {
   const router = useRouter();
-  const { status } = useAuth();
+  const { status, user } = useAuth();
   const timer = useRef<NodeJS.Timeout | null>(null);
   const [mounted, setMounted] = useState(false);
 
@@ -20,8 +20,10 @@ function DashboardGuard({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     if (status === "unauthenticated") {
       router.replace("/login");
+    } else if (status === "authenticated" && user?.role !== "admin") {
+      router.replace("/customer");
     }
-  }, [status, router]);
+  }, [status, user, router]);
 
   useEffect(() => {
     if (status !== "authenticated") {
@@ -34,7 +36,7 @@ function DashboardGuard({ children }: { children: React.ReactNode }) {
     };
   }, [status, router]);
 
-  if (mounted && status === "authenticated") {
+  if (mounted && status === "authenticated" && user?.role === "admin") {
     return <>{children}</>;
   }
 
