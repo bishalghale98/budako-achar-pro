@@ -14,7 +14,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useUser } from "@/features/auth/auth-hooks";
 import { useLogoutMutation } from "@/features/auth/auth-api";
 import { useRouter } from "next/navigation";
@@ -95,15 +95,14 @@ function SidebarNav({
 }) {
   const pathname = usePathname();
 
-  const [openGroups, setOpenGroups] = useState<Record<string, boolean>>(() => {
-    if (typeof window === "undefined") return {};
+  const [openGroups, setOpenGroups] = useState<Record<string, boolean>>({});
+
+  useEffect(() => {
     try {
       const stored = localStorage.getItem("admin-sidebar");
-      return stored ? JSON.parse(stored) : {};
-    } catch {
-      return {};
-    }
-  });
+      if (stored) setOpenGroups(JSON.parse(stored));
+    } catch {}
+  }, []);
 
   const toggleGroup = (label: string) => {
     setOpenGroups((prev) => {
